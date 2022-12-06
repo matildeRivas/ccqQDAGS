@@ -1,0 +1,1 @@
+/usr/bin/g++  -g   CMakeFiles/ex.dir/external/sdsl-lite/tutorial/expl-04.cpp.o  -o ex  ../external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a ../external/sdsl-lite/build/lib/libsdsl.a ../external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a 

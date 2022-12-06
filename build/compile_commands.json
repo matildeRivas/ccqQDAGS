@@ -1,0 +1,17 @@
+[
+{
+  "directory": "/home/mati/Documents/ccqQDAGS/build",
+  "command": "/usr/bin/g++   -I/home/mati/Documents/ccqQDAGS/includes -I/home/mati/Documents/ccqQDAGS/external/sdsl-lite/include -I/home/mati/Documents/ccqQDAGS/external/sdsl-lite/build/external/libdivsufsort/include -I/home/mati/Documents/ccqQDAGS/src  -g   -std=gnu++14 -o CMakeFiles/ex.dir/external/sdsl-lite/tutorial/expl-04.cpp.o -c /home/mati/Documents/ccqQDAGS/external/sdsl-lite/tutorial/expl-04.cpp",
+  "file": "/home/mati/Documents/ccqQDAGS/external/sdsl-lite/tutorial/expl-04.cpp"
+},
+{
+  "directory": "/home/mati/Documents/ccqQDAGS/build",
+  "command": "/usr/bin/g++   -I/home/mati/Documents/ccqQDAGS/includes -I/home/mati/Documents/ccqQDAGS/external/sdsl-lite/include -I/home/mati/Documents/ccqQDAGS/external/sdsl-lite/build/external/libdivsufsort/include -I/home/mati/Documents/ccqQDAGS/src  -g   -std=gnu++14 -o CMakeFiles/ccq_qdags.dir/queries/join_test.cpp.o -c /home/mati/Documents/ccqQDAGS/queries/join_test.cpp",
+  "file": "/home/mati/Documents/ccqQDAGS/queries/join_test.cpp"
+},
+{
+  "directory": "/home/mati/Documents/ccqQDAGS/build",
+  "command": "/usr/bin/g++   -I/home/mati/Documents/ccqQDAGS/includes -I/home/mati/Documents/ccqQDAGS/external/sdsl-lite/include -I/home/mati/Documents/ccqQDAGS/external/sdsl-lite/build/external/libdivsufsort/include -I/home/mati/Documents/ccqQDAGS/src  -g   -std=gnu++14 -o CMakeFiles/qdags.dir/queries/j3.cpp.o -c /home/mati/Documents/ccqQDAGS/queries/j3.cpp",
+  "file": "/home/mati/Documents/ccqQDAGS/queries/j3.cpp"
+}
+]

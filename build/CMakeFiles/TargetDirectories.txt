@@ -1,0 +1,5 @@
+/home/mati/Documents/ccqQDAGS/build/CMakeFiles/rebuild_cache.dir
+/home/mati/Documents/ccqQDAGS/build/CMakeFiles/edit_cache.dir
+/home/mati/Documents/ccqQDAGS/build/CMakeFiles/ex.dir
+/home/mati/Documents/ccqQDAGS/build/CMakeFiles/ccq_qdags.dir
+/home/mati/Documents/ccqQDAGS/build/CMakeFiles/qdags.dir
