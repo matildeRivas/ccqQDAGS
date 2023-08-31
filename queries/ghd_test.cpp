@@ -6,7 +6,7 @@
 using namespace std::chrono;
 
 
-#include "../src/joins.cpp"
+//#include "../src/joins.cpp"
 #include "../includes/ghd.hpp"
 
 high_resolution_clock::time_point start_select, stop_select;
@@ -17,7 +17,8 @@ duration<double> time_span_select;
 #define AT_X2 1
 #define AT_X3 2
 #define AT_X4 3
-
+#define AT_X5 4
+#define AT_X6 5
 
 std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, uint16_t n_Atts)
 {
@@ -57,54 +58,38 @@ uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_
     return max_temp;
 }
 
-uint64_t removeContinuousZeros(uint64_t seq) {
-    uint64_t result = 0;
-    int count = 0;
-
-    // Process each 4-bit block from the rightmost side
-    for (int i = 0; i < 64; i += 4) {
-        // Extract the current 4-bit block
-        uint64_t block = seq & 0xF;
-
-        if (block != 0) {
-            // Append the non-zero block to the result
-            result |= (block << count);
-            count += 4;
-        }
-
-        // Move to the next 4-bit block
-        seq >>= 4;
-    }
-
-    return result;
-}
-
 
 
 int main(int argc, char** argv)
 {
+    // Setup de GHD: leer qdags que forman nodos
     qdag::att_set att_R;
     qdag::att_set att_S;
     qdag::att_set att_T;
-    qdag::att_set att_Q;
+    qdag::att_set att_X;
+    qdag::att_set att_W;
 
     att_R.push_back(AT_X1); att_R.push_back(AT_X2);
     att_S.push_back(AT_X2); att_S.push_back(AT_X3);
     att_T.push_back(AT_X3); att_T.push_back(AT_X4);//att_T.push_back(AT_X3);
-    att_Q.push_back(AT_X3); att_Q.push_back(AT_X1);//att_Q.push_back(AT_X1);
+    att_X.push_back(AT_X1); att_X.push_back(AT_X2);//att_Q.push_back(AT_X1);
+    att_W.push_back(AT_X1); att_W.push_back(AT_X3);
 
-    std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]), strRel_Q(argv[4]);
+
+    std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]), strRel_X(argv[4]), strRel_W(argv[5]);
     std::vector<std::vector<uint64_t>>* rel_R = read_relation(strRel_R, att_R.size());
     std::vector<std::vector<uint64_t>>* rel_S = read_relation(strRel_S, att_S.size());
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
-    std::vector<std::vector<uint64_t>>* rel_Q = read_relation(strRel_Q, att_Q.size());
+    std::vector<std::vector<uint64_t>>* rel_X = read_relation(strRel_X, att_X.size());
+    std::vector<std::vector<uint64_t>>* rel_W = read_relation(strRel_W, att_W.size());
 
     uint64_t grid_side = 32;
 
     grid_side = maximum_in_table(*rel_R, att_R.size(), grid_side);
     grid_side = maximum_in_table(*rel_S, att_S.size(), grid_side);
     grid_side = maximum_in_table(*rel_T, att_T.size(), grid_side);
-    grid_side = maximum_in_table(*rel_Q, att_Q.size(), grid_side);
+    grid_side = maximum_in_table(*rel_X, att_X.size(), grid_side);
+    grid_side = maximum_in_table(*rel_W, att_W.size(), grid_side);
 
     grid_side++;
 
@@ -113,51 +98,39 @@ int main(int argc, char** argv)
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
-    qdag qdag_rel_Q(*rel_Q, att_Q, grid_side, 2, att_Q.size());
+    qdag qdag_rel_X(*rel_X, att_X, grid_side, 2, att_X.size());
+    qdag qdag_rel_W(*rel_W, att_W, grid_side, 2, att_W.size());
 
-    std::ostream &output_stream = cout;
-    cout << "izquierda:\n";
-    qdag_rel_R.print(output_stream);
-    cout << "\nderecha:\n";
-    qdag_rel_S.print(output_stream);
-    cout << endl;
-    qdag_rel_T.print(output_stream);
+    // Crear vectores de relacion de cada nodo
 
-    cout << endl;
-    qdag_rel_Q.print(output_stream);
+    vector<qdag> Q_a(3);
 
-    vector<qdag> Q(3);
+    Q_a[0] = qdag_rel_R;
+    Q_a[1] = qdag_rel_S;
+    Q_a[2] = qdag_rel_T;
 
-    Q[0] = qdag_rel_R;
-    Q[1] = qdag_rel_S;
-    Q[2] = qdag_rel_T;
+    vector<qdag> Q_b(2);
 
-    qdag *Join_Result;
-    Join_Result = multiJoin(Q, false, 1000);
-    cout << "\n result:\n";
-    Join_Result->print(output_stream);
-    semiJoin(Q, false, 1000);
-    cout << "\n active:\n";
-    Q[0].print_active(output_stream);
+    Q_b[0] = qdag_rel_X;
+    Q_b[1] = qdag_rel_W;
 
-    vector<qdag> Q_pt2(2);
+    // Crear GHDs
 
-    Q_pt2[0] = qdag_rel_R;
-    Q_pt2[1] = qdag_rel_Q;
+    vector<ghd> empty_children(0);
+    ghd sub = ghd(Q_b, empty_children);
+    vector<ghd> level_1;
+    level_1.push_back(sub);
+    ghd root = ghd(Q_a, level_1);
 
-    qdag *Join_Result2;
-    // Join_Result2 = multiJoin(Q_pt2, false, 1000);
-    // cout << "\n result:\n";
-    // Join_Result2->print(output_stream);
-    semiJoin(Q_pt2, false, 1000);
-    cout << "\n active:\n";
-    Q_pt2[0].print_active(output_stream);
-    //Q_pt2[0].print(output_stream);
+    // Ejecutar multijoin en todos los niveles
 
-    // seq = 20720;
-    //uint64_t result = removeContinuousZeros(seq);
+    root.deep_ex_multijoin();
+    auto result = root.get_relations();
+    for (auto rel = result.begin(); rel != result.end(); rel++){
+        cout << "resulting qdag: " << endl;
+        rel->print(cout);
+    }
 
-    //std::cout << "Original: " << seq << std::endl;
-    //std::cout << "Result: " << result << std::endl;
+
     return 0;
 }
