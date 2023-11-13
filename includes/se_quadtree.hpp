@@ -529,8 +529,8 @@ public:
                 // read each byte
                 if (j % dim == 0)
                 {
-                    uint8_t x;
-                    x = +active[i].get_8_bits(j);
+                    uint16_t x;
+                    x = +active[i].get_bits(j, dim);
 
                     for (int l = 0; l < dim; l++)
                     {

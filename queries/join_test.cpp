@@ -6,17 +6,17 @@
 using namespace std::chrono;
 
 
-#include "../src/joins.cpp"
+//#include "../src/joins.cpp"
 #include "../includes/ghd.hpp"
 
 high_resolution_clock::time_point start_select, stop_select;
 double total_time_select = 0.0;
 duration<double> time_span_select;
 
-#define AT_X1 0
-#define AT_X2 1
-#define AT_X3 2
-#define AT_X4 3
+#define AT_X1 6
+#define AT_X2 5
+#define AT_X3 3
+#define AT_X4 7
 
 
 std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, uint16_t n_Atts)
@@ -91,6 +91,7 @@ int main(int argc, char** argv)
     att_R.push_back(AT_X1); att_R.push_back(AT_X2);
     att_S.push_back(AT_X2); att_S.push_back(AT_X3);
     att_T.push_back(AT_X3); att_T.push_back(AT_X4);//att_T.push_back(AT_X3);
+
     att_Q.push_back(AT_X3); att_Q.push_back(AT_X1);//att_Q.push_back(AT_X1);
 
     std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]), strRel_Q(argv[4]);
@@ -133,9 +134,9 @@ int main(int argc, char** argv)
     Q[2] = qdag_rel_T;
 
     qdag *Join_Result;
-    Join_Result = multiJoin(Q, false, 1000);
+    //Join_Result = multiJoin(Q, false, 1000);
     cout << "\n result:\n";
-    Join_Result->print(output_stream);
+    //Join_Result->print(output_stream);
     semiJoin(Q, false, 1000);
     cout << "\n active:\n";
     Q[0].print_active(output_stream);

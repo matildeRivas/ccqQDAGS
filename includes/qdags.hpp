@@ -100,28 +100,30 @@ class qdag
            
            for (i = 0; i < Msize; i++)
                M[i] = i;  // identity mapping 
-           
+
            attribute_set = _attribute_set;
-           
+
+           /*/start
            vector<uint64_t> tuple_aux(d);
            vector<pair<uint64_t,uint64_t>> map_sort_att(d);
-           
+
            for (i = 0; i < d; i++)
-               map_sort_att[i] = make_pair(i, attribute_set[i]);           
-           
+               map_sort_att[i] = make_pair(i, attribute_set[i]);
+
            std::sort(map_sort_att.begin(), map_sort_att.end(), compare_pairs);
-           
+
            for (i = 0; i < points.size(); i++) {
-               //if (i%1000000==0) cout << i << endl;  
+               //if (i%1000000==0) cout << i << endl;
                for (j = 0; j < d; j++)
-                   tuple_aux[j] = points[i][map_sort_att[j].first]; 
-               
+                   tuple_aux[j] = points[i][map_sort_att[j].first];
+
                for (j = 0; j < d; j++)
                    points[i][j] = tuple_aux[j];
-                  
+
            }
 
-           std::sort(attribute_set.begin(), attribute_set.end());            
+           std::sort(attribute_set.begin(), attribute_set.end());
+           //end*/
 
            //cout << "Construyendo el quadtree" << endl;
            Q = new se_quadtree(points, _grid_side, k, d);          
@@ -198,12 +200,25 @@ class qdag
         {
             uint16_t dim = attribute_set_A.size();
             uint16_t dim_prime = attribute_set.size();
-            uint64_t p = std::pow(Q->getK(), dim);            
+            uint64_t p = std::pow(Q->getK(), dim);
+
+            cout << "extendiendo de [" << attribute_set << "] a [" << attribute_set_A << "]" << endl;
             
             type_mapping_M* _M = new type_mapping_M[p];
+
+            map<uint64_t, uint64_t> indice;
+
+            uint64_t att_index, i;
+            for (uint16_t j = 0; j < dim_prime; ++j) {
+                for (uint16_t i = 0; i < dim; ++i) {
+                    if (attribute_set_A[i] == attribute_set[j]) {
+                        indice[attribute_set[j]] = i;
+                        break;
+                    }
+                }
+            }
             
-            uint64_t mask;
-            uint64_t i, i_prime;            
+            uint64_t mask, i_prime;
 
             for (i = 0; i < p; ++i) {
                 mask = 1<<(dim_prime-1);
@@ -211,7 +226,7 @@ class qdag
                
                 for (uint16_t j = 0; j < dim_prime; ++j) {
                     // Tomar todos los 1 que estan en la pos adecuada en el attribute set
-                    if (i & (1 << (dim-attribute_set[j]-1)))
+                    if (i & (1 << (dim-indice[attribute_set[j]]-1)))
                         i_prime |= mask;
                 
                     mask >>= 1;

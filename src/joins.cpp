@@ -709,10 +709,12 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
                 // check if my children are marked, if they are, mark me.
                 uint64_t temp_children = temp_bv[cur_level+1].get_bits(root_temp[0], Q[0]->Q->getKD());
                 uint64_t leftQ_children = Q[0]->Q->bv[cur_level+1].get_bits(root_temp[0], Q[0]->Q->getKD());
+                cout << cur_level << "  " << temp_children <<endl;
+                cout << cur_level << "  " << leftQ_children <<endl;
 
                 if (temp_children == leftQ_children){
-                    uint64_t mask_one =1;
-                    //cout << "mark active" << endl;
+                    uint64_t mask_one = 1;
+                    cout << "mark active" << endl;
                     *(temp_bv[cur_level]).seq = ( *(temp_bv[cur_level]).seq | (mask_one << (roots[0] + Q[0]->getM(last_pos[cur_level] % p))));
                 }
                 last_pos[cur_level]++;
@@ -973,14 +975,19 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
     // computes the union of the attribute sets
     for (uint64_t i = 0; i < Q.size(); i++)
     {
+        cout << "attrs " << i << ":";
         uint64_t nAttr = Q[i].nAttr();
-        for (uint64_t j = 0; j < nAttr; j++)
+        for (uint64_t j = 0; j < nAttr; j++) {
             attr_map[Q[i].getAttr(j)] = 1;
+            cout << " " << Q[i].getAttr(j);
+        }
+        cout << endl;
     }
 
     for (map<uint64_t, uint8_t>::iterator it = attr_map.begin(); it != attr_map.end(); it++)
         A.push_back(it->first);
 
+    cout << "union de attrs: " << A << endl;
     qdag *Q_star[Q.size()];
     uint64_t Q_roots[Q.size()];
 
@@ -1001,7 +1008,6 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
 
         Q_roots[i] = 0; // root of every qdag
     }
-
 
     // para el semijoin bv debe ser igual a active
     vector<uint64_t> bv[Q[0].getHeight()]; // OJO, asume que todos los qdags son de la misma altura
