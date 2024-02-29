@@ -122,7 +122,7 @@ class rank_bv_64
         cout << " ";
     }
 
-    uint64_t get_bits(uint64_t start_pos, k2_tree_ns::size_type dim)
+    uint32_t get_bits(uint64_t start_pos, k2_tree_ns::size_type dim)
     {
 
         switch (dim){

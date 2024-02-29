@@ -69,13 +69,15 @@ int main(int argc, char** argv)
     qdag::att_set att_X;
     qdag::att_set att_W;
 
-    att_R.push_back(AT_X1); att_R.push_back(AT_X2);att_R.push_back(AT_X3); att_R.push_back(AT_X4);
+
+    att_R.push_back(AT_X1); att_R.push_back(AT_X2);// att_R.push_back(AT_X3); att_R.push_back(AT_X4);
+    //att_R.push_back(AT_X1); att_R.push_back(AT_X2);
     att_S.push_back(AT_X2); att_S.push_back(AT_X3);
     att_T.push_back(AT_X3); att_T.push_back(AT_X4);
 
-    att_X.push_back(AT_X5); att_X.push_back(AT_X1);
+    att_X.push_back(AT_X1); att_X.push_back(AT_X2);
     att_W.push_back(AT_X1); att_W.push_back(AT_X3);
-    att_W.push_back(AT_X5);
+    //att_W.push_back(AT_X5);
 
 
     std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]), strRel_X(argv[4]), strRel_W(argv[5]);
@@ -110,45 +112,52 @@ int main(int argc, char** argv)
     Q_a[0] = qdag_rel_R;
     Q_a[1] = qdag_rel_S;
     Q_a[2] = qdag_rel_T;
+    //Q_a[1] = qdag_rel_X;
 
     vector<qdag> Q_b(2);
 
-    Q_b[0] = qdag_rel_R;
+    Q_b[0] = qdag_rel_X;
     Q_b[1] = qdag_rel_W;
+    cout << endl;
 
     // Crear GHDs
-
+//*
     cout << "izquierda:\n";
     Q_b[0].print(cout);
     cout << "\nderecha:\n";
     Q_b[1].print(cout);
     cout << endl;
+    qdag* res = multiJoin(Q_b, false, 1000);
+    res->print(cout);
     semiJoin(Q_b, false, 1000);
     Q_b[0].print_active(cout);
-
-    //vector<ghd> empty_children(0);
-    //ghd sub = ghd(Q_b, empty_children);
-    //vector<ghd> level_1;
-    //level_1.push_back(sub);
-    //ghd root = ghd(Q_a, level_1);
+    cout << endl;
+    /*/
+//
+    vector<ghd> empty_children(0);
+    ghd sub = ghd(Q_b, empty_children);
+    vector<ghd> level_1;
+    level_1.push_back(sub);
+    ghd root = ghd(Q_a, level_1);
 
     // Ejecutar multijoin en todos los niveles
-    //root.deep_ex_multijoin();
-    //auto result = root.get_relations();
-    //for (auto rel = result.begin(); rel != result.end(); rel++){
-    //    cout << "resulting qdag root: " << endl;
-    //    rel->print_active(cout);
-    //}
-    //auto result_level1 = root.get_child_qdags().front();
-    //cout << "resulting qdag level 1: " << endl;
-    //result_level1.print(cout);
+    root.deep_ex_multijoin();
+    auto result = root.get_relations();
+    for (auto rel = result.begin(); rel != result.end(); rel++){
+        cout << "resulting qdag root: " << endl;
+        rel->print(cout);
+        cout << endl;
+    }
+    auto result_level1 = root.get_child_qdags().front();
+    cout << "resulting qdag level 1: " << endl;
+    result_level1.print(cout);
 
     // Ejecutar semijoin entre root y nivel 1
-    //root.constrained_by_children();
-    //root.get_relations().front().print(cout);
-    //cout << "active de root desp de sj" <<endl;
-    //root.get_relations().front().print_active(cout);
-
+    root.constrained_by_children();
+    root.get_relations().front().print(cout);
+    cout << "active de root desp de sj" <<endl;
+    root.get_relations().front().print_active(cout);
+*/
 
     return 0;
 }

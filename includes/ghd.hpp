@@ -43,7 +43,6 @@ public:
     }
 
     void ex_multijoin(){
-    // TODO: funcion que mapea atributos globales de join de todo el GHD a atributos locales en el multijoin
         qdag* join_result = multiJoin(relations, false, 1000);
         relations.clear();
         relations.push_back(*join_result);

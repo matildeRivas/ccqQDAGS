@@ -28,9 +28,11 @@ class qdag
         
         typedef vector<uint64_t> att_set;
         se_quadtree* Q;
-        int32_t tab_extend_5[16];   // queries of 5 attributes, i.e., dimension 2^5=32
-    int32_t tab_extend_4[16];
-    int32_t tab_extend_3[16];
+        int32_t tab_extend_5[65535];   // queries of 5 attributes, i.e., dimension 2^5=32
+        int32_t tab_extend_4[65535];
+        int32_t tab_extend_3[65535];
+        //int32_t tab_extend[];
+        //TODO: crear tab extend genérico
 
 	 private:
 	            
@@ -226,7 +228,7 @@ class qdag
                
                 for (uint16_t j = 0; j < dim_prime; ++j) {
                     // Tomar todos los 1 que estan en la pos adecuada en el attribute set
-                    if (i & (1 << (dim-indice[attribute_set[j]]-1)))
+                    if (i & (1 << (dim - indice[attribute_set[j]] - 1)))
                         i_prime |= mask;
                 
                     mask >>= 1;
@@ -301,11 +303,7 @@ class qdag
         {
             uint64_t i, j;
             uint32_t x, B;
-
-            if (Q->getKD() == 2)
-                B = 4;
-            else
-                B = 16;
+            B = std::pow(2, Q->getKD());
             
             for (i = 0; i < B; i++) {
                 x = 0;
@@ -325,18 +323,14 @@ class qdag
         {
             uint64_t i, j;
             uint32_t x, B;
-
-            if (Q->getKD() == 2)
-                B = 4;
-            else
-                B = 16;
+            B = std::pow(2, Q->getKD());
 
             for (i = 0; i < B; i++) {
                 x = 0;
                 for(j = 0; j < 16; j++)
-                    if (i& (1<<M[j])) 
+                    if (i& (1<<M[j]))
                        x = (x << 1) | 1;
-                    else 
+                    else
                        x = (x << 1);
 
                 tab_extend_4[i] = x<<16;
@@ -348,7 +342,8 @@ class qdag
         void createTableExtend3()
         {
             uint64_t i, j;
-            uint32_t x, B=16;
+            uint32_t x, B;
+            B = std::pow(2, Q->getKD());
 
             //if (Q->getKD() == 2) 
             //    B = 4;
@@ -367,21 +362,58 @@ class qdag
                 //cout << std::hex << x << endl;
             }
         }
+/*
+    void createTableExtend()
+    //TODO: inicializar arreglo para que sea del tamaño adecuado segun el número de atributos del qdag sin extender
+    {
+        uint64_t i, j;
+        uint32_t x, B=16;
+        uint64_t kd = Q->getKD();
 
+        //if (Q->getKD() == 2)
+        //    B = 4;
+        //else
+        //    B = 16
+
+        for (i = 0; i < B; i++) {
+            x = 0;
+            for(j = 0; j < kd; j++)
+                if (i& (1<<M[j]))
+                    x = (x << 1) | 1;
+                else
+                    x = (x << 1);
+
+            tab_extend3[i] = x<<(32-kd);
+            //cout << std::hex << x << endl;
+        }
+    }*/
+        //TODO: crear un materialize general
         inline uint32_t materialize_node_3(uint64_t level, uint64_t node, uint64_t* rank_vector) {
             uint64_t r = Q->rank(level, node);
+            auto n = Q->get_node(level, node, rank_vector, r);
+            cout << "node " << std::bitset<32>(n) << endl;
+            cout << "mat " << std::bitset<32>(tab_extend_3[n]) << endl;
+            return tab_extend_3[n];
             return tab_extend_3[Q->get_node(level, node, rank_vector, r)];
         }
 
 
         inline uint32_t materialize_node_4(uint64_t level, uint64_t node, uint64_t* rank_vector) {
             uint64_t r = Q->rank(level, node);
+            auto n = Q->get_node(level, node, rank_vector, r);
+            cout << "node " << std::bitset<32>(n) << endl;
+            cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
+            return tab_extend_4[n];
             return tab_extend_4[Q->get_node(level, node, rank_vector, r)];
         }
 
 
         inline uint32_t materialize_node_5(uint64_t level, uint64_t node, uint64_t* rank_vector) {
-            uint64_t r = Q->rank(level, node);            
+            uint64_t r = Q->rank(level, node);
+            auto n = Q->get_node(level, node, rank_vector, r);
+            cout << "node " << std::bitset<32>(n) << endl;
+            cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
+            return tab_extend_5[n];
             return tab_extend_5[Q->get_node(level, node, rank_vector, r)];
         }
 
@@ -402,17 +434,29 @@ class qdag
 
 
         inline uint32_t materialize_active_node_3(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
-            return tab_extend_3[Q->get_node_active(level, node, temp_active)];
+            auto n = Q->get_node_active(level, node, temp_active);
+            cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
+            cout << "mat  " << std::bitset<32>(tab_extend_3[n]) << endl;
+            return tab_extend_3[n];
+            //return tab_extend_3[Q->get_node_active(level, node, temp_active)];
         }
 
 
         inline uint32_t materialize_active_node_4(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
-            return tab_extend_4[Q->get_node_active(level, node, temp_active)];
+            auto n = Q->get_node_active(level, node, temp_active);
+            cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
+            cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
+            return tab_extend_4[n];
+            //return tab_extend_4[Q->get_node_active(level, node, temp_active)];
         }
 
 
         inline uint32_t materialize_active_node_5(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
-            return tab_extend_3[Q->get_node_active(level, node, temp_active)];
+            auto n = Q->get_node_active(level, node, temp_active);
+            cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
+            cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
+            return tab_extend_5[n];
+            //return tab_extend_5[Q->get_node_active(level, node, temp_active)];
         }
 
 
