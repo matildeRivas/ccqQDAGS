@@ -391,8 +391,8 @@ class qdag
         inline uint32_t materialize_node_3(uint64_t level, uint64_t node, uint64_t* rank_vector) {
             uint64_t r = Q->rank(level, node);
             auto n = Q->get_node(level, node, rank_vector, r);
-            cout << "node " << std::bitset<32>(n) << endl;
-            cout << "mat " << std::bitset<32>(tab_extend_3[n]) << endl;
+            //cout << "node " << std::bitset<32>(n) << endl;
+            //cout << "mat " << std::bitset<32>(tab_extend_3[n]) << endl;
             return tab_extend_3[n];
             return tab_extend_3[Q->get_node(level, node, rank_vector, r)];
         }
@@ -401,8 +401,8 @@ class qdag
         inline uint32_t materialize_node_4(uint64_t level, uint64_t node, uint64_t* rank_vector) {
             uint64_t r = Q->rank(level, node);
             auto n = Q->get_node(level, node, rank_vector, r);
-            cout << "node " << std::bitset<32>(n) << endl;
-            cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
+            //cout << "node " << std::bitset<32>(n) << endl;
+            //cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
             return tab_extend_4[n];
             return tab_extend_4[Q->get_node(level, node, rank_vector, r)];
         }
@@ -411,8 +411,8 @@ class qdag
         inline uint32_t materialize_node_5(uint64_t level, uint64_t node, uint64_t* rank_vector) {
             uint64_t r = Q->rank(level, node);
             auto n = Q->get_node(level, node, rank_vector, r);
-            cout << "node " << std::bitset<32>(n) << endl;
-            cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
+            //cout << "node " << std::bitset<32>(n) << endl;
+            //cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
             return tab_extend_5[n];
             return tab_extend_5[Q->get_node(level, node, rank_vector, r)];
         }
@@ -435,8 +435,8 @@ class qdag
 
         inline uint32_t materialize_active_node_3(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
             auto n = Q->get_node_active(level, node, temp_active);
-            cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
-            cout << "mat  " << std::bitset<32>(tab_extend_3[n]) << endl;
+            //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
+            //cout << "mat  " << std::bitset<32>(tab_extend_3[n]) << endl;
             return tab_extend_3[n];
             //return tab_extend_3[Q->get_node_active(level, node, temp_active)];
         }
@@ -444,8 +444,8 @@ class qdag
 
         inline uint32_t materialize_active_node_4(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
             auto n = Q->get_node_active(level, node, temp_active);
-            cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
-            cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
+            //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
+            //cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
             return tab_extend_4[n];
             //return tab_extend_4[Q->get_node_active(level, node, temp_active)];
         }
@@ -453,8 +453,8 @@ class qdag
 
         inline uint32_t materialize_active_node_5(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
             auto n = Q->get_node_active(level, node, temp_active);
-            cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
-            cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
+            //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
+            //cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
             return tab_extend_5[n];
             //return tab_extend_5[Q->get_node_active(level, node, temp_active)];
         }

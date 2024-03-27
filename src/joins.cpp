@@ -1036,3 +1036,4 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
     }
 
 }
+
