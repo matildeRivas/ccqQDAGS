@@ -173,7 +173,7 @@ int main(int argc, char** argv)
     qdag* res = multiJoin(producto_punto, false, 1000);
     res->print(cout);
     */
-    
+
     vector<qdag> test(5);
 
     test[0] = qdag_rel_R;
