@@ -393,6 +393,24 @@ public:
     }
 
 
+    void get_children_result(uint16_t level, uint64_t node, uint64_t* children_array, uint64_t &n_children, rank_bv_64 result)
+    {
+        n_children = 0;
+        //Hay que hacer el chequeo de que no exceda la posición máxima del nodo desde get_children.
+        uint64_t pos = node;
+
+        pos = result.select_next(pos);
+
+        while (pos < k_d){
+            //hay que guardar la posición relativa o absoluta?
+            children_array[n_children++] = pos;
+            pos++;
+            pos = result.select_next(pos);
+        }
+        //children son los 1 en el nodo o lo que esté en el siguiente nivel? es como un get bits pero solo las posiciones de los 1
+    }
+
+
 
     uint64_t total_ones_level(uint16_t level)
     {

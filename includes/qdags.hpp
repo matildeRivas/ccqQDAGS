@@ -487,6 +487,33 @@ public:
                 C.increment(element);
                 if (C[element] == n_relations_join)
                     children_to_recurse[size_children_to_recurse++] = element;
+                if (C[element] == n_relations_join * 2 + 1)
+                    cout << "skipped node " << cur_child << " extended " << element << endl;
+            }
+        }
+
+    }
+
+    void filterChildren(uint16_t level, const uint64_t node,
+                     initializable_array &C,
+                     uint64_t n_relations_join,
+                     uint16_t *children_to_recurse,
+                     uint64_t &size_children_to_recurse,
+                     const uint64_t k_d,
+                     rank_bv_64 result
+    ) {
+        uint64_t children_array[k_d], n_children, ic;
+        Q->get_children_result(level, node, children_array, n_children, result);
+
+        uint16_t cur_child;
+        uint64_t j, size, element;
+
+        for (ic = 0; ic < n_children; ++ic) {
+            cur_child = children_array[ic];
+            size = M_prime[cur_child]->size();
+            for (j = 0; j < size; ++j) {
+                element = (*M_prime[cur_child])[j];
+                C.assign(element, n_relations_join + 1);
             }
         }
 
