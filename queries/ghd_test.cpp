@@ -113,8 +113,15 @@ int main(int argc, char** argv)
     Q_a[0] = qdag_rel_R;
     Q_a[1] = qdag_rel_S;
     Q_a[2] = qdag_rel_T;
-    //Q_a[1] = qdag_rel_X;
+    qdag_rel_R.print(cout);
+    qdag_rel_S.print(cout);
+    qdag_rel_T.print(cout);
 
+    semiJoin(Q_a, false, 1000);
+    qdag_rel_R.print_active(cout);
+
+    //Q_a[2] = qdag_rel_T;
+    //Q_a[1] = qdag_rel_X;
     vector<qdag> Q_b(2);
 
     Q_b[0] = qdag_rel_X;
@@ -133,15 +140,15 @@ int main(int argc, char** argv)
     semiJoin(Q_b, false, 1000);
     Q_b[0].print_active(cout);
     cout << endl;
-    /*/
-//
+
+
     vector<ghd> empty_children(0);
     ghd sub = ghd(Q_b, empty_children);
     vector<ghd> level_1;
     level_1.push_back(sub);
     ghd root = ghd(Q_a, level_1);
 
-    /*
+
     // Ejecutar multijoin en todos los niveles
     root.deep_exec_multijoin();
     auto result = root.get_relations();
@@ -172,7 +179,7 @@ int main(int argc, char** argv)
 
     qdag* res = multiJoin(producto_punto, false, 1000);
     res->print(cout);
-    */
+
 
     vector<qdag> test(5);
 
@@ -189,7 +196,7 @@ int main(int argc, char** argv)
 
 
 
-//*/
+*/
 
     return 0;
 }

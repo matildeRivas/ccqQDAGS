@@ -57,7 +57,6 @@ public:
     rank_bv_64 *active;
 
 private:
-    //rank_support_v<> *bv_rank;
 
     uint16_t height; // number of levels of the tree
 
@@ -374,10 +373,30 @@ public:
     }
 
 
+    void get_children(uint16_t level, uint64_t node, uint64_t* children_array, uint64_t &n_children)
+    {
+        n_children = 0;
+        //Hay que hacer el chequeo de que no exceda la posición máxima del nodo desde get_children.
+        uint64_t pos = node;
+
+        auto debug = false;
+
+        pos = bv[level].select_next_active(pos, active[level]);
+
+        while (pos < node + k_d){
+            //hay que guardar la posición relativa o absoluta?
+            children_array[n_children++] = pos % k_d;
+            pos++;
+            pos = bv[level].select_next_active(pos, active[level]);
+        }
+        //children son los 1 en el nodo o lo que esté en el siguiente nivel? es como un get bits pero solo las posiciones de los 1
+    }
+
+
 
     uint64_t total_ones_level(uint16_t level)
     {
-        return total_ones[level];
+        return total_ones[level] ;
     }
 
     uint64_t getKD()

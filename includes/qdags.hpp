@@ -4,6 +4,7 @@
 
 #include <sdsl/bit_vectors.hpp>
 #include "se_quadtree.hpp"
+#include "initArray.hpp"
 
 #include<bits/stdc++.h>
 #include<ratio>
@@ -16,352 +17,342 @@
 
 typedef uint8_t type_mapping_M;
 
-bool compare_pairs(const pair<uint64_t, uint64_t>&i, const pair<uint64_t, uint64_t>&j)
-{
+bool compare_pairs(const pair<uint64_t, uint64_t> &i, const pair<uint64_t, uint64_t> &j) {
     return i.second < j.second;
 }
 
 
-class qdag 
-{
-    public:
-        
-        typedef vector<uint64_t> att_set;
-        se_quadtree* Q;
-        int32_t tab_extend_5[65535];   // queries of 5 attributes, i.e., dimension 2^5=32
-        int32_t tab_extend_4[65535];
-        int32_t tab_extend_3[65535];
-        //int32_t tab_extend[];
-        //TODO: crear tab extend genérico
+class qdag {
+public:
 
-	 private:
-	            
-        type_mapping_M*    M;    // mapping
-        
-        att_set      attribute_set;
-        
-        uint64_t     grid_side;
-        
-        uint16_t     Msize;  // number of children of every qdag node
+    typedef vector<uint64_t> att_set;
+    se_quadtree *Q;
+    int32_t tab_extend_5[65535];   // queries of 5 attributes, i.e., dimension 2^5=32
+    int32_t tab_extend_4[65535];
+    int32_t tab_extend_3[65535];
+    //int32_t tab_extend[];
+    //TODO: crear tab extend genérico
 
-        bool         is_extended_qdag;
-        
-        vector<vector<type_mapping_M>*> M_prime;
+private:
 
+    type_mapping_M *M;    // mapping
+
+    att_set attribute_set;
+
+    uint64_t grid_side;
+
+    uint16_t Msize;  // number of children of every qdag node
+
+    bool is_extended_qdag;
+
+    vector<vector<type_mapping_M> *> M_prime;
 
 
-    public:
+public:
 
-        qdag() = default;
+    qdag() = default;
 
 
-        uint64_t size()
-	{
-	    uint64_t s = Q->size() + Msize*sizeof(uint16_t) + attribute_set.size()*sizeof(uint64_t) 
-                        + M_prime.size()*sizeof(vector<type_mapping_M>*) + sizeof(uint64_t);
+    uint64_t size() {
+        uint64_t s = Q->size() + Msize * sizeof(uint16_t) + attribute_set.size() * sizeof(uint64_t)
+                     + M_prime.size() * sizeof(vector<type_mapping_M> *) + sizeof(uint64_t);
 
-            //for (uint64_t i = 0; i < M_prime.size(); i++)
-            //    s += M_prime[i]->size()*sizeof(type_mapping_M);
+        for (uint64_t i = 0; i < M_prime.size(); i++)
+            s += M_prime[i]->size() * sizeof(type_mapping_M);
 
-	    return s;
+        return s;
+    }
+
+
+    void setAtts(uint64_t att1, uint64_t att2) {
+        attribute_set[0] = att1;
+        attribute_set[1] = att2;
+    }
+
+    qdag(const qdag &_Q) {
+        this->Q = _Q.Q;
+        _Q.Q->inc_ref_count();
+        this->M = _Q.M;
+        for (uint64_t i = 0; i < _Q.attribute_set.size(); i++)
+            this->attribute_set.push_back(_Q.attribute_set[i]);
+
+        this->grid_side = _Q.grid_side;
+        this->Msize = _Q.Msize;
+        this->is_extended_qdag = _Q.is_extended_qdag;
+
+    }
+
+    qdag(std::vector<std::vector<uint64_t>> &points,
+         att_set &_attribute_set,
+         const uint64_t _grid_side,
+         uint8_t k, uint8_t d
+    ) {
+
+        Msize = std::pow(k, d);
+
+        M = new type_mapping_M[Msize];
+
+        uint64_t i, j;
+
+        for (i = 0; i < Msize; i++)
+            M[i] = i;  // identity mapping
+
+        attribute_set = _attribute_set;
+
+        // es necesario volver a ordenar los atributos?
+        // se puede mantener la nueva forma de mapear?
+
+        /*/start
+        vector<uint64_t> tuple_aux(d);
+        vector<pair<uint64_t,uint64_t>> map_sort_att(d);
+
+        for (i = 0; i < d; i++)
+            map_sort_att[i] = make_pair(i, attribute_set[i]);
+
+        std::sort(map_sort_att.begin(), map_sort_att.end(), compare_pairs);
+
+        for (i = 0; i < points.size(); i++) {
+            //if (i%1000000==0) cout << i << endl;
+            for (j = 0; j < d; j++)
+                tuple_aux[j] = points[i][map_sort_att[j].first];
+
+            for (j = 0; j < d; j++)
+                points[i][j] = tuple_aux[j];
+
         }
-      
-       
-        void setAtts(uint64_t att1, uint64_t att2)
-	{
-	    attribute_set[0] = att1;
-	    attribute_set[1] = att2;
-	}
 
-        qdag (const qdag &_Q)
-	{
-	    this->Q = _Q.Q;
-            _Q.Q->inc_ref_count();
-            this->M = _Q.M;
-	    for (uint64_t i=0; i < _Q.attribute_set.size(); i++)
-	        this->attribute_set.push_back(_Q.attribute_set[i]);
+        std::sort(attribute_set.begin(), attribute_set.end());
+        //end*/
 
-            this->grid_side = _Q.grid_side;
-	    this->Msize = _Q.Msize;
-	    this->is_extended_qdag = _Q.is_extended_qdag;
+        //cout << "Construyendo el quadtree" << endl;
+        Q = new se_quadtree(points, _grid_side, k, d);
 
-	}
+        grid_side = _grid_side;
+        is_extended_qdag = false;
 
-        qdag(std::vector<std::vector<uint64_t>> &points, 
-             att_set &_attribute_set, 
-             const uint64_t _grid_side,
-             uint8_t k, uint8_t d
-            )
-        {            
+        //M_prime.reserve(Msize);
 
-           Msize = std::pow(k, d);           
-           
-           M = new type_mapping_M[Msize];
-           
-           uint64_t i, j;
-           
-           for (i = 0; i < Msize; i++)
-               M[i] = i;  // identity mapping 
+        for (uint64_t i = 0; i < Msize; i++)
+            M_prime.push_back(new std::vector<type_mapping_M>());
 
-           attribute_set = _attribute_set;
+        for (uint64_t i = 0; i < Msize; i++)
+            M_prime[i]->push_back(i);
 
-           /*/start
-           vector<uint64_t> tuple_aux(d);
-           vector<pair<uint64_t,uint64_t>> map_sort_att(d);
+    }
 
-           for (i = 0; i < d; i++)
-               map_sort_att[i] = make_pair(i, attribute_set[i]);
 
-           std::sort(map_sort_att.begin(), map_sort_att.end(), compare_pairs);
+    qdag(vector<uint64_t> bv[],
+         att_set &_attribute_set,
+         const uint64_t _grid_side,
+         uint8_t k, uint8_t d
+    ) {
+        Q = new se_quadtree(bv, bv, _grid_side, k, d);
 
-           for (i = 0; i < points.size(); i++) {
-               //if (i%1000000==0) cout << i << endl;
-               for (j = 0; j < d; j++)
-                   tuple_aux[j] = points[i][map_sort_att[j].first];
+        Msize = std::pow(k, d);
 
-               for (j = 0; j < d; j++)
-                   points[i][j] = tuple_aux[j];
+        M = new type_mapping_M[Msize];
 
-           }
+        for (uint64_t i = 0; i < Msize; i++)
+            M[i] = i;  // identity mapping
 
-           std::sort(attribute_set.begin(), attribute_set.end());
-           //end*/
+        attribute_set = _attribute_set;
+        //std::sort(attribute_set.begin(), attribute_set.end());
+        grid_side = _grid_side;
+        is_extended_qdag = false;
 
-           //cout << "Construyendo el quadtree" << endl;
-           Q = new se_quadtree(points, _grid_side, k, d);          
-           
-           grid_side = _grid_side;
-           is_extended_qdag = false;
-           
-           //M_prime.reserve(Msize);
+        //M_prime.reserve(Msize);
 
-           //for (uint64_t i = 0; i < Msize; i++)              
-           //    M_prime.push_back(new std::vector<type_mapping_M>());
-           
-           //for (uint64_t i = 0; i < Msize; i++)
-           //    M_prime[i]->push_back(i);            
-           
+        for (uint64_t i = 0; i < Msize; i++)
+            M_prime.push_back(new std::vector<type_mapping_M>());
+
+        for (uint64_t i = 0; i < Msize; i++) {
+            M_prime[M[i]]->push_back(i);
         }
-      
 
-        qdag(vector<uint64_t> bv[], 
-             att_set &_attribute_set, 
-             const uint64_t _grid_side,
-             uint8_t k, uint8_t d
-				)
-        {
-           Q = new se_quadtree(bv, bv,_grid_side, k, d);
-
-           Msize = std::pow(k, d);           
-           
-           M = new type_mapping_M[Msize];
-           
-           for (uint64_t i = 0; i < Msize; i++)
-               M[i] = i;  // identity mapping 
-           
-           attribute_set = _attribute_set;
-           //std::sort(attribute_set.begin(), attribute_set.end());            
-           grid_side = _grid_side;
-           is_extended_qdag = false;
- 
-           //M_prime.reserve(Msize);
-           
-           //for (uint64_t i = 0; i < Msize; i++)              
-           //    M_prime.push_back(new std::vector<type_mapping_M>());
-           
-           //for (uint64_t i = 0; i < Msize; i++) {               
-           //    M_prime[M[i]]->push_back(i);
-           //}
-                   	
-        }            
+    }
 
 
-        /*qdag(qdag &q, att_set &_attribute_set)
-        {
-            this->Q = q.Q;
-	    Msize = q.Msize;
-	    M = new type_mapping_M[Msize];
-	    for (uint64_t i = 0; i < Msize; i++)
-	        M[i] = q.M[i];
+    /*qdag(qdag &q, att_set &_attribute_set)
+    {
+        this->Q = q.Q;
+    Msize = q.Msize;
+    M = new type_mapping_M[Msize];
+    for (uint64_t i = 0; i < Msize; i++)
+        M[i] = q.M[i];
 
-            attribute_set = _attribute_set;
-	    std::sort(attribute_set.begin(), attribute_set.end());
-	}*/
-      
-        ~qdag() 
-        {
-             //if (Q && !is_extended_qdag) {
-             //    delete Q;  
-             //    Q = NULL;
-             //}             
-             if (is_extended_qdag) delete M;
+        attribute_set = _attribute_set;
+    std::sort(attribute_set.begin(), attribute_set.end());
+}*/
+
+    ~qdag() {
+        //if (Q && !is_extended_qdag) {
+        //    delete Q;
+        //    Q = NULL;
+        //}
+        if (is_extended_qdag) delete M;
+    }
+
+
+    qdag *extend(att_set &attribute_set_A) {
+        uint16_t dim = attribute_set_A.size();
+        uint16_t dim_prime = attribute_set.size();
+        uint64_t p = std::pow(Q->getK(), dim);
+
+        cout << "extendiendo de [" << attribute_set << "] a [" << attribute_set_A << "]" << endl;
+
+        type_mapping_M *_M = new type_mapping_M[p];
+
+        map<uint64_t, uint64_t> indice;
+
+        uint64_t att_index, i;
+        for (uint16_t j = 0; j < dim_prime; ++j) {
+            for (uint16_t i = 0; i < dim; ++i) {
+                if (attribute_set_A[i] == attribute_set[j]) {
+                    indice[attribute_set[j]] = i;
+                    break;
+                }
+            }
         }
-       
 
-        qdag* extend(att_set &attribute_set_A)
-        {
-            uint16_t dim = attribute_set_A.size();
-            uint16_t dim_prime = attribute_set.size();
-            uint64_t p = std::pow(Q->getK(), dim);
+        uint64_t mask, i_prime;
 
-            cout << "extendiendo de [" << attribute_set << "] a [" << attribute_set_A << "]" << endl;
-            
-            type_mapping_M* _M = new type_mapping_M[p];
+        for (i = 0; i < p; ++i) {
+            mask = 1 << (dim_prime - 1);
+            i_prime = 0;
 
-            map<uint64_t, uint64_t> indice;
-
-            uint64_t att_index, i;
             for (uint16_t j = 0; j < dim_prime; ++j) {
-                for (uint16_t i = 0; i < dim; ++i) {
-                    if (attribute_set_A[i] == attribute_set[j]) {
-                        indice[attribute_set[j]] = i;
-                        break;
-                    }
-                }
+                // Tomar todos los 1 que estan en la pos adecuada en el attribute set
+                if (i & (1 << (dim - indice[attribute_set[j]] - 1)))
+                    i_prime |= mask;
+
+                mask >>= 1;
             }
-            
-            uint64_t mask, i_prime;
 
-            for (i = 0; i < p; ++i) {
-                mask = 1<<(dim_prime-1);
-                i_prime = 0;
-               
-                for (uint16_t j = 0; j < dim_prime; ++j) {
-                    // Tomar todos los 1 que estan en la pos adecuada en el attribute set
-                    if (i & (1 << (dim - indice[attribute_set[j]] - 1)))
-                        i_prime |= mask;
-                
-                    mask >>= 1;
-                }
-            
-                _M[i] = M[i_prime];
-            }
-             
-            qdag* q = new qdag();
-            
-            q->Q = this->Q;
-            q->M = _M;
-            q->attribute_set = attribute_set_A;
-            q->grid_side = this->grid_side; 
-            q->is_extended_qdag = true;
-            q->Msize = p; // this.Msize;
-            
-            return q;
+            _M[i] = M[i_prime];
         }
 
+        qdag *q = new qdag();
 
-        uint64_t nAttr() 
-        {
-            return attribute_set.size();        
+        q->Q = this->Q;
+        q->M = _M;
+        q->attribute_set = attribute_set_A;
+        q->grid_side = this->grid_side;
+        q->is_extended_qdag = true;
+        q->Msize = p; // this.Msize;
+
+        uint64_t j = std::pow(Q->getK(), dim_prime);
+
+        for (i = 0; i < j; i++)
+            q->M_prime.push_back(new std::vector<type_mapping_M>());
+
+        for (i = 0; i < p; i++)
+            q->M_prime[q->M[i]]->push_back(i);
+
+        return q;
+    }
+
+
+    uint64_t nAttr() {
+        return attribute_set.size();
+    }
+
+
+    uint64_t getAttr(uint64_t i) {
+        return attribute_set[i];
+    }
+
+
+    uint64_t getGridSide() {
+        return grid_side;
+    }
+
+
+    uint64_t getHeight() {
+        return Q->getHeight();
+    }
+
+
+    uint8_t getK() {
+        return Q->getK();
+    }
+
+
+    uint16_t nChildren() {
+        return Msize;
+    }
+
+
+    uint64_t getKD() {
+        return Q->getKD();
+    }
+
+
+    uint16_t getM(uint16_t i) {
+        return M[i];
+    }
+
+
+    // This is for a binary relation, i.e., a k^2-tree with 4 children per node
+    void createTableExtend5() {
+        uint64_t i, j;
+        uint32_t x, B;
+        B = std::pow(2, Q->getKD());
+
+        for (i = 0; i < B; i++) {
+            x = 0;
+            for (j = 0; j < 32; j++)
+                if (i & (1 << M[j]))
+                    x = (x << 1) | 1;
+                else
+                    x = (x << 1);
+
+            tab_extend_5[i] = x;
+            //cout << x << endl;
         }
+    }
 
+    // This is for a binary relation, i.e., a k^2-tree with 4 children per node
+    void createTableExtend4() {
+        uint64_t i, j;
+        uint32_t x, B;
+        B = std::pow(2, Q->getKD());
 
-        uint64_t getAttr(uint64_t i) 
-        {
-            return attribute_set[i];        
+        for (i = 0; i < B; i++) {
+            x = 0;
+            for (j = 0; j < 16; j++)
+                if (i & (1 << M[j]))
+                    x = (x << 1) | 1;
+                else
+                    x = (x << 1);
+
+            tab_extend_4[i] = x << 16;
+            //cout << std::hex << x << endl;
         }
-        
-        
-        uint64_t getGridSide() 
-        {
-            return grid_side;        
+    }
+
+    // This is for a binary relation, i.e., a k^2-tree with 4 children per node
+    void createTableExtend3() {
+        uint64_t i, j;
+        uint32_t x, B;
+        B = std::pow(2, Q->getKD());
+
+        //if (Q->getKD() == 2)
+        //    B = 4;
+        //else
+        //    B = 16
+
+        for (i = 0; i < B; i++) {
+            x = 0;
+            for (j = 0; j < 8; j++)
+                if (i & (1 << M[j]))
+                    x = (x << 1) | 1;
+                else
+                    x = (x << 1);
+
+            tab_extend_3[i] = x << 24;
+            //cout << std::hex << x << endl;
         }
-
-        
-        uint64_t getHeight() 
-        {
-            return Q->getHeight();        
-        }
-
-
-        uint8_t getK() 
-        {
-            return Q->getK();     
-        }
-        
-        
-        uint16_t nChildren()
-        {
-            return Msize;        
-        }
-     
-              
-        uint64_t getKD()
-        {
-            return Q->getKD();
-        }
-
-
-        uint16_t getM(uint16_t i)
-        {
-            return M[i];
-        }
-
-
-        // This is for a binary relation, i.e., a k^2-tree with 4 children per node
-        void createTableExtend5()
-        {
-            uint64_t i, j;
-            uint32_t x, B;
-            B = std::pow(2, Q->getKD());
-            
-            for (i = 0; i < B; i++) {
-                x = 0;
-                for(j = 0; j < 32; j++)            
-                    if (i& (1<<M[j]))
-                       x = (x << 1) | 1;
-                    else
-                       x = (x << 1);
-                
-                tab_extend_5[i] = x;
-                //cout << x << endl;
-            }                
-        }
-        
-        // This is for a binary relation, i.e., a k^2-tree with 4 children per node
-        void createTableExtend4()
-        {
-            uint64_t i, j;
-            uint32_t x, B;
-            B = std::pow(2, Q->getKD());
-
-            for (i = 0; i < B; i++) {
-                x = 0;
-                for(j = 0; j < 16; j++)
-                    if (i& (1<<M[j]))
-                       x = (x << 1) | 1;
-                    else
-                       x = (x << 1);
-
-                tab_extend_4[i] = x<<16;
-                //cout << std::hex << x << endl;
-            }
-        }
-
-        // This is for a binary relation, i.e., a k^2-tree with 4 children per node
-        void createTableExtend3()
-        {
-            uint64_t i, j;
-            uint32_t x, B;
-            B = std::pow(2, Q->getKD());
-
-            //if (Q->getKD() == 2) 
-            //    B = 4;
-            //else
-            //    B = 16
-
-            for (i = 0; i < B; i++) {
-                x = 0;
-                for(j = 0; j < 8; j++)
-                    if (i& (1<<M[j]))
-                       x = (x << 1) | 1;
-                    else
-                       x = (x << 1);
-
-                tab_extend_3[i] = x<<24;
-                //cout << std::hex << x << endl;
-            }
-        }
+    }
 /*
     void createTableExtend()
     //TODO: inicializar arreglo para que sea del tamaño adecuado segun el número de atributos del qdag sin extender
@@ -387,90 +378,157 @@ class qdag
             //cout << std::hex << x << endl;
         }
     }*/
-        //TODO: crear un materialize general
-        inline uint32_t materialize_node_3(uint64_t level, uint64_t node, uint64_t* rank_vector) {
-            uint64_t r = Q->rank(level, node);
-            auto n = Q->get_node(level, node, rank_vector, r);
-            //cout << "node " << std::bitset<32>(n) << endl;
-            //cout << "mat " << std::bitset<32>(tab_extend_3[n]) << endl;
-            return tab_extend_3[n];
-            return tab_extend_3[Q->get_node(level, node, rank_vector, r)];
+
+
+    //TODO: crear un materialize general
+    inline uint32_t materialize_node_3(uint64_t level, uint64_t node, uint64_t *rank_vector) {
+        uint64_t r = Q->rank(level, node);
+        auto n = Q->get_node(level, node, rank_vector, r);
+        //cout << "node " << std::bitset<32>(n) << endl;
+        //cout << "mat " << std::bitset<32>(tab_extend_3[n]) << endl;
+        return tab_extend_3[n];
+        return tab_extend_3[Q->get_node(level, node, rank_vector, r)];
+    }
+
+
+    inline uint32_t materialize_node_4(uint64_t level, uint64_t node, uint64_t *rank_vector) {
+        uint64_t r = Q->rank(level, node);
+        auto n = Q->get_node(level, node, rank_vector, r);
+        //cout << "node " << std::bitset<32>(n) << endl;
+        //cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
+        return tab_extend_4[n];
+        return tab_extend_4[Q->get_node(level, node, rank_vector, r)];
+    }
+
+
+    inline uint32_t materialize_node_5(uint64_t level, uint64_t node, uint64_t *rank_vector) {
+        uint64_t r = Q->rank(level, node);
+        auto n = Q->get_node(level, node, rank_vector, r);
+        //cout << "node " << std::bitset<32>(n) << endl;
+        //cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
+        return tab_extend_5[n];
+        return tab_extend_5[Q->get_node(level, node, rank_vector, r)];
+    }
+
+
+    inline uint32_t materialize_node_3_lastlevel(uint64_t level, uint64_t node) {
+        return tab_extend_3[Q->get_node_lastlevel(level, node)];
+    }
+
+
+    inline uint32_t materialize_node_4_lastlevel(uint64_t level, uint64_t node) {
+        return tab_extend_4[Q->get_node_lastlevel(level, node)];
+    }
+
+
+    inline uint32_t materialize_node_5_lastlevel(uint64_t level, uint64_t node) {
+        return tab_extend_5[Q->get_node_lastlevel(level, node)];
+    }
+
+
+    inline uint32_t materialize_active_node_3(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
+        auto n = Q->get_node_active(level, node, temp_active);
+        //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
+        //cout << "mat  " << std::bitset<32>(tab_extend_3[n]) << endl;
+        return tab_extend_3[n];
+        //return tab_extend_3[Q->get_node_active(level, node, temp_active)];
+    }
+
+
+    inline uint32_t materialize_active_node_4(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
+        auto n = Q->get_node_active(level, node, temp_active);
+        //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
+        //cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
+        return tab_extend_4[n];
+        //return tab_extend_4[Q->get_node_active(level, node, temp_active)];
+    }
+
+
+    inline uint32_t materialize_active_node_5(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
+        auto n = Q->get_node_active(level, node, temp_active);
+        //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
+        //cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
+        return tab_extend_5[n];
+        //return tab_extend_5[Q->get_node_active(level, node, temp_active)];
+    }
+
+
+    void getChildren(uint16_t level, const uint64_t node,
+                     initializable_array &C,
+                     uint64_t n_relations_join,
+                     uint16_t *children_to_recurse,
+                     uint64_t &size_children_to_recurse,
+                     uint64_t *rank_vector,
+                     const uint64_t k_d
+    ) {
+//            start_rank = high_resolution_clock::now();
+        uint64_t r = Q->rank(level, node);
+//            stop_rank = high_resolution_clock::now();
+//            time_span_rank = duration_cast<duration<double>>(stop_rank - start_rank);
+//            total_time_rank += time_span_rank.count();
+
+        uint64_t children_array[k_d], n_children, ic;
+
+        //start_rank = high_resolution_clock::now();
+        Q->get_children(level, node, children_array, n_children);
+        //          stop_rank = high_resolution_clock::now();
+        //          time_span_rank = duration_cast<duration<double>>(stop_rank - start_rank);
+        //          total_time_rank += time_span_rank.count();
+
+        uint16_t cur_child;
+        uint64_t j, size, element;
+
+        for (ic = 0; ic < n_children; ++ic) {
+            cur_child = children_array[ic];
+            rank_vector[cur_child] = ++r;
+            size = M_prime[cur_child]->size();
+            for (j = 0; j < size; ++j) {
+                element = (*M_prime[cur_child])[j];
+                C.increment(element);
+                if (C[element] == n_relations_join)
+                    children_to_recurse[size_children_to_recurse++] = element;
+            }
         }
 
+    }
 
-        inline uint32_t materialize_node_4(uint64_t level, uint64_t node, uint64_t* rank_vector) {
-            uint64_t r = Q->rank(level, node);
-            auto n = Q->get_node(level, node, rank_vector, r);
-            //cout << "node " << std::bitset<32>(n) << endl;
-            //cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
-            return tab_extend_4[n];
-            return tab_extend_4[Q->get_node(level, node, rank_vector, r)];
+
+    void getChildren_lastlevel(const uint64_t node,
+                               initializable_array &C,
+                               uint64_t n_relations_join,
+                               uint16_t *children_to_recurse,
+                               uint64_t &size_children_to_recurse,
+                               const uint64_t k_d
+    ) {
+        uint64_t children_array[k_d], n_children, ic;
+
+        Q->get_children(Q->getHeight() - 1, node, children_array, n_children);
+
+        uint16_t cur_child;
+        uint64_t j, size, element;
+
+        for (ic = 0; ic < n_children; ++ic) {
+            cur_child = children_array[ic];
+            size = M_prime[cur_child]->size();
+            for (j = 0; j < size; ++j) {
+                element = (*M_prime[cur_child])[j];
+                C.increment(element);
+                if (C[element] == n_relations_join)
+                    children_to_recurse[size_children_to_recurse++] = element;
+            }
         }
 
-
-        inline uint32_t materialize_node_5(uint64_t level, uint64_t node, uint64_t* rank_vector) {
-            uint64_t r = Q->rank(level, node);
-            auto n = Q->get_node(level, node, rank_vector, r);
-            //cout << "node " << std::bitset<32>(n) << endl;
-            //cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
-            return tab_extend_5[n];
-            return tab_extend_5[Q->get_node(level, node, rank_vector, r)];
-        }
+    }
 
 
-        inline uint32_t materialize_node_3_lastlevel(uint64_t level, uint64_t node) {
-            return tab_extend_3[Q->get_node_lastlevel(level, node)];
-        }
+    void print(std::ostream &ost) {
+        Q->print(ost);
+    }
 
 
-        inline uint32_t materialize_node_4_lastlevel(uint64_t level, uint64_t node) {
-            return tab_extend_4[Q->get_node_lastlevel(level, node)];
-        }
-       
-
-        inline uint32_t materialize_node_5_lastlevel(uint64_t level, uint64_t node) {
-            return tab_extend_5[Q->get_node_lastlevel(level, node)];
-        }
-
-
-        inline uint32_t materialize_active_node_3(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
-            auto n = Q->get_node_active(level, node, temp_active);
-            //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
-            //cout << "mat  " << std::bitset<32>(tab_extend_3[n]) << endl;
-            return tab_extend_3[n];
-            //return tab_extend_3[Q->get_node_active(level, node, temp_active)];
-        }
-
-
-        inline uint32_t materialize_active_node_4(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
-            auto n = Q->get_node_active(level, node, temp_active);
-            //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
-            //cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
-            return tab_extend_4[n];
-            //return tab_extend_4[Q->get_node_active(level, node, temp_active)];
-        }
-
-
-        inline uint32_t materialize_active_node_5(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
-            auto n = Q->get_node_active(level, node, temp_active);
-            //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
-            //cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
-            return tab_extend_5[n];
-            //return tab_extend_5[Q->get_node_active(level, node, temp_active)];
-        }
-
-
-
-        void print(std::ostream &ost)
-        {
-            Q->print(ost);
-        }
-
-
-        void print_active(std::ostream &ost)
-        {
-            Q->print_active(ost);
-        }
+    void print_active(std::ostream &ost) {
+        Q->print_active(ost);
+    }
 };
 
 #endif
