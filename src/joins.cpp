@@ -9,6 +9,13 @@ void tobinary(unsigned number) {
 }
 
 
+void mark_result_bv(vector<rank_bv_64> temp_bv, uint16_t cur_level, uint64_t i) {
+    uint64_t block = i>>6; // dividir por 64
+    uint64_t mask_one = 1 << (i % 64);
+    *(temp_bv[cur_level]).seq[block] = *(temp_bv[cur_level]).seq[block] | mask_one;
+}
+
+
 bool propagate_active(qdag* Q, uint16_t cur_level, uint16_t max_level, vector<rank_bv_64> temp_bv, uint64_t node){
     bool has_children = false;
     uint32_t children;
@@ -55,8 +62,7 @@ bool propagate_active(qdag* Q, uint16_t cur_level, uint16_t max_level, vector<ra
             root_temp = k_d * (rank_vector[child] - 1);
 
             if (propagate_active(Q, cur_level + 1, max_level, temp_bv, root_temp)) {
-                uint64_t mask_one = 1 << (node + child);
-                *(temp_bv[cur_level]).seq = (*(temp_bv[cur_level]).seq | (mask_one));
+                mark_result_bv(temp_bv, cur_level, node + child)
                 has_children = true;
             }
 
@@ -548,9 +554,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
             else {
 
                 // obtener el bit del nodo
-                uint64_t mask_one = 1;
-                *(result_bv[cur_level].seq) = (*(result_bv[cur_level]).seq |
-                                             (mask_one << (roots[0] + Q[0]->getM(last_pos[cur_level] % p))));
+                mark_result_bv(result_bv, cur_level,roots[0] + Q[0]->getM(last_pos[cur_level] % p))
                 last_pos[cur_level]++;
                 just_zeroes = false;
             }
@@ -605,9 +609,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
                 uint64_t leftQ_children = Q[0]->Q->bv[cur_level + 1].get_bits(root_temp[0], Q[0]->Q->getKD());
 
                 if (temp_children == leftQ_children) {
-                    uint64_t mask_one = 1;
-                    *(result_bv[cur_level]).seq = (*(result_bv[cur_level]).seq |
-                                                 (mask_one << (roots[0] + Q[0]->getM(last_pos[cur_level] % p))));
+                    mark_result_bv(result_bv, cur_level, roots[0] + Q[0]->getM(last_pos[cur_level] % p))
                 }
                 last_pos[cur_level]++;
 
@@ -862,17 +864,6 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
 
     for (uint64_t i = 0; i < Q.size(); i++) {
         Q_star[i] = Q[i].extend(A);
-        if (A.size() == 3)
-            Q_star[i]->createTableExtend3();
-        else if (A.size() == 4)
-            Q_star[i]->createTableExtend4();
-        else if (A.size() == 5)
-            Q_star[i]->createTableExtend5();
-        else {
-            cout << "Code only works for queries of up to 5 attributes..." << endl;
-            exit(1);
-        }
-
         Q_roots[i] = 0; // root of every qdag
     }
 
@@ -884,14 +875,13 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
         last_pos[i] = 0;
 
     // create result_bv of 0s
-    bit_vector blank = bit_vector(4, 0);
     vector<rank_bv_64> result_bv(Q[0].getHeight());
     for (int i = 0; i < Q[0].getHeight(); i++) {
-        result_bv[i] = rank_bv_64(blank);
+        result_bv[i] = rank_bv_64(Q[0].Q->bv[i]);
+        result_bv[i].empty();
     }
 
-    SemiAND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, last_pos, A.size(), bounded_result, UPPER_BOUND,
-            result_bv);
+    SemiAND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, last_pos, A.size(), bounded_result, UPPER_BOUND, result_bv);
 
     cout << endl << "========================  propagating active  =======================" << endl << endl;
     //bajar por result_bv recursivamente, si hay un 1 en el nodo hijo, marcar padre

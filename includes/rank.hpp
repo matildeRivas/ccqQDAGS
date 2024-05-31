@@ -176,9 +176,16 @@ public:
     }
 
     void bv_and(rank_bv_64 bv){
-        seq[0] &= *bv.seq;
+        for (uint64_t i = 0; i < nw; i++) {
+            seq[i] &= *bv.seq[i];
+        }
     }
 
+    void empty() {
+        for (uint64_t i = 0; i < nw; i++) {
+            seq[i] &= 0;
+        }
+    }
 };
 
 #endif
