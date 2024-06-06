@@ -30,8 +30,6 @@ public:
     int32_t tab_extend_5[65535];   // queries of 5 attributes, i.e., dimension 2^5=32
     int32_t tab_extend_4[65535];
     int32_t tab_extend_3[65535];
-    //int32_t tab_extend[];
-    //TODO: crear tab extend genérico
 
 private:
 
@@ -353,31 +351,6 @@ public:
             //cout << std::hex << x << endl;
         }
     }
-/*
-    void createTableExtend()
-    //TODO: inicializar arreglo para que sea del tamaño adecuado segun el número de atributos del qdag sin extender
-    {
-        uint64_t i, j;
-        uint32_t x, B=16;
-        uint64_t kd = Q->getKD();
-
-        //if (Q->getKD() == 2)
-        //    B = 4;
-        //else
-        //    B = 16
-
-        for (i = 0; i < B; i++) {
-            x = 0;
-            for(j = 0; j < kd; j++)
-                if (i& (1<<M[j]))
-                    x = (x << 1) | 1;
-                else
-                    x = (x << 1);
-
-            tab_extend3[i] = x<<(32-kd);
-            //cout << std::hex << x << endl;
-        }
-    }*/
 
 
     //TODO: crear un materialize general
@@ -487,8 +460,8 @@ public:
                 C.increment(element);
                 if (C[element] == n_relations_join)
                     children_to_recurse[size_children_to_recurse++] = element;
-                if (C[element] == n_relations_join * 2 + 1)
-                    cout << "skipped node " << cur_child << " extended " << element << endl;
+                if (C[element] >= n_relations_join * 2 + 1)
+                    cout << "level " << level  << " node " << node << " skipped child " << cur_child << endl;
             }
         }
 
@@ -514,6 +487,7 @@ public:
             for (j = 0; j < size; ++j) {
                 element = (*M_prime[cur_child])[j];
                 C.assign(element, n_relations_join + 1);
+                cout << "marked level " << level << " node " << node << "child " << cur_child << " extended " << element <<endl;
             }
         }
 

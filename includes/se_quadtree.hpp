@@ -337,12 +337,12 @@ public:
         return bv[level].rank(node);
     }
 
-    inline uint32_t get_node_lastlevel(uint16_t level, uint64_t node)
+    inline uint64_t get_node_lastlevel(uint16_t level, uint64_t node)
     {
         return bv[level].get_bits(node, k_d) & active[level].get_bits(node, k_d);
     }
 
-    inline uint32_t get_node(uint16_t level, uint64_t node, uint64_t *rank_array, uint64_t rank_value)
+    inline uint64_t get_node(uint16_t level, uint64_t node, uint64_t *rank_array, uint64_t rank_value)
     {
         uint32_t nd;
         uint32_t nd_active;
@@ -362,9 +362,9 @@ public:
         return nd & nd_active;
     }
 
-    inline uint32_t get_node_active(uint16_t level, uint64_t node, vector<rank_bv_64> tactive)
+    inline uint64_t get_node_active(uint16_t level, uint64_t node, vector<rank_bv_64> tactive)
     {
-        uint32_t nd;
+        uint64_t nd;
 
         nd = (~(tactive[level].get_bits(node, k_d))) & ((1<<k_d) - 1);
 
@@ -401,9 +401,9 @@ public:
 
         pos = result.select_next(pos);
 
-        while (pos < k_d){
+        while (pos < node + k_d){
             //hay que guardar la posición relativa o absoluta?
-            children_array[n_children++] = pos;
+            children_array[n_children++] = pos % k_d;
             pos++;
             pos = result.select_next(pos);
         }
@@ -476,7 +476,7 @@ public:
                 // read each byte
                 if (j % dim == 0)
                 {
-                    uint16_t x;
+                    uint64_t x;
                     x = +active[i].get_bits(j, dim);
 
                     for (int l = 0; l < dim; l++)

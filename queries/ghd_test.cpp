@@ -71,9 +71,9 @@ int main(int argc, char** argv)
     qdag::att_set att_W;
 
 
-    att_R.push_back(AT_X1); att_R.push_back(AT_X2);// att_R.push_back(AT_X3); att_R.push_back(AT_X4);
-    //att_R.push_back(AT_X1); att_R.push_back(AT_X2);
-    att_S.push_back(AT_X2); att_S.push_back(AT_X3);
+    att_R.push_back(AT_X1); att_R.push_back(AT_X2); att_R.push_back(AT_X3); att_R.push_back(AT_X4);
+    att_R.push_back(AT_X5);// att_R.push_back(AT_X2);
+    att_S.push_back(AT_X2); att_S.push_back(AT_X6);
     att_T.push_back(AT_X3); att_T.push_back(AT_X4);
 
     att_X.push_back(AT_X5); att_X.push_back(AT_X1);
@@ -108,25 +108,30 @@ int main(int argc, char** argv)
 
     // Crear vectores de relacion de cada nodo
 
-    vector<qdag> Q_a(3);
+    vector<qdag> Q_a(2);
 
     Q_a[0] = qdag_rel_R;
     Q_a[1] = qdag_rel_S;
-    Q_a[2] = qdag_rel_T;
+    //Q_a[2] = qdag_rel_T;
     qdag_rel_R.print(cout);
     qdag_rel_S.print(cout);
-    qdag_rel_T.print(cout);
+    qdag* res = multiJoin(Q_a, false, 1000);
+    res->print(cout);
 
     semiJoin(Q_a, false, 1000);
     qdag_rel_R.print_active(cout);
 
     //Q_a[2] = qdag_rel_T;
     //Q_a[1] = qdag_rel_X;
-    vector<qdag> Q_b(2);
-
-    Q_b[0] = qdag_rel_X;
-    Q_b[1] = qdag_rel_W;
+    /*vector<qdag> Q_b(3);
+    Q_b[0] = qdag_rel_R;
+    Q_b[1] = qdag_rel_X;
+    Q_b[2] = qdag_rel_W;
     cout << endl;
+
+    semiJoin(Q_b, false, 1000);
+    qdag_rel_R.print_active(cout);
+*/
 
     // Crear GHDs
 /*

@@ -10,15 +10,14 @@ void tobinary(unsigned number) {
 
 
 void mark_result_bv(vector<rank_bv_64> temp_bv, uint16_t cur_level, uint64_t i) {
-    uint64_t block = i>>6; // dividir por 64
-    uint64_t mask_one = 1 << (i % 64);
-    *(temp_bv[cur_level]).seq[block] = *(temp_bv[cur_level]).seq[block] | mask_one;
+    // cout << "mark result " << cur_level << " " << i << endl;
+    temp_bv[cur_level].mark_bit(i);
 }
 
 
 bool propagate_active(qdag* Q, uint16_t cur_level, uint16_t max_level, vector<rank_bv_64> temp_bv, uint64_t node){
     bool has_children = false;
-    uint32_t children;
+    uint64_t children;
     if (cur_level == max_level) {
         //caso base: hay un 1 en un nodo hoja de active
         if (temp_bv[cur_level].get_bits(node, Q->getKD()) != 0){
@@ -62,7 +61,7 @@ bool propagate_active(qdag* Q, uint16_t cur_level, uint16_t max_level, vector<ra
             root_temp = k_d * (rank_vector[child] - 1);
 
             if (propagate_active(Q, cur_level + 1, max_level, temp_bv, root_temp)) {
-                mark_result_bv(temp_bv, cur_level, node + child)
+                mark_result_bv(temp_bv, cur_level, node + child);
                 has_children = true;
             }
 
@@ -272,6 +271,7 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
         uint16_t child;
 
         for (i = 0; i < children_to_recurse_size; ++i) {
+            cout << "match encontrado" <<endl;
 
             child = children_to_recurse[i];
 
@@ -529,7 +529,6 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
     uint64_t i;
     uint64_t children_to_recurse_size = 0;
 
-
     if (cur_level == max_level) {
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
@@ -554,7 +553,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
             else {
 
                 // obtener el bit del nodo
-                mark_result_bv(result_bv, cur_level,roots[0] + Q[0]->getM(last_pos[cur_level] % p))
+                mark_result_bv(result_bv, cur_level, roots[0] + Q[0]->getM(last_pos[cur_level] % p));
                 last_pos[cur_level]++;
                 just_zeroes = false;
             }
@@ -564,8 +563,8 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
             last_pos[cur_level] += (p - last_child - 1);
         }//(p_left - last_child - 1); //
     } else {
-        // arreglo con raices que serán usadas en llamda recursiva
-        uint64_t root_temp[nQ]; // CUIDADO, solo hasta 16 relaciones por query
+        // arreglo con raices que serán usadas en llamada recursiva
+        uint64_t root_temp[nQ];
         uint64_t rank_vector[nQ][64];
 
 
@@ -609,7 +608,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
                 uint64_t leftQ_children = Q[0]->Q->bv[cur_level + 1].get_bits(root_temp[0], Q[0]->Q->getKD());
 
                 if (temp_children == leftQ_children) {
-                    mark_result_bv(result_bv, cur_level, roots[0] + Q[0]->getM(last_pos[cur_level] % p))
+                    mark_result_bv(result_bv, cur_level, roots[0] + Q[0]->getM(last_pos[cur_level] % p));
                 }
                 last_pos[cur_level]++;
 
@@ -868,17 +867,14 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
     }
 
     // para el semijoin bv debe ser igual a active
-    vector<uint64_t> bv[Q[0].getHeight()]; // OJO, asume que todos los qdags son de la misma altura
     uint64_t last_pos[Q[0].getHeight()];
-
     for (uint64_t i = 0; i < Q[0].getHeight(); i++)
         last_pos[i] = 0;
 
     // create result_bv of 0s
     vector<rank_bv_64> result_bv(Q[0].getHeight());
     for (int i = 0; i < Q[0].getHeight(); i++) {
-        result_bv[i] = rank_bv_64(Q[0].Q->bv[i]);
-        result_bv[i].empty();
+        result_bv[i] = Q[0].Q->bv[i].clone_empty();
     }
 
     SemiAND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, last_pos, A.size(), bounded_result, UPPER_BOUND, result_bv);

@@ -80,6 +80,21 @@ public:
         }
     }
 
+    rank_bv_64 clone_empty()
+    {
+        rank_bv_64 *bv = new rank_bv_64();
+        bv->n = this->n;
+        bv->u = this->u;
+        bv->nw = this->nw;
+        bv->seq = new uint64_t[(u+63)/64]();
+        bv->block = new uint32_t[(u+63)/64]();
+        for (uint64_t i = 0; i < nw; i++) {
+            bv->seq[i] &= 0;
+        }
+
+        return *bv;
+    }
+
     inline uint64_t rank(uint64_t i)
     {
         return block[i>>6] + bits::cnt(seq[i>>6] & ~(0xffffffffffffffff << (i&0x3f)));
@@ -117,16 +132,6 @@ public:
         }
     }
 
-    inline uint8_t get_4_bits(uint64_t start_pos)
-    {
-        return ((seq[start_pos >> 6] >>(start_pos & 0x3f) ) & 0x0f);
-    }
-
-    inline uint8_t get_2_bits(uint64_t start_pos)
-    {
-        return ((seq[start_pos >> 6] >>(start_pos & 0x3f) ) & 0x03);
-    }
-
     // number of bits in the bv
     inline uint64_t size()
     {
@@ -146,39 +151,31 @@ public:
     }
 
 
-    uint32_t get_bits(uint64_t start_pos, k2_tree_ns::size_type dim)
+    uint64_t get_bits(uint64_t start_pos, k2_tree_ns::size_type dim)
     {
 
-        switch (dim){
-            case 2:
-                return ((seq[start_pos >> 6] >>(start_pos & 0x3f) ) & 0x03);
-                break;
-            case 4:
-                return ((seq[start_pos >> 6] >>(start_pos & 0x3f) ) & 0x0f);
-                break;
-            case 8:
-                return ((seq[start_pos >> 6] >>(start_pos & 0x3f) ) & 0xff);
-                break;
-            case 16:
-                return ((seq[start_pos >> 6] >>(start_pos & 0x3f) ) & 0xffff);
-                break;
-            case 32:
+        uint64_t shift = start_pos & 0x3f;
+        uint64_t mask = (1ULL << dim) - 1; // Creates a mask with 'dim' bits set to 1
 
-                return((seq[start_pos >> 6] >>(start_pos & 0x3f) ) & 0xffffffff);
-                break;
+        uint64_t result = (seq[start_pos >> 6] >> shift) & mask;
 
+        // Handle bits spanning across two 64-bit words
+        if (shift + dim > 64) {
+            uint64_t bits_in_next_word = (shift + dim) - 64;
+            result |= (seq[(start_pos >> 6) + 1] & ((1ULL << bits_in_next_word) - 1)) << (64 - shift);
         }
-        /*for (int l = 0; l < dim; l++)
-        {
-            cout << ((x & (1 << l)) ? "1" : "0");
-        }
-        cout << " ";*/
+
+        return result;
     }
 
     void bv_and(rank_bv_64 bv){
         for (uint64_t i = 0; i < nw; i++) {
-            seq[i] &= *bv.seq[i];
+            seq[i] &= bv.seq[i];
         }
+    }
+
+    void mark_bit(uint64_t i){
+        seq[i>>6] |= 1 << (i % 64);
     }
 
     void empty() {
