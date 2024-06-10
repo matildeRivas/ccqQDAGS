@@ -150,8 +150,7 @@ public:
                + 2*sizeof(uint64_t);
     }
 
-
-    uint64_t get_bits(uint64_t start_pos, k2_tree_ns::size_type dim)
+    uint64_t get_bits(uint64_t start_pos, uint64_t dim)
     {
 
         uint64_t shift = start_pos & 0x3f;

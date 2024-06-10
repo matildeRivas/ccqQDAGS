@@ -156,7 +156,7 @@ protected:
             {
                 cur_l = l;
                 k_t_.resize(t);
-                active_.resize(t);
+                active_ = bit_vector(t, 1);
                 bv[cur_level] = rank_bv_64(k_t_);
                 active[cur_level] = rank_bv_64(active_);
                 total_ones[cur_level] = bv[cur_level].n_ones();
@@ -244,7 +244,7 @@ protected:
 
         k_t_.resize(t);
         bv[height - 1] = rank_bv_64(k_t_);
-        active_.resize(t);
+        active_ = bit_vector(t, 1);
         active[height - 1] = rank_bv_64(active_);
 
         total_ones[height - 1] = bv[height - 1].n_ones();
@@ -471,20 +471,13 @@ public:
                 aa_r = 0;
             ost << "level " << i << ": ";
 
-            for (int j = 0; j < aa_r; j++)
-            {
-                // read each byte
-                if (j % dim == 0)
-                {
-                    uint64_t x;
-                    x = +active[i].get_bits(j, dim);
+            for (int j = 0; j < aa_r; j += dim) {
+                uint64_t x = active[i].get_bits(j, dim);
 
-                    for (int l = 0; l < dim; l++)
-                    {
-                        ost << ((x & (1 << l)) ? "1" : "0");
-                    }
-                    ost << " ";
+                for (int l = 0; l < dim; l++) {
+                    ost << ((x & (1 << l)) ? "1" : "0");
                 }
+                ost << " ";
             }
             ost << endl;
         }

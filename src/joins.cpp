@@ -553,6 +553,9 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
             else {
 
                 // obtener el bit del nodo
+                cout << endl
+                     << "----------------------------------------" << endl
+                     << "encontro match: " << roots[0] + Q[0]->getM(last_pos[cur_level] % p) << endl;
                 mark_result_bv(result_bv, cur_level, roots[0] + Q[0]->getM(last_pos[cur_level] % p));
                 last_pos[cur_level]++;
                 just_zeroes = false;
@@ -567,7 +570,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
         uint64_t root_temp[nQ];
         uint64_t rank_vector[nQ][64];
 
-
+        k_d[0] = Q[0]->getKD();
         Q[0]->filterChildren(cur_level, roots[0], C, nQ, children_to_recurse, children_to_recurse_size, k_d[0], result_bv[cur_level]);
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
