@@ -10,7 +10,7 @@ void tobinary(unsigned number) {
 
 
 void mark_result_bv(vector<rank_bv_64> temp_bv, uint16_t cur_level, uint64_t i) {
-    // cout << "mark result " << cur_level << " " << i << endl;
+    cout << "mark result " << cur_level << " " << i << endl;
     temp_bv[cur_level].mark_bit(i);
 }
 
@@ -20,43 +20,35 @@ bool propagate_active(qdag* Q, uint16_t cur_level, uint16_t max_level, vector<ra
     uint64_t children;
     if (cur_level == max_level) {
         //caso base: hay un 1 en un nodo hoja de active
-        if (temp_bv[cur_level].get_bits(node, Q->getKD()) != 0){
-            has_children = true;
+        vector<uint64_t> x = temp_bv[cur_level].get_bits(node, Q->getKD());
+        for (uint64_t& it : x) {
+            if (it != 0) {
+                has_children = true;
+            }
         }
-
     } else {
 
         //caso recursivo: debo revisar si hay 1s en el nivel inferior, hijo por hijo
         uint64_t root_temp;
         uint64_t rank_vector[64];
 
-        uint64_t r = Q->Q->rank(cur_level, node);
-        children = Q->Q->get_node(cur_level, node, rank_vector, r);
         uint64_t k_d = Q->getKD();
+        uint64_t r = Q->Q->rank(cur_level, node);
 
+        uint64_t children_array[k_d], n_children;
+        Q->Q->get_children(cur_level, node, children_array, n_children);
 
         // por cuántos hijos voy a bajar, cuenta la cantitdad de 1s en un arreglo de bits/entero
         uint64_t children_to_recurse_size = bits::cnt((uint64_t) children);
         uint64_t i = 0;
-        uint64_t msb;
-        uint16_t children_to_recurse[512];
-
-        // obtener todos los hijos
-        while (i < children_to_recurse_size) {
-            // obtener el más significativo
-            msb = __builtin_clz(children);
-            children_to_recurse[i] = 31 - msb;
-            ++i;
-            children &= (((uint32_t) 0xffffffff) >> (msb + 1)); // borra el más significativo
-        }
-
         uint16_t child;
 
         // bajar por todos los hijos marcados
-        for (i = 0; i < children_to_recurse_size; ++i) {
+        for (i = 0; i < n_children; ++i) {
 
             // hijo actual
-            child = children_to_recurse[i];
+            child = children_array[i];
+            rank_vector[child] = ++r;
 
             root_temp = k_d * (rank_vector[child] - 1);
 
@@ -64,7 +56,6 @@ bool propagate_active(qdag* Q, uint16_t cur_level, uint16_t max_level, vector<ra
                 mark_result_bv(temp_bv, cur_level, node + child);
                 has_children = true;
             }
-
         }
     }
 
@@ -72,7 +63,7 @@ bool propagate_active(qdag* Q, uint16_t cur_level, uint16_t max_level, vector<ra
 
 }
 
-
+/*
 void ANDCount(qdag *Q[], uint64_t *roots, uint16_t nQ,
               uint16_t cur_level, uint16_t max_level,
               uint64_t &ntuples, uint64_t nAtt) {
@@ -95,8 +86,8 @@ void ANDCount(qdag *Q[], uint64_t *roots, uint16_t nQ,
         ntuples += bits::cnt((uint64_t) children);
         return;
     } else {
-        uint64_t k_d[16 /*nQ*/];       // CUIDADO, solo hasta 16 relaciones por query
-        uint64_t root_temp[16 /*nQ*/]; // CUIDADO, solo hasta 16 relaciones por query
+        uint64_t k_d[16];       // CUIDADO, solo hasta 16 relaciones por query
+        uint64_t root_temp[16]; // CUIDADO, solo hasta 16 relaciones por query
         uint64_t rank_vector[16][64];
         uint16_t children_to_recurse[512]; // CUIDADO, solo hasta 9 atributos distintos
 
@@ -115,7 +106,7 @@ void ANDCount(qdag *Q[], uint64_t *roots, uint16_t nQ,
         i = 0;
         uint64_t msb;
 
-        while (/*children &&*/ i < children_to_recurse_size) {
+        while ( i < children_to_recurse_size) {
             msb = __builtin_clz(children);
             children_to_recurse[i] = msb;
             ++i;
@@ -133,7 +124,7 @@ void ANDCount(qdag *Q[], uint64_t *roots, uint16_t nQ,
             ANDCount(Q, root_temp, nQ, cur_level + 1, max_level, ntuples, nAtt);
         }
     }
-}
+}*/
 
 /*
 void parANDCount(uint16_t totalThreads, uint16_t threadId, uint16_t levelOfCut,
@@ -262,7 +253,7 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
     if (cur_level == max_level) {
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
-            Q[i]->getChildren_lastlevel(roots[i], C, nQ, children_to_recurse, children_to_recurse_size, k_d[i]);
+            Q[i]->get_children_lastlevel(roots[i], C, nQ, children_to_recurse, children_to_recurse_size, k_d[i]);
         }
 
         std::sort(children_to_recurse, children_to_recurse + children_to_recurse_size);
@@ -298,7 +289,7 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
         uint64_t rank_vector[16][64];
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
-            Q[i]->getChildren(cur_level, roots[i], C, nQ, children_to_recurse, children_to_recurse_size, rank_vector[i], k_d[i]);
+            Q[i]->get_children(cur_level, roots[i], C, nQ, children_to_recurse, children_to_recurse_size, rank_vector[i], k_d[i]);
         }
 
 
@@ -534,7 +525,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
     if (cur_level == max_level) {
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
-            Q[i]->getChildren_lastlevel(roots[i], C, nQ, children_to_recurse, children_to_recurse_size, k_d[i]);
+            Q[i]->get_children_lastlevel(roots[i], C, nQ, children_to_recurse, children_to_recurse_size, k_d[i]);
         }
         std::sort(children_to_recurse, children_to_recurse + children_to_recurse_size);
 
@@ -576,7 +567,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
         Q[0]->filterChildren(cur_level, roots[0], C, nQ, children_to_recurse, children_to_recurse_size, k_d[0], result_bv[cur_level]);
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
-            Q[i]->getChildren(cur_level, roots[i], C, nQ, children_to_recurse, children_to_recurse_size, rank_vector[i], k_d[i]);
+            Q[i]->get_children(cur_level, roots[i], C, nQ, children_to_recurse, children_to_recurse_size, rank_vector[i], k_d[i]);
         }
 
 
@@ -609,10 +600,10 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
                 // si se llega al último nivel o si hay resultados en el subárbol, se pone un 1 en la posición para
                 // indicar que hay resultados
                 // check if my children are marked, if they are, mark me.
-                uint64_t temp_children = result_bv[cur_level + 1].get_bits(root_temp[0], Q[0]->Q->getKD());
-                uint64_t leftQ_children = Q[0]->Q->bv[cur_level + 1].get_bits(root_temp[0], Q[0]->Q->getKD());
+                vector<uint64_t> result_children = result_bv[cur_level + 1].get_bits(root_temp[0], Q[0]->Q->getKD());
+                vector<uint64_t> leftQ_children = Q[0]->Q->bv[cur_level + 1].get_bits(root_temp[0], Q[0]->Q->getKD());
 
-                if (temp_children == leftQ_children) {
+                if (result_children == leftQ_children) {
                     mark_result_bv(result_bv, cur_level, roots[0] + Q[0]->getM(last_pos[cur_level] % p));
                 }
                 last_pos[cur_level]++;
@@ -633,7 +624,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
     return !just_zeroes;
 }
 
-
+/*
 uint64_t multiJoinCount(vector<qdag> &Q) {
     qdag::att_set A;
     map<uint64_t, uint8_t> attr_map;
@@ -674,7 +665,7 @@ uint64_t multiJoinCount(vector<qdag> &Q) {
 
     return ntuples;
 }
-
+*/
 /*
 uint64_t parMultiJoinCount(vector<qdag> &Q)
 {

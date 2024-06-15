@@ -86,7 +86,9 @@ public:
          uint8_t k, uint8_t d
     ) {
 
+        cout << "creando qdag con k=" << unsigned(k) << " y d=" << unsigned(d) << endl;
         Msize = std::pow(k, d);
+        cout << "k^d=" << Msize << endl;
 
         M = new type_mapping_M[Msize];
 
@@ -97,32 +99,6 @@ public:
 
         attribute_set = _attribute_set;
 
-        // es necesario volver a ordenar los atributos?
-        // se puede mantener la nueva forma de mapear?
-
-        /*/start
-        vector<uint64_t> tuple_aux(d);
-        vector<pair<uint64_t,uint64_t>> map_sort_att(d);
-
-        for (i = 0; i < d; i++)
-            map_sort_att[i] = make_pair(i, attribute_set[i]);
-
-        std::sort(map_sort_att.begin(), map_sort_att.end(), compare_pairs);
-
-        for (i = 0; i < points.size(); i++) {
-            //if (i%1000000==0) cout << i << endl;
-            for (j = 0; j < d; j++)
-                tuple_aux[j] = points[i][map_sort_att[j].first];
-
-            for (j = 0; j < d; j++)
-                points[i][j] = tuple_aux[j];
-
-        }
-
-        std::sort(attribute_set.begin(), attribute_set.end());
-        //end*/
-
-        //cout << "Construyendo el quadtree" << endl;
         Q = new se_quadtree(points, _grid_side, k, d);
 
         grid_side = _grid_side;
@@ -338,89 +314,15 @@ public:
         }
     }
 
-
-    //TODO: crear un materialize general
-    inline uint32_t materialize_node_3(uint64_t level, uint64_t node, uint64_t *rank_vector) {
-        uint64_t r = Q->rank(level, node);
-        auto n = Q->get_node(level, node, rank_vector, r);
-        //cout << "node " << std::bitset<32>(n) << endl;
-        //cout << "mat " << std::bitset<32>(tab_extend_3[n]) << endl;
-        return tab_extend_3[n];
-        return tab_extend_3[Q->get_node(level, node, rank_vector, r)];
-    }
-
-
-    inline uint32_t materialize_node_4(uint64_t level, uint64_t node, uint64_t *rank_vector) {
-        uint64_t r = Q->rank(level, node);
-        auto n = Q->get_node(level, node, rank_vector, r);
-        //cout << "node " << std::bitset<32>(n) << endl;
-        //cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
-        return tab_extend_4[n];
-        return tab_extend_4[Q->get_node(level, node, rank_vector, r)];
-    }
-
-
-    inline uint32_t materialize_node_5(uint64_t level, uint64_t node, uint64_t *rank_vector) {
-        uint64_t r = Q->rank(level, node);
-        auto n = Q->get_node(level, node, rank_vector, r);
-        //cout << "node " << std::bitset<32>(n) << endl;
-        //cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
-        return tab_extend_5[n];
-        return tab_extend_5[Q->get_node(level, node, rank_vector, r)];
-    }
-
-
-    inline uint32_t materialize_node_3_lastlevel(uint64_t level, uint64_t node) {
-        return tab_extend_3[Q->get_node_lastlevel(level, node)];
-    }
-
-
-    inline uint32_t materialize_node_4_lastlevel(uint64_t level, uint64_t node) {
-        return tab_extend_4[Q->get_node_lastlevel(level, node)];
-    }
-
-
-    inline uint32_t materialize_node_5_lastlevel(uint64_t level, uint64_t node) {
-        return tab_extend_5[Q->get_node_lastlevel(level, node)];
-    }
-
-
-    inline uint32_t materialize_active_node_3(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
-        auto n = Q->get_node_active(level, node, temp_active);
-        //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
-        //cout << "mat  " << std::bitset<32>(tab_extend_3[n]) << endl;
-        return tab_extend_3[n];
-        //return tab_extend_3[Q->get_node_active(level, node, temp_active)];
-    }
-
-
-    inline uint32_t materialize_active_node_4(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
-        auto n = Q->get_node_active(level, node, temp_active);
-        //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
-        //cout << "mat  " << std::bitset<32>(tab_extend_4[n]) << endl;
-        return tab_extend_4[n];
-        //return tab_extend_4[Q->get_node_active(level, node, temp_active)];
-    }
-
-
-    inline uint32_t materialize_active_node_5(uint64_t level, uint64_t node, vector<rank_bv_64> temp_active) {
-        auto n = Q->get_node_active(level, node, temp_active);
-        //cout << "act  " << std::bitset<32>(n) << " (" << n << endl;
-        //cout << "mat  " << std::bitset<32>(tab_extend_5[n]) << endl;
-        return tab_extend_5[n];
-        //return tab_extend_5[Q->get_node_active(level, node, temp_active)];
-    }
-
-
-    void getChildren(uint16_t level, const uint64_t node,
-                     initializable_array &C,
-                     uint64_t n_relations_join,
-                     uint16_t *children_to_recurse,
-                     uint64_t &size_children_to_recurse,
-                     uint64_t *rank_vector,
-                     const uint64_t k_d
-    ) {
-//            start_rank = high_resolution_clock::now();
+    void get_children(uint16_t level, const uint64_t node,
+        initializable_array& C,
+        uint64_t n_relations_join,
+        uint16_t* children_to_recurse,
+        uint64_t& size_children_to_recurse,
+        uint64_t* rank_vector,
+        const uint64_t k_d)
+    {
+        //            start_rank = high_resolution_clock::now();
         uint64_t r = Q->rank(level, node);
 //            stop_rank = high_resolution_clock::now();
 //            time_span_rank = duration_cast<duration<double>>(stop_rank - start_rank);
@@ -450,7 +352,6 @@ public:
                     cout << "level " << level  << " node " << node << " skipped child " << cur_child << endl;
             }
         }
-
     }
 
     void filterChildren(uint16_t level, const uint64_t node,
@@ -479,14 +380,13 @@ public:
 
     }
 
-
-    void getChildren_lastlevel(const uint64_t node,
-                               initializable_array &C,
-                               uint64_t n_relations_join,
-                               uint16_t *children_to_recurse,
-                               uint64_t &size_children_to_recurse,
-                               const uint64_t k_d
-    ) {
+    void get_children_lastlevel(const uint64_t node,
+        initializable_array& C,
+        uint64_t n_relations_join,
+        uint16_t* children_to_recurse,
+        uint64_t& size_children_to_recurse,
+        const uint64_t k_d)
+    {
         uint64_t children_array[k_d], n_children, ic;
 
         Q->get_children(Q->getHeight() - 1, node, children_array, n_children);
@@ -504,9 +404,7 @@ public:
                     children_to_recurse[size_children_to_recurse++] = element;
             }
         }
-
     }
-
 
     void print(std::ostream &ost) {
         Q->print(ost);

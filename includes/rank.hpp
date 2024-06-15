@@ -1,6 +1,7 @@
 #ifndef RANK_BV
 #define RANK_BV
 
+#include <bitset>
 #include <sdsl/bit_vectors.hpp>
 #include <sdsl/int_vector_buffer.hpp>
 
@@ -58,7 +59,7 @@ public:
         for (int i = 0;  i < n; i++) {
             bv[_bv[i]] = 1;
         }
-        cout << "lo que llegó " << bv << endl;
+        // cout << "lo que llegó " << bv << endl;
 
         uint64_t i;
         uint8_t byte_mask;
@@ -151,13 +152,21 @@ public:
                + 2*sizeof(uint64_t);
     }
 
-    uint64_t get_bits(uint64_t start_pos, uint64_t dim)
+    vector<uint64_t> get_bits(uint64_t start_pos, uint64_t dim)
     {
+        uint64_t mask, shift, size = (dim + 63) / 64;
+        vector<uint64_t> result = vector<uint64_t>(size);
 
-        uint64_t shift = start_pos & 0x3f;
-        uint64_t mask = (1ULL << dim) - 1; // Creates a mask with 'dim' bits set to 1
-
-        uint64_t result = (seq[start_pos >> 6] >> shift) & mask;
+        for (size_t i = 0; i < size; i++, dim -= 64, start_pos += 64) {
+            shift = start_pos & 0x3f;
+            mask = (1ULL << (dim & 0x3f)) - 1;
+            // cout << "obteniendo bits en posicion i = " << i << ", mask = " << std::bitset<64>(mask) << ", shift = " << shift << ", dim = " << dim << endl;
+            if (dim >= 64) {
+                result[i] = (seq[start_pos >> 6] >> shift);
+            } else {
+                result[i] = (seq[start_pos >> 6] >> shift) & mask;
+            }
+        }
 
         return result;
     }

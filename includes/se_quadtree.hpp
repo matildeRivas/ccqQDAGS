@@ -129,7 +129,7 @@ protected:
         bit_vector k_t_ = bit_vector(k_d, 0); // OJO, cuidado con esto
         // NOTA: se podrá usar esto en vez de rankbv para el bm de active?
         // create bit vector of size kd full of 1s, because at first all cells are active
-        bit_vector active_ = bit_vector(k_d, 1);
+        bit_vector active_;
 
         std::queue<t_part_tuple> q;
         idx_type t = 0, last_level = 0;
@@ -335,42 +335,6 @@ public:
         return bv[level].rank(node);
     }
 
-    inline uint64_t get_node_lastlevel(uint16_t level, uint64_t node)
-    {
-        return bv[level].get_bits(node, k_d) & active[level].get_bits(node, k_d);
-    }
-
-    inline uint64_t get_node(uint16_t level, uint64_t node, uint64_t *rank_array, uint64_t rank_value)
-    {
-        uint32_t nd;
-        uint32_t nd_active;
-
-        nd = bv[level].get_bits(node, k_d);
-        nd_active = active[level].get_bits(node, k_d);
-
-        int acc= 1;
-        for (int i = 0; i < k_d; ++i) {
-            int mask = 1 << i;
-            if (mask & nd) {
-                rank_array[i] = rank_value + acc;
-                acc++;
-            }
-        }
-
-        return nd & nd_active;
-    }
-
-    inline uint64_t get_node_active(uint16_t level, uint64_t node, vector<rank_bv_64> tactive)
-    {
-        uint64_t nd;
-
-        nd = (~(tactive[level].get_bits(node, k_d))) & ((1<<k_d) - 1);
-
-
-        return nd;
-    }
-
-
     void get_children(uint16_t level, uint64_t node, uint64_t* children_array, uint64_t &n_children)
     {
         n_children = 0;
@@ -441,16 +405,12 @@ public:
             for (int j = 0; j < aa_r; j+=dim)
             {
                 // read each block
-
-                uint64_t x;
-                x = +bv[i].get_bits(j, dim);
-                cout << std::bitset<128>(x) << endl;
+                vector<uint64_t> x = bv[i].get_bits(j, dim);
                 for (int l = 0; l < dim; l++)
                 {
-                    ost << ((x & (1 << l)) ? "1" : "0");
+                    ost << ((x[l / 64] & (1 << (l % 64))) ? "1" : "0");
                 }
                 ost << " ";
-
             }
             ost << endl;
         }
@@ -469,10 +429,9 @@ public:
             ost << "level " << i << ": ";
 
             for (int j = 0; j < aa_r; j += dim) {
-                uint64_t x = active[i].get_bits(j, dim);
-
+                vector<uint64_t> x = active[i].get_bits(j, dim);
                 for (int l = 0; l < dim; l++) {
-                    ost << ((x & (1 << l)) ? "1" : "0");
+                    ost << ((x[l / 64] & (1 << l)) ? "1" : "0");
                 }
                 ost << " ";
             }
