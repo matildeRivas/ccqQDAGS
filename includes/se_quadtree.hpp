@@ -294,8 +294,6 @@ public:
 
         k_d = std::pow(k, d);
 
-        // cout << /*"Join has " <<*/ _bv[height-1].size() << " \t"/* << endl*/;
-
         for (uint64_t i = 0; i < height; i++)
         {
             bv[i] = rank_bv_64(_bv[i]);
@@ -440,20 +438,19 @@ public:
                 aa_r = 0;
             ost << "level " << i << ": ";
 
-            for (int j = 0; j < aa_r; j++)
+            for (int j = 0; j < aa_r; j+=dim)
             {
-                // read each byte
-                if (j % dim == 0)
-                {
-                    uint64_t x;
-                    x = +bv[i].get_bits(j, dim);
+                // read each block
 
-                    for (int l = 0; l < dim; l++)
-                    {
-                        ost << ((x & (1 << l)) ? "1" : "0");
-                    }
-                    ost << " ";
+                uint64_t x;
+                x = +bv[i].get_bits(j, dim);
+                cout << std::bitset<128>(x) << endl;
+                for (int l = 0; l < dim; l++)
+                {
+                    ost << ((x & (1 << l)) ? "1" : "0");
                 }
+                ost << " ";
+
             }
             ost << endl;
         }

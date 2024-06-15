@@ -274,6 +274,7 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
             cout << "match encontrado" <<endl;
 
             child = children_to_recurse[i];
+            cout << child << endl;
 
             if (child - last_child > 1)
                 last_pos[cur_level] += (child - last_child - 1);
@@ -327,6 +328,7 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
             else if (cur_level == max_level ||
                      AND(Q, root_temp, nQ, cur_level + 1, max_level, bv, last_pos, nAtt, bounded_result, UPPER_BOUND)) {
                 //si se llega al último nivel o si hay resultados en el subárbol, se pone un 1 en la posición para indicar que hay resultados
+                cout << "level " << cur_level << "  " << last_pos[cur_level]+1 << endl;
                 bv[cur_level].push_back(last_pos[cur_level]++);
                 just_zeroes = false;
             } else {
@@ -770,7 +772,9 @@ qdag *multiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
         last_pos[i] = 0;
 
     AND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, bv, last_pos, A.size(), bounded_result, UPPER_BOUND);
-
+    for (uint64_t l=0; l<6; l++){
+        cout << "qdag level " << l << " " << bv[l]<< endl;
+    }
     qdag *qResult = new qdag(bv, A, Q_star[0]->getGridSide(), Q_star[0]->getK(), (uint8_t) A.size());
     return qResult;
 }

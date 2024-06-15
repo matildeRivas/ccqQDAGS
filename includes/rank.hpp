@@ -58,6 +58,7 @@ public:
         for (int i = 0;  i < n; i++) {
             bv[_bv[i]] = 1;
         }
+        cout << "lo que llegó " << bv << endl;
 
         uint64_t i;
         uint8_t byte_mask;
@@ -132,7 +133,7 @@ public:
         }
     }
 
-    // number of bits in the bv
+    // number of bits in the bitvector
     inline uint64_t size()
     {
         return u;
@@ -157,12 +158,6 @@ public:
         uint64_t mask = (1ULL << dim) - 1; // Creates a mask with 'dim' bits set to 1
 
         uint64_t result = (seq[start_pos >> 6] >> shift) & mask;
-
-        // Handle bits spanning across two 64-bit words
-        if (shift + dim > 64) {
-            uint64_t bits_in_next_word = (shift + dim) - 64;
-            result |= (seq[(start_pos >> 6) + 1] & ((1ULL << bits_in_next_word) - 1)) << (64 - shift);
-        }
 
         return result;
     }

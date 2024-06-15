@@ -72,8 +72,8 @@ int main(int argc, char** argv)
 
 
     att_R.push_back(AT_X1); att_R.push_back(AT_X2); att_R.push_back(AT_X3); att_R.push_back(AT_X4);
-    att_R.push_back(AT_X5);// att_R.push_back(AT_X2);
-    att_S.push_back(AT_X2); att_S.push_back(AT_X6);
+    att_R.push_back(AT_X5); att_R.push_back(AT_X6);
+    att_S.push_back(AT_X2); att_S.push_back(AT_X3);
     att_T.push_back(AT_X3); att_T.push_back(AT_X4);
 
     att_X.push_back(AT_X5); att_X.push_back(AT_X1);
@@ -118,8 +118,8 @@ int main(int argc, char** argv)
     qdag* res = multiJoin(Q_a, false, 1000);
     res->print(cout);
 
-    semiJoin(Q_a, false, 1000);
-    qdag_rel_R.print_active(cout);
+    //semiJoin(Q_a, false, 1000);
+    //qdag_rel_R.print_active(cout);
 
     //Q_a[2] = qdag_rel_T;
     //Q_a[1] = qdag_rel_X;

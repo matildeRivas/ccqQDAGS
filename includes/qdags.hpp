@@ -15,7 +15,7 @@
 //extern double total_time_rank;
 //extern duration<double> time_span_rank;
 
-typedef uint8_t type_mapping_M;
+typedef uint16_t type_mapping_M;
 
 bool compare_pairs(const pair<uint64_t, uint64_t> &i, const pair<uint64_t, uint64_t> &j) {
     return i.second < j.second;
