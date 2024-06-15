@@ -118,8 +118,8 @@ int main(int argc, char** argv)
     qdag* res = multiJoin(Q_a, false, 1000);
     res->print(cout);
 
-    //semiJoin(Q_a, false, 1000);
-    //qdag_rel_R.print_active(cout);
+    semiJoin(Q_a, false, 1000);
+    qdag_rel_R.print_active(cout);
 
     //Q_a[2] = qdag_rel_T;
     //Q_a[1] = qdag_rel_X;

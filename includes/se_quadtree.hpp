@@ -393,22 +393,23 @@ public:
     void print(std::ostream &ost)
     {
         size_type dim = pow(k, d);
-        uint64_t i, j, l, aa_r, zz;
+        uint64_t i, start, l, level_size;
         for (i = 1; i < height; i++)
         {
             if (bv[i].size() > 0)
-                aa_r = bv[i].size();
+                level_size = bv[i].size();
             else
-                aa_r = 0;
+                level_size = 0;
             ost << "level " << i << ": ";
 
-            for (int j = 0; j < aa_r; j+=dim)
-            {
+            for (int start = 0; start < level_size; start += dim) {
+                vector<uint64_t> child = bv[i].get_bits(start, dim);
+
                 // read each block
-                vector<uint64_t> x = bv[i].get_bits(j, dim);
-                for (int l = 0; l < dim; l++)
-                {
-                    ost << ((x[l / 64] & (1 << (l % 64))) ? "1" : "0");
+                for (auto block : child) {
+                    string s = bitset<64>(block).to_string();
+                    string reversed(s.rbegin(), s.rend());
+                    ost << reversed.substr(0, dim);
                 }
                 ost << " ";
             }
@@ -419,19 +420,23 @@ public:
     void print_active(std::ostream &ost)
     {
         size_type dim = pow(k, d);
-        uint64_t i, j, l, aa_r, zz;
+        uint64_t i, start, l, level_size;
         for (i = 1; i < height; i++)
         {
             if (active[i].size() > 0)
-                aa_r = active[i].size();
+                level_size = active[i].size();
             else
-                aa_r = 0;
+                level_size = 0;
             ost << "level " << i << ": ";
 
-            for (int j = 0; j < aa_r; j += dim) {
-                vector<uint64_t> x = active[i].get_bits(j, dim);
-                for (int l = 0; l < dim; l++) {
-                    ost << ((x[l / 64] & (1 << l)) ? "1" : "0");
+            for (int start = 0; start < level_size; start += dim) {
+                vector<uint64_t> child = active[i].get_bits(start, dim);
+
+                // read each block
+                for (auto block : child) {
+                    string s = bitset<64>(block).to_string();
+                    string reversed(s.rbegin(), s.rend());
+                    ost << reversed.substr(0, dim);
                 }
                 ost << " ";
             }
