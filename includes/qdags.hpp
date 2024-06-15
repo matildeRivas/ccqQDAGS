@@ -154,7 +154,6 @@ public:
             M[i] = i;  // identity mapping
 
         attribute_set = _attribute_set;
-        //std::sort(attribute_set.begin(), attribute_set.end());
         grid_side = _grid_side;
         is_extended_qdag = false;
 
@@ -168,19 +167,6 @@ public:
         }
 
     }
-
-
-    /*qdag(qdag &q, att_set &_attribute_set)
-    {
-        this->Q = q.Q;
-    Msize = q.Msize;
-    M = new type_mapping_M[Msize];
-    for (uint64_t i = 0; i < Msize; i++)
-        M[i] = q.M[i];
-
-        attribute_set = _attribute_set;
-    std::sort(attribute_set.begin(), attribute_set.end());
-}*/
 
     ~qdag() {
         //if (Q && !is_extended_qdag) {
