@@ -178,7 +178,7 @@ public:
     }
 
     void mark_bit(uint64_t i){
-        seq[i>>6] |= 1 << (i % 64);
+        seq[i>>6] |= 1ULL << (i % 64);
     }
 
     void empty() {
