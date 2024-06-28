@@ -20,7 +20,7 @@ public:
     rank_bv_64() = default;
     uint64_t* seq;
 
-    rank_bv_64(bit_vector &bv)
+    rank_bv_64(bit_vector& bv, int kd)
     {
         uint64_t i;
         uint8_t byte_mask;
@@ -28,9 +28,9 @@ public:
 
         u = bv.size();
 
-        seq = new uint64_t[(u+63)/64]();
-        block = new uint32_t[(u+63)/64]();
-        nw = (u+63)/64;
+        nw = (u + kd - 1) / 64;
+        seq = new uint64_t[nw]();
+        block = new uint32_t[nw]();
 
         for (i = 0; i < u; ++i) {
 
@@ -48,25 +48,24 @@ public:
         n = count;
     }
 
-    rank_bv_64(vector<uint64_t> _bv)
+    rank_bv_64(vector<uint64_t> _bv, int kd)
     {
         u = _bv[_bv.size() - 1] + 1; //last element
         n = _bv.size(); // each element  is a position with a 1
-        nw = (u+63)/64;
-        cout << "u: " << u << " n " << n << endl;
+        nw = ((u + kd - 1) / kd) * ((kd + 63) / 64);
+        u = 64 * nw;
         bit_vector bv = bit_vector(u, 0);
         // for each 1 in _bv, we mark it in bv
         for (int i = 0;  i < n; i++) {
             bv[_bv[i]] = 1;
         }
-        cout << "lo que llegó " << bv << endl;
 
         uint64_t i;
         uint8_t byte_mask;
         uint32_t cur_word = 0, count = 0;
 
-        seq = new uint64_t[(u+63)/64]();
-        block = new uint32_t[(u+63)/64]();
+        seq = new uint64_t[nw]();
+        block = new uint32_t[nw]();
 
         for (i = 0; i < u; ++i) {
 
@@ -75,10 +74,10 @@ public:
 
             if (bv[i]) {
                 count++;
-                seq[i/64] |= (1L<<(i%64));
+                seq[i / 64] |= (1ULL << (i % 64));
             }
             else
-                seq[i/64] &= ~(1L<<(i%64));
+                seq[i / 64] &= ~(1ULL << (i % 64));
         }
     }
 
@@ -159,7 +158,6 @@ public:
         for (size_t i = 0; i < size; i++, dim -= 64, start_pos += 64) {
             shift = start_pos & 0x3f;
             mask = (1ULL << (dim & 0x3f)) - 1;
-            //cout << "obteniendo bits en posicion i = " << i << ", mask = " << std::bitset<64>(mask) << ", shift = " << shift << ", dim = " << dim << endl;
             if (dim >= 64) {
                 result[i] = (seq[start_pos >> 6] >> shift);
             } else {

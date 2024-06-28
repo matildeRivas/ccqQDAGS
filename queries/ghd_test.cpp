@@ -74,16 +74,18 @@ int main(int argc, char **argv) {
     att_R.push_back(AT_X5);
     att_R.push_back(AT_X6);
     att_R.push_back(8);
+
     att_S.push_back(AT_X2);
     att_S.push_back(7);
+
     att_T.push_back(AT_X1);
     att_T.push_back(AT_X2);
     att_T.push_back(AT_X3);
     att_T.push_back(AT_X4);
     att_T.push_back(AT_X5);
     att_T.push_back(AT_X6);
-    att_T.push_back(8);
     att_T.push_back(7);
+    att_T.push_back(8);
 
     att_X.push_back(AT_X5);
     att_X.push_back(AT_X1);
@@ -124,7 +126,9 @@ int main(int argc, char **argv) {
     Q_a[0] = qdag_rel_R;
     Q_a[1] = qdag_rel_S;
     //Q_a[2] = qdag_rel_T;
+    cout << "izquierdo" << endl;
     qdag_rel_R.print(cout);
+    cout << "derecho" << endl;
     qdag_rel_S.print(cout);
 
     //semiJoin(Q_a, false, 1000);
@@ -133,32 +137,11 @@ int main(int argc, char **argv) {
     qdag *res = multiJoin(Q_a, false, 1000);
     res->print(cout);
 
-    cout << "expected result:" <<endl;
-    qdag_rel_T.print(cout);
-    //TODO: select next con el bv de res a ver qué hay
-    uint64_t pos =0;
-    pos = qdag_rel_T.Q->bv[5].select_next(pos);
-    int node=0;
-    cout<< endl<<"1s en level 5 en creado a mano"<<endl;
-    while (pos < 255, node<4){
-        //hay que guardar la posición relativa o absoluta?
-        cout << (pos % qdag_rel_T.getKD())+(node*256) << " ";
-        pos++;
-        pos = qdag_rel_T.Q->bv[5].select_next(pos);
-        node++;
-    }
-    pos = 0;
-
-    pos = res->Q->bv[5].select_next(pos);
-     node=0;
-    cout<<"\n 1s en level 5"<<endl;
-    while (pos < 255, node<4){
-        //hay que guardar la posición relativa o absoluta?
-        cout << (pos % res->getKD())+(node*256) << " ";
-        pos++;
-        pos = res->Q->bv[5].select_next(pos);
-        node++;
-    }
+    vector<qdag> Q_b(2);
+    Q_b[0] = *res;
+    Q_b[1] = qdag_rel_T;
+    qdag* res2 = multiJoin(Q_b, false, 1000);
+    res2->print(cout);
 
     //Q_a[2] = qdag_rel_T;
     //Q_a[1] = qdag_rel_X;

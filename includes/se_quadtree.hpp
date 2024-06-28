@@ -157,8 +157,8 @@ protected:
                 cur_l = l;
                 k_t_.resize(t);
                 active_ = bit_vector(t, 1);
-                bv[cur_level] = rank_bv_64(k_t_);
-                active[cur_level] = rank_bv_64(active_);
+                bv[cur_level] = rank_bv_64(k_t_, k_d);
+                active[cur_level] = rank_bv_64(active_, k_d);
                 total_ones[cur_level] = bv[cur_level].n_ones();
                 cur_level++;
                 t = 0;
@@ -243,9 +243,9 @@ protected:
         }
 
         k_t_.resize(t);
-        bv[height - 1] = rank_bv_64(k_t_);
+        bv[height - 1] = rank_bv_64(k_t_, k_d);
         active_ = bit_vector(t, 1);
-        active[height - 1] = rank_bv_64(active_);
+        active[height - 1] = rank_bv_64(active_, k_d);
 
         total_ones[height - 1] = bv[height - 1].n_ones();
     }
@@ -293,18 +293,14 @@ public:
         total_ones.reserve(height);
 
         k_d = std::pow(k, d);
-        for (uint64_t i = 0; i < height; i++)
-        {
-            cout << "making level " << i <<endl;
-            bv[i] = rank_bv_64(_bv[i]);
+        for (uint64_t i = 0; i < height; i++) {
+            bv[i] = rank_bv_64(_bv[i], k_d);
             total_ones[i] = _bv[i].size();
         }
 
         active = new rank_bv_64[height];
-        for (uint64_t j = 0; j < height; j++)
-        {
-            cout << "creando active" << endl;
-            active[j] = rank_bv_64(_active[j]);
+        for (uint64_t j = 0; j < height; j++) {
+            active[j] = rank_bv_64(_active[j], k_d);
         }
     }
 
@@ -407,7 +403,6 @@ public:
                 vector<uint64_t> child = bv[i].get_bits(start, dim);
 
                 // read each block
-
                 for (uint64_t block : child) {
                     string s = bitset<64>(block).to_string();
                     string reversed(s.rbegin(), s.rend());

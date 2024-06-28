@@ -44,11 +44,13 @@ def decrypt(littleTree):
 def parseTree():
   littleTree = []
 
-  level = input()
+  line = input()
   # leer hasta que haya un input vacío
-  while level:
-    littleTree.append(level[level.find(':')+1:].strip().split(' '))
-    level = input()
+  while line:
+    level = line[line.find(':')+1:].strip().split(' ')
+    level = [node for node in level if int(node) != 0]
+    littleTree.append(level)
+    line = input()
 
   return littleTree
 
