@@ -53,13 +53,13 @@ public:
         u = _bv[_bv.size() - 1] + 1; //last element
         n = _bv.size(); // each element  is a position with a 1
         nw = (u+63)/64;
-
+        cout << "u: " << u << " n " << n << endl;
         bit_vector bv = bit_vector(u, 0);
         // for each 1 in _bv, we mark it in bv
         for (int i = 0;  i < n; i++) {
             bv[_bv[i]] = 1;
         }
-        // cout << "lo que llegó " << bv << endl;
+        cout << "lo que llegó " << bv << endl;
 
         uint64_t i;
         uint8_t byte_mask;
@@ -114,7 +114,7 @@ public:
             uint64_t j = i/64;
             while (++j < nw && !seq[j]);
             if (j == nw) return u; // there is no next 1
-            cout << "el bit siguiente  " << bits::lo(seq[j]) + j*64 << endl;
+            //cout << "el bit siguiente  " << bits::lo(seq[j]) + j*64 << endl;
             return bits::lo(seq[j]) + j*64;
         }
     }
@@ -156,11 +156,10 @@ public:
     {
         uint64_t mask, shift, size = (dim + 63) / 64;
         vector<uint64_t> result = vector<uint64_t>(size);
-
         for (size_t i = 0; i < size; i++, dim -= 64, start_pos += 64) {
             shift = start_pos & 0x3f;
             mask = (1ULL << (dim & 0x3f)) - 1;
-            // cout << "obteniendo bits en posicion i = " << i << ", mask = " << std::bitset<64>(mask) << ", shift = " << shift << ", dim = " << dim << endl;
+            //cout << "obteniendo bits en posicion i = " << i << ", mask = " << std::bitset<64>(mask) << ", shift = " << shift << ", dim = " << dim << endl;
             if (dim >= 64) {
                 result[i] = (seq[start_pos >> 6] >> shift);
             } else {

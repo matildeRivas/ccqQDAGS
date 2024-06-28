@@ -21,13 +21,12 @@ duration<double> time_span_select;
 #define AT_X5 4
 #define AT_X6 5
 
-std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, uint16_t n_Atts)
-{
+std::vector<std::vector<uint64_t>> *read_relation(const std::string filename, uint16_t n_Atts) {
     std::ifstream input_stream(filename);
     uint64_t x;
-    uint16_t i, j=0;
+    uint16_t i, j = 0;
 
-    std::vector<std::vector<uint64_t>>* relation;
+    std::vector<std::vector<uint64_t>> *relation;
     std::vector<uint64_t> tuple;
 
     relation = new std::vector<std::vector<uint64_t>>();
@@ -46,8 +45,7 @@ std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, ui
 }
 
 
-uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_columns, uint64_t max_temp)
-{
+uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_columns, uint64_t max_temp) {
     uint64_t i, j;
 
     for (i = 0; i < table.size(); i++)
@@ -60,9 +58,7 @@ uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_
 }
 
 
-
-int main(int argc, char** argv)
-{
+int main(int argc, char **argv) {
     // Setup de GHD: leer qdags que forman nodos
     qdag::att_set att_R;
     qdag::att_set att_S;
@@ -71,22 +67,37 @@ int main(int argc, char** argv)
     qdag::att_set att_W;
 
 
-    att_R.push_back(AT_X1); att_R.push_back(AT_X2); att_R.push_back(AT_X3); att_R.push_back(AT_X4);
-    att_R.push_back(AT_X5); att_R.push_back(AT_X6);
-    att_S.push_back(AT_X2); att_S.push_back(AT_X3);
-    att_T.push_back(AT_X3); att_T.push_back(AT_X4);
+    att_R.push_back(AT_X1);
+    att_R.push_back(AT_X2);
+    att_R.push_back(AT_X3);
+    att_R.push_back(AT_X4);
+    att_R.push_back(AT_X5);
+    att_R.push_back(AT_X6);
+    att_R.push_back(8);
+    att_S.push_back(AT_X2);
+    att_S.push_back(7);
+    att_T.push_back(AT_X1);
+    att_T.push_back(AT_X2);
+    att_T.push_back(AT_X3);
+    att_T.push_back(AT_X4);
+    att_T.push_back(AT_X5);
+    att_T.push_back(AT_X6);
+    att_T.push_back(8);
+    att_T.push_back(7);
 
-    att_X.push_back(AT_X5); att_X.push_back(AT_X1);
-    att_W.push_back(AT_X5); att_W.push_back(AT_X3);
+    att_X.push_back(AT_X5);
+    att_X.push_back(AT_X1);
+    att_W.push_back(AT_X5);
+    att_W.push_back(AT_X3);
     //att_W.push_back(AT_X5);
 
 
     std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]), strRel_X(argv[4]), strRel_W(argv[5]);
-    std::vector<std::vector<uint64_t>>* rel_R = read_relation(strRel_R, att_R.size());
-    std::vector<std::vector<uint64_t>>* rel_S = read_relation(strRel_S, att_S.size());
-    std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
-    std::vector<std::vector<uint64_t>>* rel_X = read_relation(strRel_X, att_X.size());
-    std::vector<std::vector<uint64_t>>* rel_W = read_relation(strRel_W, att_W.size());
+    std::vector<std::vector<uint64_t>> *rel_R = read_relation(strRel_R, att_R.size());
+    std::vector<std::vector<uint64_t>> *rel_S = read_relation(strRel_S, att_S.size());
+    std::vector<std::vector<uint64_t>> *rel_T = read_relation(strRel_T, att_T.size());
+    std::vector<std::vector<uint64_t>> *rel_X = read_relation(strRel_X, att_X.size());
+    std::vector<std::vector<uint64_t>> *rel_W = read_relation(strRel_W, att_W.size());
 
     uint64_t grid_side = 32;
 
@@ -115,23 +126,51 @@ int main(int argc, char** argv)
     //Q_a[2] = qdag_rel_T;
     qdag_rel_R.print(cout);
     qdag_rel_S.print(cout);
-    qdag* res = multiJoin(Q_a, false, 1000);
+
+    //semiJoin(Q_a, false, 1000);
+    //qdag_rel_R.print_active(cout);
+
+    qdag *res = multiJoin(Q_a, false, 1000);
     res->print(cout);
 
-    semiJoin(Q_a, false, 1000);
-    qdag_rel_R.print_active(cout);
+    cout << "expected result:" <<endl;
+    qdag_rel_T.print(cout);
+    //TODO: select next con el bv de res a ver qué hay
+    uint64_t pos =0;
+    pos = qdag_rel_T.Q->bv[5].select_next(pos);
+    int node=0;
+    cout<< endl<<"1s en level 5 en creado a mano"<<endl;
+    while (pos < 255, node<4){
+        //hay que guardar la posición relativa o absoluta?
+        cout << (pos % qdag_rel_T.getKD())+(node*256) << " ";
+        pos++;
+        pos = qdag_rel_T.Q->bv[5].select_next(pos);
+        node++;
+    }
+    pos = 0;
+
+    pos = res->Q->bv[5].select_next(pos);
+     node=0;
+    cout<<"\n 1s en level 5"<<endl;
+    while (pos < 255, node<4){
+        //hay que guardar la posición relativa o absoluta?
+        cout << (pos % res->getKD())+(node*256) << " ";
+        pos++;
+        pos = res->Q->bv[5].select_next(pos);
+        node++;
+    }
 
     //Q_a[2] = qdag_rel_T;
     //Q_a[1] = qdag_rel_X;
-    /*vector<qdag> Q_b(3);
-    Q_b[0] = qdag_rel_R;
-    Q_b[1] = qdag_rel_X;
-    Q_b[2] = qdag_rel_W;
-    cout << endl;
+    //vector<qdag> Q_b(2);
+    //Q_b[0] = *res;
+    //Q_b[1] = qdag_rel_R;
+    //Q_b[2] = qdag_rel_W;
+    //cout << endl;
 
-    semiJoin(Q_b, false, 1000);
-    qdag_rel_R.print_active(cout);
-*/
+    //semiJoin(Q_b, false, 1000);
+    //qdag_rel_R.print_active(cout);
+
 
     // Crear GHDs
 /*

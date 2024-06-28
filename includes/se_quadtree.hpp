@@ -293,9 +293,9 @@ public:
         total_ones.reserve(height);
 
         k_d = std::pow(k, d);
-
         for (uint64_t i = 0; i < height; i++)
         {
+            cout << "making level " << i <<endl;
             bv[i] = rank_bv_64(_bv[i]);
             total_ones[i] = _bv[i].size();
         }
@@ -303,6 +303,7 @@ public:
         active = new rank_bv_64[height];
         for (uint64_t j = 0; j < height; j++)
         {
+            cout << "creando active" << endl;
             active[j] = rank_bv_64(_active[j]);
         }
     }
@@ -406,7 +407,8 @@ public:
                 vector<uint64_t> child = bv[i].get_bits(start, dim);
 
                 // read each block
-                for (auto block : child) {
+
+                for (uint64_t block : child) {
                     string s = bitset<64>(block).to_string();
                     string reversed(s.rbegin(), s.rend());
                     ost << reversed.substr(0, dim);
