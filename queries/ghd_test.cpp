@@ -69,30 +69,19 @@ int main(int argc, char **argv) {
 
     att_R.push_back(AT_X1);
     att_R.push_back(AT_X2);
-    att_R.push_back(AT_X3);
-    att_R.push_back(AT_X4);
-    att_R.push_back(AT_X5);
-    att_R.push_back(AT_X6);
-    att_R.push_back(8);
 
     att_S.push_back(AT_X2);
-    att_S.push_back(7);
+    att_S.push_back(AT_X3);
 
-    att_T.push_back(AT_X1);
-    att_T.push_back(AT_X2);
     att_T.push_back(AT_X3);
     att_T.push_back(AT_X4);
-    att_T.push_back(AT_X5);
-    att_T.push_back(AT_X6);
-    att_T.push_back(7);
-    att_T.push_back(8);
 
     att_X.push_back(AT_X5);
     att_X.push_back(AT_X1);
     att_W.push_back(AT_X5);
     att_W.push_back(AT_X3);
-    //att_W.push_back(AT_X5);
 
+    //att_W.push_back(AT_X5);
 
     std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]), strRel_X(argv[4]), strRel_W(argv[5]);
     std::vector<std::vector<uint64_t>> *rel_R = read_relation(strRel_R, att_R.size());
@@ -121,60 +110,28 @@ int main(int argc, char **argv) {
 
     // Crear vectores de relacion de cada nodo
 
-    vector<qdag> Q_a(2);
+    vector<qdag> Q_a(3);
 
     Q_a[0] = qdag_rel_R;
     Q_a[1] = qdag_rel_S;
-    //Q_a[2] = qdag_rel_T;
-    cout << "izquierdo" << endl;
-    qdag_rel_R.print(cout);
-    cout << "derecho" << endl;
-    qdag_rel_S.print(cout);
-
-    //semiJoin(Q_a, false, 1000);
-    //qdag_rel_R.print_active(cout);
-
-    qdag *res = multiJoin(Q_a, false, 1000);
-    res->print(cout);
+    Q_a[2] = qdag_rel_T;
 
     vector<qdag> Q_b(2);
-    Q_b[0] = *res;
-    Q_b[1] = qdag_rel_T;
-    qdag* res2 = multiJoin(Q_b, false, 1000);
-    res2->print(cout);
+    Q_b[0] = qdag_rel_X;
+    Q_b[1] = qdag_rel_W;
 
-    //Q_a[2] = qdag_rel_T;
-    //Q_a[1] = qdag_rel_X;
-    //vector<qdag> Q_b(2);
-    //Q_b[0] = *res;
-    //Q_b[1] = qdag_rel_R;
-    //Q_b[2] = qdag_rel_W;
-    //cout << endl;
 
     //semiJoin(Q_b, false, 1000);
     //qdag_rel_R.print_active(cout);
 
 
     // Crear GHDs
-/*
-    cout << "izquierda:\n";
-    Q_b[0].print(cout);
-    cout << "\nderecha:\n";
-    Q_b[1].print(cout);
-    cout << endl;
-    qdag* res = multiJoin(Q_b, false, 1000);
-    res->print(cout);
-    semiJoin(Q_b, false, 1000);
-    Q_b[0].print_active(cout);
-    cout << endl;
-
 
     vector<ghd> empty_children(0);
     ghd sub = ghd(Q_b, empty_children);
     vector<ghd> level_1;
     level_1.push_back(sub);
     ghd root = ghd(Q_a, level_1);
-
 
     // Ejecutar multijoin en todos los niveles
     root.deep_exec_multijoin();
@@ -190,24 +147,31 @@ int main(int argc, char **argv) {
 
     // Ejecutar semijoin entre root y nivel 1
     root.constrained_by_children();
-    root.get_relations().front().print(cout);
+    //cout << "bv de root desp de sj" <<endl;
+    //root.get_relations().front().print(cout);
     cout << "active de root desp de sj" <<endl;
     root.get_relations().front().print_active(cout);
 
     root.constrain_children();
-    root.get_relations().front().print(cout);
+    //cout << "bv de l1 desp de sj" <<endl;
+    //root.get_child_qdags().front().print(cout);
     cout << "active de level1 desp de sj" <<endl;
     root.get_child_qdags().front().print_active(cout);
 
     // multijoin para obtener resultado del join
     vector<qdag> producto_punto(2);
     producto_punto[0] = root.get_relations().front();
+    cout << "izq\n";
+    producto_punto[0].print(cout);
     producto_punto[1] = root.get_child_qdags().front();
-
+    cout << "der\n";
+    producto_punto[1].print(cout);
+    cout << "resultado final\n";
     qdag* res = multiJoin(producto_punto, false, 1000);
     res->print(cout);
 
 
+/*
     vector<qdag> test(5);
 
     test[0] = qdag_rel_R;
@@ -217,13 +181,14 @@ int main(int argc, char **argv) {
     test[4] = qdag_rel_W;
     qdag* test_result = multiJoin(test, false, 1000);
     test_result->print(cout);
-
+    */
+/*
     qdag* yan_res = yannakakis(root);
+    cout << "resultado yannakakis\n";
     yan_res->print(cout);
-
-
-
 */
+
+
 
     return 0;
 }

@@ -341,13 +341,17 @@ public:
         auto debug = false;
 
         pos = bv[level].select_next_active(pos, active[level]);
-
+        cout << "node + kd = " << node+k_d<< endl;
+        cout << "children: "<< pos;
         while (pos < node + k_d){
             //hay que guardar la posición relativa o absoluta?
             children_array[n_children++] = pos % k_d;
             pos++;
             pos = bv[level].select_next_active(pos, active[level]);
+
+            cout << " " << pos;
         }
+        cout << endl;
         //children son los 1 en el nodo o lo que esté en el siguiente nivel? es como un get bits pero solo las posiciones de los 1
     }
 

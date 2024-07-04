@@ -235,6 +235,7 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
          uint16_t cur_level, uint16_t max_level,
          vector<uint64_t> bv[], uint64_t last_pos[], uint64_t nAtt,
          bool bounded_result, uint64_t UPPER_BOUND) {
+    cout << "entro al AND " << cur_level<<endl;
     uint64_t p = Q[0]->nChildren();
     bool result = false;
     //uint64_t root_temp[nQ];
@@ -286,10 +287,12 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
             last_pos[cur_level] += (p - last_child - 1);
     } else {
         uint64_t root_temp[nQ];
-        uint64_t rank_vector[16][64];
+        uint64_t rank_vector[nQ][64];
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
-            Q[i]->get_children(cur_level, roots[i], C, nQ, children_to_recurse, children_to_recurse_size, rank_vector[i], k_d[i]);
+            cout<<"get children qdag number "<< i << endl;
+            Q[i]->get_children(cur_level, roots[i], C, nQ, children_to_recurse, children_to_recurse_size, rank_vector[i], k_d[i], i);
+
         }
 
 
@@ -567,7 +570,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
         Q[0]->filterChildren(cur_level, roots[0], C, nQ, children_to_recurse, children_to_recurse_size, k_d[0], result_bv[cur_level]);
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
-            Q[i]->get_children(cur_level, roots[i], C, nQ, children_to_recurse, children_to_recurse_size, rank_vector[i], k_d[i]);
+            Q[i]->get_children(cur_level, roots[i], C, nQ, children_to_recurse, children_to_recurse_size, rank_vector[i], k_d[i], i);
         }
 
 

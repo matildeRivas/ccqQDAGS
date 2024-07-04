@@ -199,14 +199,18 @@ public:
         q->grid_side = this->grid_side;
         q->is_extended_qdag = true;
         q->Msize = p; // this.Msize;
+        cout << "p es "<<p<<endl;
 
         uint64_t j = std::pow(Q->getK(), dim_prime);
 
         for (i = 0; i < j; i++)
             q->M_prime.push_back(new std::vector<type_mapping_M>());
 
-        for (i = 0; i < p; i++)
+        for (i = 0; i < p; i++) {
+            cout << "posicion asignada " << q->M[i];
+            cout << "  contenido " << i<<endl;
             q->M_prime[q->M[i]]->push_back(i);
+        }
 
         return q;
     }
@@ -320,7 +324,7 @@ public:
         uint16_t* children_to_recurse,
         uint64_t& size_children_to_recurse,
         uint64_t* rank_vector,
-        const uint64_t k_d)
+        const uint64_t k_d, int flag)
     {
         //            start_rank = high_resolution_clock::now();
         uint64_t r = Q->rank(level, node);
@@ -343,14 +347,18 @@ public:
             cur_child = children_array[ic];
             rank_vector[cur_child] = ++r;
             size = M_prime[cur_child]->size();
+            cout << "extended: ";
             for (j = 0; j < size; ++j) {
                 element = (*M_prime[cur_child])[j];
+                cout << " " << element;
                 C.increment(element);
-                if (C[element] == n_relations_join)
+                if (C[element] == n_relations_join) {
                     children_to_recurse[size_children_to_recurse++] = element;
+                    //cout << "marked child " << "level " << level  << " node " << node << " child " << cur_child << "extended child "<< element<< endl;
+                }
                 if (C[element] >= n_relations_join * 2 + 1)
                     cout << "level " << level  << " node " << node << " skipped child " << cur_child << endl;
-            }
+            }cout<<endl;
         }
     }
 

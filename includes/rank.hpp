@@ -50,6 +50,7 @@ public:
 
     rank_bv_64(vector<uint64_t> _bv, int kd)
     {
+        cout<< "esto llega a rank " << _bv << endl;
         u = _bv[_bv.size() - 1] + 1; //last element
         n = _bv.size(); // each element  is a position with a 1
         nw = ((u + kd - 1) / kd) * ((kd + 63) / 64);
@@ -128,7 +129,9 @@ public:
         } else {
             uint64_t j = i/64;
             while (++j < nw && !(seq[j] & active.seq[j]));
-            if (j == nw) return u; // there is no next 1
+            if (j == nw){
+                return u; // there is no next 1
+            }
             return bits::lo(seq[j] & active.seq[j]) + j*64;
         }
     }
