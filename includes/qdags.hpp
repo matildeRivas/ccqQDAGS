@@ -199,7 +199,6 @@ public:
         q->grid_side = this->grid_side;
         q->is_extended_qdag = true;
         q->Msize = p; // this.Msize;
-        cout << "p es "<<p<<endl;
 
         uint64_t j = std::pow(Q->getK(), dim_prime);
 
@@ -207,8 +206,6 @@ public:
             q->M_prime.push_back(new std::vector<type_mapping_M>());
 
         for (i = 0; i < p; i++) {
-            cout << "posicion asignada " << q->M[i];
-            cout << "  contenido " << i<<endl;
             q->M_prime[q->M[i]]->push_back(i);
         }
 
@@ -332,25 +329,31 @@ public:
 //            time_span_rank = duration_cast<duration<double>>(stop_rank - start_rank);
 //            total_time_rank += time_span_rank.count();
 
-        uint64_t children_array[k_d], n_children, ic;
+        uint16_t n_children, n_active;
+        uint64_t children_array[k_d], active_array[k_d];
 
         //start_rank = high_resolution_clock::now();
         Q->get_children(level, node, children_array, n_children);
+        Q->get_children_active(level, node, active_array, n_active);
         //          stop_rank = high_resolution_clock::now();
         //          time_span_rank = duration_cast<duration<double>>(stop_rank - start_rank);
         //          total_time_rank += time_span_rank.count();
 
-        uint16_t cur_child;
+        uint16_t cur_child, i_active = 0;
         uint64_t j, size, element;
 
-        for (ic = 0; ic < n_children; ++ic) {
+        for (uint16_t ic = 0; ic < n_children, i_active < n_active; ++ic) {
             cur_child = children_array[ic];
             rank_vector[cur_child] = ++r;
+
+            // filter only active childs
+            if (cur_child != active_array[i_active])
+                continue;
+            i_active++;
+
             size = M_prime[cur_child]->size();
-            cout << "extended: ";
             for (j = 0; j < size; ++j) {
                 element = (*M_prime[cur_child])[j];
-                cout << " " << element;
                 C.increment(element);
                 if (C[element] == n_relations_join) {
                     children_to_recurse[size_children_to_recurse++] = element;
@@ -358,7 +361,7 @@ public:
                 }
                 if (C[element] >= n_relations_join * 2 + 1)
                     cout << "level " << level  << " node " << node << " skipped child " << cur_child << endl;
-            }cout<<endl;
+            };
         }
     }
 
@@ -395,14 +398,15 @@ public:
         uint64_t& size_children_to_recurse,
         const uint64_t k_d)
     {
-        uint64_t children_array[k_d], n_children, ic;
+        uint16_t n_children;
+        uint64_t children_array[k_d];
 
         Q->get_children(Q->getHeight() - 1, node, children_array, n_children);
 
         uint16_t cur_child;
         uint64_t j, size, element;
 
-        for (ic = 0; ic < n_children; ++ic) {
+        for (uint16_t ic = 0; ic < n_children; ++ic) {
             cur_child = children_array[ic];
             size = M_prime[cur_child]->size();
             for (j = 0; j < size; ++j) {

@@ -35,7 +35,8 @@ bool propagate_active(qdag* Q, uint16_t cur_level, uint16_t max_level, vector<ra
         uint64_t k_d = Q->getKD();
         uint64_t r = Q->Q->rank(cur_level, node);
 
-        uint64_t children_array[k_d], n_children;
+        uint16_t n_children;
+        uint64_t children_array[k_d];
         Q->Q->get_children(cur_level, node, children_array, n_children);
 
         // por cuántos hijos voy a bajar, cuenta la cantitdad de 1s en un arreglo de bits/entero
@@ -235,7 +236,7 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
          uint16_t cur_level, uint16_t max_level,
          vector<uint64_t> bv[], uint64_t last_pos[], uint64_t nAtt,
          bool bounded_result, uint64_t UPPER_BOUND) {
-    cout << "entro al AND " << cur_level<<endl;
+    cout << "------------ entro al AND " << cur_level << endl;
     uint64_t p = Q[0]->nChildren();
     bool result = false;
     //uint64_t root_temp[nQ];
@@ -266,7 +267,7 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
             cout << "match encontrado" <<endl;
 
             child = children_to_recurse[i];
-            cout << child << endl;
+            cout << "level " << cur_level << "  " << child << endl;
 
             if (child - last_child > 1)
                 last_pos[cur_level] += (child - last_child - 1);
@@ -287,17 +288,17 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
             last_pos[cur_level] += (p - last_child - 1);
     } else {
         uint64_t root_temp[nQ];
-        uint64_t rank_vector[nQ][64];
+        uint64_t level_size = 0;
+        for (i = 0; i < nQ; ++i) {
+            level_size = std::max(level_size, Q[i]->Q->bv->size());
+        }
+        uint64_t rank_vector[nQ][level_size];
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
-            cout<<"get children qdag number "<< i << endl;
             Q[i]->get_children(cur_level, roots[i], C, nQ, children_to_recurse, children_to_recurse_size, rank_vector[i], k_d[i], i);
-
         }
 
-
         std::sort(children_to_recurse, children_to_recurse + children_to_recurse_size);
-
 
         int64_t last_child = -1;
         uint16_t child;
@@ -564,7 +565,11 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
     } else {
         // arreglo con raices que serán usadas en llamada recursiva
         uint64_t root_temp[nQ];
-        uint64_t rank_vector[nQ][64];
+        uint64_t level_size = 0;
+        for (i = 0; i < nQ; ++i) {
+            level_size = std::max(level_size, Q[i]->Q->bv->size());
+        }
+        uint64_t rank_vector[nQ][level_size];
 
         k_d[0] = Q[0]->getKD();
         Q[0]->filterChildren(cur_level, roots[0], C, nQ, children_to_recurse, children_to_recurse_size, k_d[0], result_bv[cur_level]);

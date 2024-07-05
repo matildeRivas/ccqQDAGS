@@ -332,29 +332,37 @@ public:
         return bv[level].rank(node);
     }
 
-    void get_children(uint16_t level, uint64_t node, uint64_t* children_array, uint64_t &n_children)
+    void get_children(uint16_t level, uint64_t node, uint64_t* children_array, uint16_t& n_children)
     {
         n_children = 0;
         //Hay que hacer el chequeo de que no exceda la posición máxima del nodo desde get_children.
         uint64_t pos = node;
 
-        auto debug = false;
+        pos = bv[level].select_next(pos);
+        while (pos < node + k_d) {
+            // hay que guardar la posición relativa o absoluta?
+            children_array[n_children++] = pos % k_d;
+            pos++;
+            pos = bv[level].select_next(pos);
+        }
+        // children son los 1 en el nodo o lo que esté en el siguiente nivel? es como un get bits pero solo las posiciones de los 1
+    }
+
+    void get_children_active(uint16_t level, uint64_t node, uint64_t* children_array, uint16_t& n_children)
+    {
+        n_children = 0;
+        // Hay que hacer el chequeo de que no exceda la posición máxima del nodo desde get_children.
+        uint64_t pos = node;
 
         pos = bv[level].select_next_active(pos, active[level]);
-        cout << "node + kd = " << node+k_d<< endl;
-        cout << "children: "<< pos;
         while (pos < node + k_d){
             //hay que guardar la posición relativa o absoluta?
             children_array[n_children++] = pos % k_d;
             pos++;
             pos = bv[level].select_next_active(pos, active[level]);
-
-            cout << " " << pos;
         }
-        cout << endl;
         //children son los 1 en el nodo o lo que esté en el siguiente nivel? es como un get bits pero solo las posiciones de los 1
     }
-
 
     void get_children_result(uint16_t level, uint64_t node, uint64_t* children_array, uint64_t &n_children, rank_bv_64 result)
     {

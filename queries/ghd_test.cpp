@@ -100,8 +100,6 @@ int main(int argc, char **argv) {
 
     grid_side++;
 
-    //cout << "Grid side: " << grid_side << endl;
-
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
@@ -182,13 +180,10 @@ int main(int argc, char **argv) {
     qdag* test_result = multiJoin(test, false, 1000);
     test_result->print(cout);
     */
-/*
+
     qdag* yan_res = yannakakis(root);
     cout << "resultado yannakakis\n";
     yan_res->print(cout);
-*/
-
-
 
     return 0;
 }
