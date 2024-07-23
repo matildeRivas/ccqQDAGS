@@ -11,9 +11,9 @@
 #include<chrono>
 #include<ctime>
 
-//extern high_resolution_clock::time_point start_rank, stop_rank;
-//extern double total_time_rank;
-//extern duration<double> time_span_rank;
+extern high_resolution_clock::time_point start_rank, stop_rank;
+extern double total_time_rank;
+extern duration<double> time_span_rank;
 
 typedef uint16_t type_mapping_M;
 
@@ -27,9 +27,6 @@ public:
 
     typedef vector<uint64_t> att_set;
     se_quadtree *Q;
-    int32_t tab_extend_5[65535];   // queries of 5 attributes, i.e., dimension 2^5=32
-    int32_t tab_extend_4[65535];
-    int32_t tab_extend_3[65535];
 
 private:
 
@@ -86,9 +83,9 @@ public:
          uint8_t k, uint8_t d
     ) {
 
-        cout << "creando qdag con k=" << unsigned(k) << " y d=" << unsigned(d) << endl;
+        //cout << "creando qdag con k=" << unsigned(k) << " y d=" << unsigned(d) << endl;
         Msize = std::pow(k, d);
-        cout << "k^d=" << Msize << endl;
+        //cout << "k^d=" << Msize << endl;
 
         M = new type_mapping_M[Msize];
 
@@ -158,7 +155,7 @@ public:
         uint16_t dim_prime = attribute_set.size();
         uint64_t p = std::pow(Q->getK(), dim);
 
-        cout << "extendiendo de [" << attribute_set << "] a [" << attribute_set_A << "]" << endl;
+        //cout << "extendiendo de [" << attribute_set << "] a [" << attribute_set_A << "]" << endl;
 
         type_mapping_M *_M = new type_mapping_M[p];
 
@@ -253,67 +250,6 @@ public:
     }
 
 
-    // This is for a binary relation, i.e., a k^2-tree with 4 children per node
-    void createTableExtend5() {
-        uint64_t i, j;
-        uint32_t x, B;
-        B = std::pow(2, Q->getKD());
-
-        for (i = 0; i < B; i++) {
-            x = 0;
-            for (j = 0; j < 32; j++)
-                if (i & (1 << M[j]))
-                    x = (x << 1) | 1;
-                else
-                    x = (x << 1);
-
-            tab_extend_5[i] = x;
-            //cout << x << endl;
-        }
-    }
-
-    // This is for a binary relation, i.e., a k^2-tree with 4 children per node
-    void createTableExtend4() {
-        uint64_t i, j;
-        uint32_t x, B;
-        B = std::pow(2, Q->getKD());
-
-        for (i = 0; i < B; i++) {
-            x = 0;
-            for (j = 0; j < 16; j++)
-                if (i & (1 << M[j]))
-                    x = (x << 1) | 1;
-                else
-                    x = (x << 1);
-
-            tab_extend_4[i] = x << 16;
-            //cout << std::hex << x << endl;
-        }
-    }
-
-    // This is for a binary relation, i.e., a k^2-tree with 4 children per node
-    void createTableExtend3() {
-        uint64_t i, j;
-        uint32_t x, B;
-        B = std::pow(2, Q->getKD());
-
-        //if (Q->getKD() == 2)
-        //    B = 4;
-        //else
-        //    B = 16
-
-        for (i = 0; i < B; i++) {
-            x = 0;
-            for (j = 0; j < 8; j++)
-                if (i & (1 << M[j]))
-                    x = (x << 1) | 1;
-                else
-                    x = (x << 1);
-
-            tab_extend_3[i] = x << 24;
-            //cout << std::hex << x << endl;
-        }
-    }
 
     void get_children(uint16_t level, const uint64_t node,
         initializable_array& C,
@@ -359,8 +295,8 @@ public:
                     children_to_recurse[size_children_to_recurse++] = element;
                     //cout << "marked child " << "level " << level  << " node " << node << " child " << cur_child << "extended child "<< element<< endl;
                 }
-                if (C[element] >= n_relations_join * 2 + 1)
-                    cout << "level " << level  << " node " << node << " skipped child " << cur_child << endl;
+                //if (C[element] >= n_relations_join * 2 + 1)
+                  //  cout << "level " << level  << " node " << node << " skipped child " << cur_child << endl;
             };
         }
     }
@@ -385,7 +321,7 @@ public:
             for (j = 0; j < size; ++j) {
                 element = (*M_prime[cur_child])[j];
                 C.assign(element, n_relations_join + 1);
-                cout << "marked level " << level << " node " << node << "child " << cur_child << " extended " << element <<endl;
+                //cout << "marked level " << level << " node " << node << "child " << cur_child << " extended " << element <<endl;
             }
         }
 

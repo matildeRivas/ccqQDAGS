@@ -127,7 +127,6 @@ protected:
 
         //create a bit vector of size k^d full of 0s
         bit_vector k_t_ = bit_vector(k_d, 0); // OJO, cuidado con esto
-        // NOTA: se podrá usar esto en vez de rankbv para el bm de active?
         // create bit vector of size kd full of 1s, because at first all cells are active
         bit_vector active_;
 
@@ -135,7 +134,7 @@ protected:
         idx_type t = 0, last_level = 0;
         idx_type i, j, r_0, c_0, it, c, r, z;
         size_type l = std::pow(k, height - 1);
-
+//2^25 da distinto
         std::vector<idx_type> pos_by_chunk(k_d + 1, 0);
 
         idx_type *top_left_point = new idx_type[d]();

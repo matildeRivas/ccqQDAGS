@@ -10,7 +10,7 @@ void tobinary(unsigned number) {
 
 
 void mark_result_bv(vector<rank_bv_64> temp_bv, uint16_t cur_level, uint64_t i) {
-    cout << "mark result " << cur_level << " " << i << endl;
+    //cout << "mark result " << cur_level << " " << i << endl;
     temp_bv[cur_level].mark_bit(i);
 }
 
@@ -236,7 +236,7 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
          uint16_t cur_level, uint16_t max_level,
          vector<uint64_t> bv[], uint64_t last_pos[], uint64_t nAtt,
          bool bounded_result, uint64_t UPPER_BOUND) {
-    cout << "------------ entro al AND " << cur_level << endl;
+    //cout << "------------ entro al AND " << cur_level << endl;
     uint64_t p = Q[0]->nChildren();
     bool result = false;
     //uint64_t root_temp[nQ];
@@ -264,10 +264,10 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
         uint16_t child;
 
         for (i = 0; i < children_to_recurse_size; ++i) {
-            cout << "match encontrado" <<endl;
+            //cout << "match encontrado" <<endl;
 
             child = children_to_recurse[i];
-            cout << "level " << cur_level << "  " << child << endl;
+            //cout << "level " << cur_level << "  " << child << endl;
 
             if (child - last_child > 1)
                 last_pos[cur_level] += (child - last_child - 1);
@@ -323,7 +323,7 @@ bool AND(qdag *Q[], uint64_t *roots, uint16_t nQ,
             else if (cur_level == max_level ||
                      AND(Q, root_temp, nQ, cur_level + 1, max_level, bv, last_pos, nAtt, bounded_result, UPPER_BOUND)) {
                 //si se llega al último nivel o si hay resultados en el subárbol, se pone un 1 en la posición para indicar que hay resultados
-                cout << "level " << cur_level << "  " << last_pos[cur_level]+1 << endl;
+                //cout << "level " << cur_level << "  " << last_pos[cur_level]+1 << endl;
                 bv[cur_level].push_back(last_pos[cur_level]++);
                 just_zeroes = false;
             } else {
@@ -550,9 +550,9 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
             else {
 
                 // obtener el bit del nodo
-                cout << endl
-                     << "----------------------------------------" << endl
-                     << "encontro match: " << roots[0] + Q[0]->getM(last_pos[cur_level] % p) << endl;
+                //cout << endl
+                     //<< "----------------------------------------" << endl
+                     //<< "encontro match: " << roots[0] + Q[0]->getM(last_pos[cur_level] % p) << endl;
                 mark_result_bv(result_bv, cur_level, roots[0] + Q[0]->getM(last_pos[cur_level] % p));
                 last_pos[cur_level]++;
                 just_zeroes = false;
@@ -772,7 +772,7 @@ qdag *multiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
 
     AND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, bv, last_pos, A.size(), bounded_result, UPPER_BOUND);
     for (uint64_t l=0; l<6; l++){
-        cout << "qdag level " << l << ": " << bv[l]<< endl;
+        //cout << "qdag level " << l << ": " << bv[l]<< endl;
     }
     qdag *qResult = new qdag(bv, A, Q_star[0]->getGridSide(), Q_star[0]->getK(), (uint8_t) A.size());
     return qResult;
@@ -851,19 +851,19 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
 
     // computes the union of the attribute sets
     for (uint64_t i = 0; i < Q.size(); i++) {
-        cout << "attrs " << i << ":";
+        //cout << "attrs " << i << ":";
         uint64_t nAttr = Q[i].nAttr();
         for (uint64_t j = 0; j < nAttr; j++) {
             attr_map[Q[i].getAttr(j)] = 1;
-            cout << " " << Q[i].getAttr(j);
+            //cout << " " << Q[i].getAttr(j);
         }
-        cout << endl;
+        //cout << endl;
     }
 
     for (map<uint64_t, uint8_t>::iterator it = attr_map.begin(); it != attr_map.end(); it++)
         A.push_back(it->first);
 
-    cout << "union de attrs: " << A << endl;
+    //cout << "union de attrs: " << A << endl;
     qdag *Q_star[Q.size()];
     uint64_t Q_roots[Q.size()];
 
@@ -885,7 +885,7 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
 
     SemiAND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, last_pos, A.size(), bounded_result, UPPER_BOUND, result_bv);
 
-    cout << endl << "========================  propagating active  =======================" << endl << endl;
+    //cout << endl << "========================  propagating active  =======================" << endl << endl;
     //bajar por result_bv recursivamente, si hay un 1 en el nodo hijo, marcar padre
     propagate_active(Q_star[0], 1, Q_star[0]->getHeight() - 1, result_bv, 0);
 

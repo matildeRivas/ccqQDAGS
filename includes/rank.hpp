@@ -50,7 +50,7 @@ public:
 
     rank_bv_64(vector<uint64_t> _bv, int kd)
     {
-        cout<< "esto llega a rank " << _bv << endl;
+        //cout<< "esto llega a rank " << _bv << endl;
         u = _bv[_bv.size() - 1] + 1; //last element
         n = _bv.size(); // each element  is a position with a 1
         nw = ((u + kd - 1) / kd) * ((kd + 63) / 64);
