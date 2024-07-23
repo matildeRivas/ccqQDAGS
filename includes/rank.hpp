@@ -28,7 +28,11 @@ public:
 
         u = bv.size();
 
-        nw = (u + kd - 1) / 64;
+        if (kd < 64) {
+            nw = (u + 63) / 64;
+        } else {
+            nw = (u + kd - 1) / kd * (kd / 64);
+        }
         seq = new uint64_t[nw]();
         block = new uint32_t[nw]();
 

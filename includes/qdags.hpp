@@ -89,9 +89,7 @@ public:
 
         M = new type_mapping_M[Msize];
 
-        uint64_t i, j;
-
-        for (i = 0; i < Msize; i++)
+        for (uint64_t i = 0; i < Msize; i++)
             M[i] = i;  // identity mapping
 
         attribute_set = _attribute_set;
