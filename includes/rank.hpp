@@ -33,6 +33,7 @@ public:
         } else {
             nw = (u + kd - 1) / kd * (kd / 64);
         }
+        //cout << "u: " << u << " nw: " << nw << " kd: " << kd << endl;
         seq = new uint64_t[nw]();
         block = new uint32_t[nw]();
 
@@ -57,7 +58,12 @@ public:
         //cout<< "esto llega a rank " << _bv << endl;
         u = _bv[_bv.size() - 1] + 1; //last element
         n = _bv.size(); // each element  is a position with a 1
-        nw = ((u + kd - 1) / kd) * ((kd + 63) / 64);
+        if (kd < 64) {
+            nw = (u + 63) / 64;
+        } else {
+            nw = (u + kd - 1) / kd * (kd / 64);
+        }
+        //cout << "u: " << u << " nw: " << nw << " kd: " << kd << endl;
         u = 64 * nw;
         bit_vector bv = bit_vector(u, 0);
         // for each 1 in _bv, we mark it in bv

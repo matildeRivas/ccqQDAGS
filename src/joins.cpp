@@ -771,9 +771,6 @@ qdag *multiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
         last_pos[i] = 0;
 
     AND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, bv, last_pos, A.size(), bounded_result, UPPER_BOUND);
-    for (uint64_t l=0; l<6; l++){
-        //cout << "qdag level " << l << ": " << bv[l]<< endl;
-    }
     qdag *qResult = new qdag(bv, A, Q_star[0]->getGridSide(), Q_star[0]->getK(), (uint8_t) A.size());
     return qResult;
 }

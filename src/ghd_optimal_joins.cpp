@@ -24,9 +24,9 @@ qdag *yannakakis(ghd root)
 
     root.deep_exec_multijoin();
 
-    auto result = root.get_relations();
-
     solve_mj = high_resolution_clock::now();
+
+    auto result = root.get_relations();
 
     // Ejecutar semijoin entre root y nivel 1
 
