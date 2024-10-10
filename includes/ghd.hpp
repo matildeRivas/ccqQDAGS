@@ -58,6 +58,9 @@ public:
 
     void exec_multijoin(){
         // ejecuta multijoin entre las relaciones del nodo y reemplaza el vector de relaciones
+        if (relations.size() == 1) {
+            return;
+        }
         qdag* join_result = multiJoin(relations, false, 1000);
         relations.clear();
         relations.push_back(*join_result);
