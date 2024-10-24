@@ -24,7 +24,7 @@ qdag *yannakakis(ghd root)
 
     root.deep_exec_multijoin();
 
-    solve_mj = high_resolution_clock::now();
+    //solve_mj = high_resolution_clock::now();
 
     auto result = root.get_relations();
 
@@ -32,37 +32,37 @@ qdag *yannakakis(ghd root)
 
 
     root.constrained_by_children();
-    bottom_up = high_resolution_clock::now();
+    //bottom_up = high_resolution_clock::now();
 
     root.constrain_children();
 
     // multijoin entre nodos para obtener resultado del join
-    top_down = high_resolution_clock::now();
+    //top_down = high_resolution_clock::now();
     vector<qdag> producto_punto;
     root.get_subtree_qdags(producto_punto);
 
     qdag* qResult = multiJoin(producto_punto, false, 1000);
-    stop = high_resolution_clock::now();
+    //stop = high_resolution_clock::now();
 
-    time_span_mj = duration_cast<microseconds>(solve_mj - start);
-    total_time = time_span_mj.count();
+    //time_span_mj = duration_cast<microseconds>(solve_mj - start);
+    //total_time = time_span_mj.count();
 
-    cout << "node multijoin ended in " << total_time << " seconds" << endl;
+    //cout << "node multijoin ended in " << total_time << " seconds" << endl;
 
-    time_span_bu = duration_cast<microseconds>(bottom_up - solve_mj);
-    total_time = time_span_bu.count();
+    //time_span_bu = duration_cast<microseconds>(bottom_up - solve_mj);
+    //total_time = time_span_bu.count();
 
-    cout << "bottom up ended in " << total_time << " seconds" << endl;
+    //cout << "bottom up ended in " << total_time << " seconds" << endl;
 
-    time_span_td = duration_cast<microseconds>(top_down - bottom_up);
-    total_time = time_span_td.count();
+    //time_span_td = duration_cast<microseconds>(top_down - bottom_up);
+    //total_time = time_span_td.count();
 
-    cout << "top down ended in " << total_time << " seconds" << endl;
+    //cout << "top down ended in " << total_time << " seconds" << endl;
 
-    time_span_pp = duration_cast<microseconds>(stop - top_down);
-    total_time = time_span_pp.count();
+    //time_span_pp = duration_cast<microseconds>(stop - top_down);
+    //total_time = time_span_pp.count();
 
-    cout << "final multijoin " << total_time << " seconds" << endl;
+    //cout << "final multijoin " << total_time << " seconds" << endl;
 
     return qResult;
 }

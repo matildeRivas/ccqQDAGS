@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
     grid_side = maximum_in_table(*rel_TP, att_TP.size(), grid_side);
     grid_side = maximum_in_table(*rel_U, att_U.size(), grid_side);
 
-    grid_side++;
+    grid_side = pow(2, std::ceil(log2(grid_side) ));
 
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());

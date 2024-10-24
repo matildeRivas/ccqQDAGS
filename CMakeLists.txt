@@ -26,8 +26,7 @@ include_directories(src)
     #queries/tr1.cpp
     #queries/tr2.cpp
 #   )
-add_executable(ccq_qdags queries/ghd_test.cpp includes/initArray.hpp #queries/j3_ghd.cpp
-        ) #src/test.cpp
+add_executable(ccq_qdags includes/initArray.hpp queries/square_tadpole1.cpp) #src/test.cpp queries/ghd_test.cpp queries/j3_ghd.cpp
 
 target_link_libraries(ccq_qdags ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
 target_link_libraries(ccq_qdags ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)

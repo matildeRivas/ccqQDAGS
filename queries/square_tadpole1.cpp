@@ -8,6 +8,7 @@
 #include<ratio>
 #include<chrono>
 #include<ctime>
+#include<iostream>
 
 using namespace std::chrono;
 
@@ -100,17 +101,17 @@ int main(int argc, char **argv) {
     //grid_side = maximum_in_table(*rel_U, att_U.size(), grid_side);
 
     grid_side = pow(2, std::ceil(log2(grid_side) ));
-    cout << grid_side << endl;
+    //cout << grid_side << endl;
     qdag qdag_rel_P(*rel_P, att_P, grid_side, 2, att_P.size());
-    cout << "Built P\n";
+    //cout << "Built P\n";
     qdag qdag_rel_Q(*rel_Q, att_Q, grid_side, 2, att_Q.size());
-    cout << "Built Q\n";
+    //cout << "Built Q\n";
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
-    cout << "Built R\n";
+    //cout << "Built R\n";
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
-    cout << "Built S\n";
+    //cout << "Built S\n";
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
-    cout << "Built T\n";
+    //cout << "Built T\n";
 
 
     // Crear vectores de relacion de cada nodo
@@ -185,6 +186,7 @@ int main(int argc, char **argv) {
 
     high_resolution_clock::time_point start, stop;
     double total_time = 0.0;
+    double y_time = 0.0;
     duration<double> time_span;
 
     vector<qdag> test(5);
@@ -214,11 +216,14 @@ int main(int argc, char **argv) {
 
     stop = high_resolution_clock::now();
     time_span = duration_cast<microseconds>(stop - start);
-    total_time = time_span.count();
+    y_time = time_span.count();
 
-    cout << "Yannakakis ended in " << total_time << " seconds" << endl;
+    cout << "Yannakakis ended in " << y_time << " seconds" << endl;
+    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/square_tadpole1.csv",  ios::app);
+    outfile << total_time << "," << y_time << endl;
+    outfile.close();
 
-    cout << "resultado yannakakis\n";
+    //cout << "resultado yannakakis\n";
     //yan_res->print(cout);
 
     return 0;

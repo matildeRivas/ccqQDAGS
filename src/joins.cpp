@@ -746,6 +746,7 @@ qdag *multiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
     qdag::att_set A;
     map<uint64_t, uint8_t> attr_map;
 
+
     // computes the union of the attribute sets
     for (uint64_t i = 0; i < Q.size(); i++) {
         uint64_t nAttr = Q[i].nAttr();
@@ -845,7 +846,11 @@ qdag *parMultiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
 void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
     qdag::att_set A;
     map<uint64_t, uint8_t> attr_map;
-
+/*
+    if (Q.size() == 1) {
+        return;
+    }
+*/
     // computes the union of the attribute sets
     for (uint64_t i = 0; i < Q.size(); i++) {
         //cout << "attrs " << i << ":";

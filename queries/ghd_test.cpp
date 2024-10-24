@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
     qdag::att_set att_R;
     qdag::att_set att_S;
     qdag::att_set att_T;
-    //qdag::att_set att_U;
+    qdag::att_set att_U;
 
     att_R.push_back(0); att_R.push_back(1);
     att_S.push_back(2); att_S.push_back(1);
@@ -88,11 +88,11 @@ int main(int argc, char **argv) {
     grid_side = maximum_in_table(*rel_T, att_T.size(), grid_side);
     //grid_side = maximum_in_table(*rel_U, att_U.size(), grid_side);
 
-    grid_side++;
+    grid_side = pow(2, std::ceil(log2(grid_side) ));
     cout << grid_side << endl;
 
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
-    cout << "Built R\n";
+    //cout << "Built R\n";
     qdag_rel_R.print(cout);
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     cout << "Built S\n";
