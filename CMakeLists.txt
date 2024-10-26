@@ -26,11 +26,30 @@ include_directories(src)
     #queries/tr1.cpp
     #queries/tr2.cpp
 #   )
-add_executable(ccq_qdags includes/initArray.hpp queries/square_tadpole1.cpp) #src/test.cpp queries/ghd_test.cpp queries/j3_ghd.cpp
+#add_executable(sq_tadpole includes/initArray.hpp queries/square_tadpole1.cpp)
+#
+#target_link_libraries(sq_tadpole ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
+#target_link_libraries(sq_tadpole ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
+#target_link_libraries(sq_tadpole ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
 
-target_link_libraries(ccq_qdags ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
-target_link_libraries(ccq_qdags ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
-target_link_libraries(ccq_qdags ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
+add_executable(tr_barbell includes/initArray.hpp queries/triangle_barbell.cpp)
+
+target_link_libraries(tr_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
+target_link_libraries(tr_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
+target_link_libraries(tr_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
+
+#add_executable(sq_barbell includes/initArray.hpp queries/square_barbell.cpp)
+
+#target_link_libraries(sq_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
+#target_link_libraries(sq_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
+#target_link_libraries(sq_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
+
+#add_executable(penta_barbell includes/initArray.hpp queries/penta_barbell.cpp)
+
+#target_link_libraries(penta_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
+#target_link_libraries(penta_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
+#target_link_libraries(penta_barbell ${CMAKE_SOURCE_DIR}square_barbell.cpp/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
+
 
 #target_link_libraries(qdags ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
 #target_link_libraries(qdags ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)

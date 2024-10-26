@@ -12,9 +12,6 @@ using namespace std::chrono;
 #include "../includes/ghd.hpp"
 #include "../src/ghd_optimal_joins.cpp"
 
-high_resolution_clock::time_point start_select, stop_select;
-double total_time_select = 0.0;
-duration<double> time_span_select;
 
 #define AT_X 0
 #define AT_Y 1
@@ -77,10 +74,10 @@ int main(int argc, char **argv) {
     att_S.push_back(AT_Y);
     att_S.push_back(AT_Z);
 
-    att_T.push_back(AT_X);
     att_T.push_back(AT_Z);
+    att_T.push_back(AT_X);
 
-    att_U.push_back(AT_X);
+    att_U.push_back(AT_Z);
     att_U.push_back(AT_XP);
 
     att_RP.push_back(AT_XP);
@@ -89,10 +86,10 @@ int main(int argc, char **argv) {
     att_SP.push_back(AT_YP);
     att_SP.push_back(AT_ZP);
 
-    att_TP.push_back(AT_XP);
     att_TP.push_back(AT_ZP);
-
+    att_TP.push_back(AT_XP);
     std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]), strRel_U(argv[4]), strRel_RP(argv[5]), strRel_SP(argv[6]), strRel_TP(argv[7]);
+
     std::vector<std::vector<uint64_t>> *rel_R = read_relation(strRel_R, att_R.size());
     std::vector<std::vector<uint64_t>> *rel_S = read_relation(strRel_S, att_S.size());
     std::vector<std::vector<uint64_t>> *rel_T = read_relation(strRel_T, att_T.size());
@@ -137,7 +134,6 @@ int main(int argc, char **argv) {
     Q_c[2] = qdag_rel_TP;
 
 
-
     // Crear GHDs
 
     vector<ghd> empty_children(0);
@@ -147,10 +143,29 @@ int main(int argc, char **argv) {
     level_1.push_back(sub_b);
     level_1.push_back(sub_c);
     ghd root = ghd(Q_root, level_1);
-
     high_resolution_clock::time_point start, stop;
-    double total_time = 0.0;
+    double total_time, y_time = 0.0;
     duration<double> time_span;
+
+    vector<qdag> test(7);
+
+    test[0] = qdag_rel_R;
+    test[1] = qdag_rel_S;
+    test[2] = qdag_rel_T;
+    test[3] = qdag_rel_U;
+    test[4] = qdag_rel_RP;
+    test[5] = qdag_rel_SP;
+    test[6] = qdag_rel_TP;
+
+    qdag* test_result;
+    start = high_resolution_clock::now();
+    test_result = multiJoin(test, false, 1000);
+    stop = high_resolution_clock::now();
+    time_span = duration_cast<microseconds>(stop - start);
+    total_time = time_span.count();
+
+    cout << "mj ended in " << total_time << " seconds" << endl;
+    test_result->print(cout);
 
     qdag* yan_res;
 
@@ -160,12 +175,13 @@ int main(int argc, char **argv) {
 
     stop = high_resolution_clock::now();
     time_span = duration_cast<microseconds>(stop - start);
-    total_time = time_span.count();
+    y_time = time_span.count();
 
-    cout << "Yannakakis ended in " << total_time << " seconds" << endl;
-
-    cout << "resultado yannakakis\n";
     yan_res->print(cout);
+    cout << "Yannakakis ended in " << y_time << " seconds" << endl;
+    //ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/triangle_barbell.csv",  ios::app);
+    //outfile << total_time << "," << y_time << endl;
+    //outfile.close();
 
     return 0;
 }
