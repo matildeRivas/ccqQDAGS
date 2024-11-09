@@ -219,7 +219,7 @@ int main(int argc, char **argv) {
     y_time = time_span.count();
 
     cout << "Yannakakis ended in " << y_time << " seconds" << endl;
-    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/square_tadpole1.csv",  ios::app);
+    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/square_tadpole.txt",  ios::app);
     outfile << total_time << "," << y_time << endl;
     outfile.close();
 

@@ -144,7 +144,8 @@ int main(int argc, char **argv) {
     level_1.push_back(sub_c);
     ghd root = ghd(Q_root, level_1);
     high_resolution_clock::time_point start, stop;
-    double total_time, y_time = 0.0;
+    double mj_time = 0.0;
+    double y_time = 0.0;
     duration<double> time_span;
 
     vector<qdag> test(7);
@@ -162,26 +163,21 @@ int main(int argc, char **argv) {
     test_result = multiJoin(test, false, 1000);
     stop = high_resolution_clock::now();
     time_span = duration_cast<microseconds>(stop - start);
-    total_time = time_span.count();
+    mj_time = time_span.count();
 
-    cout << "mj ended in " << total_time << " seconds" << endl;
-    test_result->print(cout);
-
-    qdag* yan_res;
+    //* yan_res;
 
     start = high_resolution_clock::now();
 
-    yan_res = yannakakis(root);
+    //yan_res = yannakakis(root);
 
     stop = high_resolution_clock::now();
     time_span = duration_cast<microseconds>(stop - start);
     y_time = time_span.count();
 
-    yan_res->print(cout);
-    cout << "Yannakakis ended in " << y_time << " seconds" << endl;
-    //ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/triangle_barbell.csv",  ios::app);
-    //outfile << total_time << "," << y_time << endl;
-    //outfile.close();
+    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/triangle_barbell_mj.csv",  ios::app);
+    outfile << mj_time << "," << y_time << endl;
+    outfile.close();
 
     return 0;
 }
