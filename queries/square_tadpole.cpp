@@ -72,14 +72,16 @@ int main(int argc, char **argv) {
     qdag::att_set att_T;
     qdag::att_set att_P;
     qdag::att_set att_Q;
+    qdag::att_set att_U;
 
     att_P.push_back(0); att_P.push_back(1);
     att_Q.push_back(1); att_Q.push_back(2);
     att_R.push_back(2); att_R.push_back(3);
     att_S.push_back(3); att_S.push_back(0);
     att_T.push_back(3); att_T.push_back(4);
+    att_U.push_back(4); att_U.push_back(5);
 
-    std::string strRel_P(argv[1]), strRel_Q(argv[2]), strRel_R(argv[3]), strRel_S(argv[4]), strRel_T(argv[5]);
+    std::string strRel_P(argv[1]), strRel_Q(argv[2]), strRel_R(argv[3]), strRel_S(argv[4]), strRel_T(argv[5]), strRel_U(argv[6]);
 
     std::vector<std::vector<uint64_t>>* rel_P = read_relation(strRel_P, att_P.size());
     std::vector<std::vector<uint64_t>>* rel_Q = read_relation(strRel_Q, att_Q.size());
@@ -88,6 +90,7 @@ int main(int argc, char **argv) {
     std::vector<std::vector<uint64_t>>* rel_S = read_relation(strRel_S, att_S.size());
     //cout<<"s"<<endl;
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
+    std::vector<std::vector<uint64_t>>* rel_U = read_relation(strRel_U, att_U.size());
     //cout<<"t"<<endl;
     //std::vector<std::vector<uint64_t>>* rel_U = read_relation(strRel_U, att_U.size());
 
@@ -98,7 +101,7 @@ int main(int argc, char **argv) {
     grid_side = maximum_in_table(*rel_R, att_R.size(), grid_side);
     grid_side = maximum_in_table(*rel_S, att_S.size(), grid_side);
     grid_side = maximum_in_table(*rel_T, att_T.size(), grid_side);
-    //grid_side = maximum_in_table(*rel_U, att_U.size(), grid_side);
+    grid_side = maximum_in_table(*rel_U, att_U.size(), grid_side);
 
     grid_side = pow(2, std::ceil(log2(grid_side) ));
     //cout << grid_side << endl;
@@ -111,6 +114,7 @@ int main(int argc, char **argv) {
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     //cout << "Built S\n";
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
+    qdag qdag_rel_U(*rel_U, att_U, grid_side, 2, att_U.size());
     //cout << "Built T\n";
 
 
@@ -122,8 +126,9 @@ int main(int argc, char **argv) {
     Q_root[2] = qdag_rel_R;
     Q_root[3] = qdag_rel_S;
 
-    vector<qdag> Q_b(1);
+    vector<qdag> Q_b(2);
     Q_b[0] = qdag_rel_T;
+    Q_b[1] = qdag_rel_U;
 
 /*
     vector<qdag> Q_c(3);
@@ -186,45 +191,41 @@ int main(int argc, char **argv) {
 
     high_resolution_clock::time_point start, stop;
     double total_time = 0.0;
-    double y_time = 0.0;
+    double mj_time = 0.0;
     duration<double> time_span;
 
-    vector<qdag> test(5);
+    vector<qdag> test(6);
 
     test[0] = qdag_rel_P;
     test[1] = qdag_rel_Q;
     test[2] = qdag_rel_R;
     test[3] = qdag_rel_S;
     test[4] = qdag_rel_T;
+    test[5] = qdag_rel_U;
+
 
     qdag* test_result;
     start = high_resolution_clock::now();
     test_result = multiJoin(test, false, 1000);
     stop = high_resolution_clock::now();
     time_span = duration_cast<microseconds>(stop - start);
-    total_time = time_span.count();
+    mj_time = time_span.count();
 
-    cout << "\nmultijoin ended in " << total_time << " seconds" << endl;
-    //test_result->print(cout);
-
-    cout << endl;
+/*
     qdag* yan_res;
 
     start = high_resolution_clock::now();
-    //cout << "Yannakakis" << endl;
+
     yan_res = yannakakis(root);
 
     stop = high_resolution_clock::now();
     time_span = duration_cast<microseconds>(stop - start);
     y_time = time_span.count();
-
-    cout << "Yannakakis ended in " << y_time << " seconds" << endl;
-    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/square_tadpole.txt",  ios::app);
-    outfile << total_time << "," << y_time << endl;
+*/
+    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/square_tadpole_mj.txt",  ios::app);
+    outfile << mj_time << endl;
     outfile.close();
 
-    //cout << "resultado yannakakis\n";
-    //yan_res->print(cout);
 
     return 0;
 }
