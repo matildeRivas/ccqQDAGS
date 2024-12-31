@@ -32,11 +32,11 @@ include_directories(src)
 #target_link_libraries(sq_tadpole ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
 #target_link_libraries(sq_tadpole ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
 
-add_executable(tr_barbell includes/initArray.hpp queries/triangle_barbell.cpp)
+add_executable(j3_ghd includes/initArray.hpp queries/j3_ghd.cpp)
 
-target_link_libraries(tr_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
-target_link_libraries(tr_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
-target_link_libraries(tr_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
+target_link_libraries(j3_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
+target_link_libraries(j3_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
+target_link_libraries(j3_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
 
 add_executable(square_tadpole includes/initArray.hpp queries/square_tadpole.cpp)
 

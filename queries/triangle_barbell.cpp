@@ -7,8 +7,6 @@
 
 using namespace std::chrono;
 
-
-//#include "../src/joins.cpp"
 #include "../includes/ghd.hpp"
 #include "../src/ghd_optimal_joins.cpp"
 
@@ -57,7 +55,7 @@ uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_
 }
 
 
-int main(int argc, char **argv) {
+int main(int argc , char **argv) {
     // Setup de GHD: leer qdags que forman nodos
     qdag::att_set att_R;
     qdag::att_set att_S;
@@ -117,8 +115,7 @@ int main(int argc, char **argv) {
     qdag qdag_rel_RP(*rel_RP, att_RP, grid_side, 2, att_RP.size());
     qdag qdag_rel_SP(*rel_SP, att_SP, grid_side, 2, att_SP.size());
     qdag qdag_rel_TP(*rel_TP, att_TP, grid_side, 2, att_TP.size());
-    // Crear vectores de relacion de cada nodo
-
+    // Crear vectores de relacion de cada nodo_tr
     vector<qdag> Q_root(1);
 
     Q_root[0] = qdag_rel_U;
@@ -148,7 +145,7 @@ int main(int argc, char **argv) {
     double y_time = 0.0;
     duration<double> time_span;
 
-    vector<qdag> test(7);
+   /* vector<qdag> test(7);
 
     test[0] = qdag_rel_R;
     test[1] = qdag_rel_S;
@@ -164,19 +161,19 @@ int main(int argc, char **argv) {
     stop = high_resolution_clock::now();
     time_span = duration_cast<microseconds>(stop - start);
     mj_time = time_span.count();
-
-    //* yan_res;
+*/
+    qdag* yan_res;
 
     start = high_resolution_clock::now();
 
-    //yan_res = yannakakis(root);
+    yan_res = yannakakis(root);
 
     stop = high_resolution_clock::now();
     time_span = duration_cast<microseconds>(stop - start);
     y_time = time_span.count();
 
-    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/triangle_barbell_mj.csv",  ios::app);
-    outfile << mj_time << "," << y_time << endl;
+    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/triangle_barbell_yk.txt",  ios::app);
+    outfile << y_time << endl;
     outfile.close();
 
     return 0;
