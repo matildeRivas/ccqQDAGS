@@ -6,6 +6,7 @@
 #include<ratio>
 #include<chrono>
 #include<ctime>
+#include<omp.h>
 
 using namespace std::chrono;
 
@@ -22,7 +23,16 @@ qdag *yannakakis(ghd root)
     // Ejecutar multijoin en todos los niveles
     start = high_resolution_clock::now();
 
-    root.deep_exec_multijoin();
+    // Collect all nodes into a flat list
+    std::vector<ghd*> node_list;
+    root.collect_all_nodes(node_list);
+
+    // Execute exec_multijoin in parallel for all nodes
+    #pragma omp parallel for
+    for (size_t i = 0; i < node_list.size(); ++i) {
+        node_list[i]->exec_multijoin();
+    }
+
 
     //solve_mj = high_resolution_clock::now();
 

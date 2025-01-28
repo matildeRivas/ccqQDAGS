@@ -1,4 +1,4 @@
-output_file="/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/penta_barbell_mj.txt"
+output_file="/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/penta_barbell_yk_par.txt"
 params_file="/home/anouk/Documents/wikidata/property_getter/query-pattern-finder/penta_barbell.txt"
 
 

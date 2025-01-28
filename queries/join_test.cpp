@@ -107,7 +107,7 @@ int main(int argc, char** argv)
     grid_side = maximum_in_table(*rel_T, att_T.size(), grid_side);
     grid_side = maximum_in_table(*rel_Q, att_Q.size(), grid_side);
 
-    grid_side++;
+    grid_side = pow(2, std::ceil(log2(grid_side) ));
 
     //cout << "Grid side: " << grid_side << endl;
 

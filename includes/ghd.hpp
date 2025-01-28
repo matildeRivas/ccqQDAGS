@@ -52,6 +52,17 @@ public:
         }
     }
 
+    void collect_all_nodes(vector<ghd*> &subtree){
+
+        subtree.push_back(this);
+
+        // Recursively collect nodes from children
+        for (auto child = children.begin(); child != children.end(); child++) {
+            child->collect_all_nodes(subtree);
+        }
+    }
+
+
     void set_relations(vector<qdag> new_relations){
         relations = new_relations;
     }

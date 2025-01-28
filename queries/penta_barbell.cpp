@@ -153,7 +153,7 @@ int main(int argc, char **argv) {
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
 
 
-/*
+
     // Crear vectores de relacion de cada nodo
     vector<qdag> Q_root(1);
 
@@ -184,13 +184,11 @@ int main(int argc, char **argv) {
     level_1.push_back(sub_c);
     ghd root = ghd(Q_root, level_1);
 
-*/
-    high_resolution_clock::time_point start, stop;
-    double mj_time = 0.0;
-    double y_time = 0.0;
-    duration<double> time_span;
 
-    vector<qdag> test(11);
+    //high_resolution_clock::time_point start, stop;
+    double mj_time = 0.0;
+    //double y_time = 0.0;
+    /*vector<qdag> test(11);
 
     test[0] = qdag_rel_A;
     test[1] = qdag_rel_B;
@@ -203,29 +201,37 @@ int main(int argc, char **argv) {
     test[8] = qdag_rel_R;
     test[9] = qdag_rel_S;
     test[10] = qdag_rel_T;
-
+/
     qdag* test_result;
-    start = high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
     test_result = multiJoin(test, false, 1000);
-    stop = high_resolution_clock::now();
+    auto stop = high_resolution_clock::now();
     time_span = duration_cast<microseconds>(stop - start);
     mj_time = time_span.count();
+    test_result->print(cout);
 
-/*
+*/
     qdag* yan_res;
 
-    start = high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
 
     yan_res = yannakakis(root);
 
-    stop = high_resolution_clock::now();
-    time_span = duration_cast<microseconds>(stop - start);
-    y_time = time_span.count();*/
+    auto stop = high_resolution_clock::now();
+    const std::chrono::duration<double, std::milli> time_span = stop - start;
+    double y_time=time_span.count()/1000;
 
-    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/penta_barbell_mj.txt",  ios::app);
-    outfile << mj_time << endl;
+    //yan_res->print(cout);
+    //cout << y_time <<endl;
+    /*auto start = high_resolution_clock::now();
+    yan_res = yannakakis(root);
+    auto stop = high_resolution_clock::now();
+    const std::chrono::duration<double, std::milli> y_time2 = stop - start;*/
+
+
+    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/penta_barbell_yk_par.txt",  ios::app);
+    outfile << y_time << endl;
     outfile.close();
-
 
     return 0;
 }
