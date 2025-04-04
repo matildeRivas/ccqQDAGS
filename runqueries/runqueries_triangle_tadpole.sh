@@ -1,4 +1,4 @@
-output_file="/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/triangle_tadpole_mj.txt"
+output_file="/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/triangle_tadpole_yk_par.txt"
 params_file="/home/anouk/Documents/wikidata/property_getter/query-pattern-finder/triangle_tadpole.txt"
 
 

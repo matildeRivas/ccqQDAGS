@@ -188,11 +188,8 @@ int main(int argc, char **argv) {
     res->print(cout);
 
 */
-
-    high_resolution_clock::time_point start, stop;
-    double total_time = 0.0;
+    /*
     double mj_time = 0.0;
-    duration<double> time_span;
 
     vector<qdag> test(6);
 
@@ -205,25 +202,25 @@ int main(int argc, char **argv) {
 
 
     qdag* test_result;
-    start = high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
     test_result = multiJoin(test, false, 1000);
-    stop = high_resolution_clock::now();
-    time_span = duration_cast<microseconds>(stop - start);
-    mj_time = time_span.count();
+    auto stop = high_resolution_clock::now();
+    const std::chrono::duration<double, std::milli> time_span = stop - start;
+     mj_time=time_span.count()/1000;
 
-/*
+*/
     qdag* yan_res;
 
-    start = high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
 
     yan_res = yannakakis(root);
 
-    stop = high_resolution_clock::now();
-    time_span = duration_cast<microseconds>(stop - start);
-    y_time = time_span.count();
-*/
-    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/square_tadpole_mj.txt",  ios::app);
-    outfile << mj_time << endl;
+    auto stop = high_resolution_clock::now();
+    const std::chrono::duration<double, std::milli> time_span = stop - start;
+    double y_time=time_span.count()/1000;
+
+    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/square_tadpole_yk_par.txt",  ios::app);
+    outfile << y_time << endl;
     outfile.close();
 
 
