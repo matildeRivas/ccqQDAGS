@@ -33,6 +33,16 @@ public:
         return children;
     }
 
+    void collect_all_nodes(vector<ghd*> &subtree){
+
+        subtree.push_back(this);
+
+        // Recursively collect nodes from children
+        for (auto child = children.begin(); child != children.end(); child++) {
+            child->collect_all_nodes(subtree);
+        }
+    }
+
     vector<qdag> get_child_qdags(){
         // This will be used during semijoin, so there will only be 1 qdag per vector
         // obtengo el primer qdag que guarda cada uno de mis hijos en su nodo

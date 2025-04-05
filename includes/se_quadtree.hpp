@@ -157,7 +157,7 @@ protected:
             {
                 cur_l = l;
                 k_t_.resize(t);
-                active_.resize(t);
+                active_ = bit_vector(t, 1);
                 bv[cur_level] = rank_bv_64(k_t_);
                 active[cur_level] = rank_bv_64(active_);
                 total_ones[cur_level] = bv[cur_level].n_ones();
@@ -245,7 +245,7 @@ protected:
 
         k_t_.resize(t);
         bv[height - 1] = rank_bv_64(k_t_);
-        active_.resize(t);
+        active_ = bit_vector(t, 1);
         active[height - 1] = rank_bv_64(active_);
 
         total_ones[height - 1] = bv[height - 1].n_ones();

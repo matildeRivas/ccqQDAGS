@@ -204,7 +204,7 @@ class qdag
             uint16_t dim_prime = attribute_set.size();
             uint64_t p = std::pow(Q->getK(), dim);
 
-            cout << "extendiendo de [" << attribute_set << "] a [" << attribute_set_A << "]" << endl;
+            //cout << "extendiendo de [" << attribute_set << "] a [" << attribute_set_A << "]" << endl;
             
             type_mapping_M* _M = new type_mapping_M[p];
 

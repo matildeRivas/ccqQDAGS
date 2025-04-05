@@ -894,7 +894,6 @@ qdag *multiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
 
     for (uint64_t i = 0; i < Q_star[0]->getHeight(); i++)
         last_pos[i] = 0;
-
     AND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, bv, last_pos, A.size(), bounded_result, UPPER_BOUND);
 
     qdag *qResult = new qdag(bv, A, Q_star[0]->getGridSide(), Q_star[0]->getK(), (uint8_t)A.size());
@@ -976,19 +975,15 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
     // computes the union of the attribute sets
     for (uint64_t i = 0; i < Q.size(); i++)
     {
-        cout << "attrs " << i << ":";
         uint64_t nAttr = Q[i].nAttr();
         for (uint64_t j = 0; j < nAttr; j++) {
             attr_map[Q[i].getAttr(j)] = 1;
-            cout << " " << Q[i].getAttr(j);
         }
-        cout << endl;
     }
 
     for (map<uint64_t, uint8_t>::iterator it = attr_map.begin(); it != attr_map.end(); it++)
         A.push_back(it->first);
 
-    cout << "union de attrs: " << A << endl;
     qdag *Q_star[Q.size()];
     uint64_t Q_roots[Q.size()];
 
