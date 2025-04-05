@@ -1,3 +1,5 @@
 /data
 /queries/outputs
 .idea
+.vscode
+/build
