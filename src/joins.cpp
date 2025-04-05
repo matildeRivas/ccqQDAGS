@@ -869,7 +869,6 @@ qdag *multiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
 
     qdag *Q_star[Q.size()];
     uint64_t Q_roots[Q.size()];
-
     for (uint64_t i = 0; i < Q.size(); i++)
     {
         Q_star[i] = Q[i].extend(A);
@@ -1021,7 +1020,6 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
 
     SemiAND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, last_pos, A.size(), bounded_result, UPPER_BOUND, temp);
 
-    cout << endl << "========================  propagating active  =======================" << endl << endl;
     //bajar por temp recursivamente, si hay un 1 en el nodo hijo, marcar padre
     propagate_active(Q_star[0], 1, Q_star[0]->getHeight() - 1, temp, 0);
 

@@ -1,15 +1,19 @@
-output_file="/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/trad_j3_mj.txt"
-params_file="/home/anouk/Documents/wikidata/property_getter/query-pattern-finder/j3.txt"
+output_file="/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/trad_j3_yk_log.txt"
+params_file="/mnt/c/Users/crist/Documents/query-pattern-finder/j3.txt"
  
  
  while IFS= read -r params; do
      # Run the program with a timeout
      echo "Running experiment with parameters: $params"
-     timeout 1800 ./j4_ghd $params
+     timeout 1800 ./build/j3_ghd $params
  
      # Check if the program timed out
      if [ $? -eq 124 ]; then
          # Log the timeout message
          echo "timeout" >> "$output_file"
+     fi
+     if [ $? -eq 139 ]; then
+         # Log the segfault message
+         echo "segfault" >> "$output_file"
      fi
  done < "$params_file"
