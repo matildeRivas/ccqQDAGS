@@ -130,7 +130,7 @@ protected:
         bit_vector k_t_ = bit_vector(k_d, 0); // OJO, cuidado con esto
         // NOTA: se podrá usar esto en vez de rankbv para el bm de active?
         // create bit vector of size kd full of 1s, because at first all cells are active
-        bit_vector active_ = bit_vector(k_d, 1);
+        bit_vector active_;
 
         std::queue<t_part_tuple> q;
         idx_type t = 0, last_level = 0;
@@ -338,15 +338,15 @@ public:
         return bv[level].rank(node);
     }
 
-    inline uint32_t get_node_lastlevel(uint16_t level, uint64_t node)
+    inline uint64_t get_node_lastlevel(uint16_t level, uint64_t node)
     {
         return bv[level].get_bits(node, k_d) & active[level].get_bits(node, k_d);
     }
 
-    inline uint32_t get_node(uint16_t level, uint64_t node, uint64_t *rank_array, uint64_t rank_value)
+    inline uint64_t get_node(uint16_t level, uint64_t node, uint64_t *rank_array, uint64_t rank_value)
     {
-        uint32_t nd;
-        uint32_t nd_active;
+        uint64_t nd;
+        uint64_t nd_active;
 
         nd = bv[level].get_bits(node, k_d);
         nd_active = active[level].get_bits(node, k_d);
@@ -363,9 +363,9 @@ public:
         return nd & nd_active;
     }
 
-    inline uint32_t get_node_active(uint16_t level, uint64_t node, vector<rank_bv_64> tactive)
+    inline uint64_t get_node_active(uint16_t level, uint64_t node, vector<rank_bv_64> tactive)
     {
-        uint32_t nd;
+        uint64_t nd;
 
         nd = (~(tactive[level].get_bits(node, k_d))) & ((1<<k_d) - 1);
 

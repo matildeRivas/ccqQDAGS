@@ -135,12 +135,11 @@ class qdag
            
            //M_prime.reserve(Msize);
 
-           //for (uint64_t i = 0; i < Msize; i++)              
-           //    M_prime.push_back(new std::vector<type_mapping_M>());
-           
-           //for (uint64_t i = 0; i < Msize; i++)
-           //    M_prime[i]->push_back(i);            
-           
+           for (uint64_t i = 0; i < Msize; i++)
+               M_prime.push_back(new std::vector<type_mapping_M>());
+
+           for (uint64_t i = 0; i < Msize; i++)
+               M_prime[i]->push_back(i);
         }
       
 
@@ -165,14 +164,13 @@ class qdag
            is_extended_qdag = false;
  
            //M_prime.reserve(Msize);
-           
-           //for (uint64_t i = 0; i < Msize; i++)              
-           //    M_prime.push_back(new std::vector<type_mapping_M>());
-           
-           //for (uint64_t i = 0; i < Msize; i++) {               
-           //    M_prime[M[i]]->push_back(i);
-           //}
-                   	
+
+           for (uint64_t i = 0; i < Msize; i++)
+               M_prime.push_back(new std::vector<type_mapping_M>());
+
+           for (uint64_t i = 0; i < Msize; i++) {
+               M_prime[M[i]]->push_back(i);
+           }
         }            
 
 
@@ -245,7 +243,14 @@ class qdag
             q->grid_side = this->grid_side; 
             q->is_extended_qdag = true;
             q->Msize = p; // this.Msize;
-            
+            uint64_t j = std::pow(Q->getK(), dim_prime);
+
+            for (i = 0; i < j; i++)
+                q->M_prime.push_back(new std::vector<type_mapping_M>());
+
+            for (i = 0; i < p; i++) {
+                q->M_prime[q->M[i]]->push_back(i);
+            }
             return q;
         }
 

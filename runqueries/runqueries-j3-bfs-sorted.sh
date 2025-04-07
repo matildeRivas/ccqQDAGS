@@ -10,10 +10,10 @@ params_file="/mnt/c/Users/crist/Documents/query-pattern-finder/j3.txt"
      # Check if the program timed out
      if [ $? -eq 124 ]; then
          # Log the timeout message
-         echo "timeout" >> "$output_file"
+         printf "timeout\n" > $output_file
      fi
      if [ $? -eq 139 ]; then
          # Log the segfault message
-         echo "segfault" >> "$output_file"
+         printf "segfault\n" > $output_file
      fi
  done < "$params_file"

@@ -6,16 +6,18 @@
 
 qdag *yannakakis(ghd root)
 {
-    // Ejecutar multijoin en todos los niveles
+    cout << " Ejecutar multijoin en todos los niveles" << endl;
     root.deep_exec_multijoin();
     auto result = root.get_relations();
 
-    // Ejecutar semijoin entre root y nivel 1
+    cout << " Ejecutar semijoin entre root y nivel 1" << endl;
     root.constrained_by_children();
 
     root.constrain_children();
 
-    // multijoin entre nodos para obtener resultado del join
+    // root.get_relations()[0].print(cout);
+
+    cout << "multijoin entre nodos para obtener resultado del join" << endl;
     //todo: obtener todas las relaciones, no solo el siguiente nivel
     vector<qdag> producto_punto;
     root.get_subtree_qdags(producto_punto);
