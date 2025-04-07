@@ -122,9 +122,9 @@ int main(int argc, char** argv)
     time_span = duration_cast<microseconds>(stop - start);
     y_time = time_span.count();*/
 
-    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/j3_mj.txt",  ios::app);
-    outfile << mj_time << endl;
-    outfile.close();
+     ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/j3_mj.txt", ios::app);
+     outfile << mj_time << endl;
+     outfile.close();
 
-    return 0;
+     return 0;
 }

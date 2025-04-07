@@ -186,10 +186,8 @@ int main(int argc, char **argv) {
     cout << "resultado final\n";
     qdag* res = multiJoin(producto_punto, false, 1000);
     res->print(cout);
-
 */
-    /*
-    double mj_time = 0.0;
+/*
 
     vector<qdag> test(6);
 
@@ -206,9 +204,12 @@ int main(int argc, char **argv) {
     test_result = multiJoin(test, false, 1000);
     auto stop = high_resolution_clock::now();
     const std::chrono::duration<double, std::milli> time_span = stop - start;
-     mj_time=time_span.count()/1000;
+    double mj_time = time_span.count() / 1000;
+    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_square_tadpole_mj.txt", ios::app);
+    outfile << mj_time << endl;
+    outfile.close();
 
-*/
+    */
     qdag* yan_res;
 
     auto start = high_resolution_clock::now();
@@ -217,12 +218,11 @@ int main(int argc, char **argv) {
 
     auto stop = high_resolution_clock::now();
     const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double y_time=time_span.count()/1000;
+    double y_time = time_span.count() / 1000;
 
-    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/square_tadpole_yk_par.txt",  ios::app);
+    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_square_tadpole_yk_par.txt", ios::app);
     outfile << y_time << endl;
     outfile.close();
-
 
     return 0;
 }
