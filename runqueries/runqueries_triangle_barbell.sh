@@ -1,6 +1,6 @@
-output_file="/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_triangle_barbell_yk_par.txt"
+output_file="/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_triangle_barbell_mj.txt"
 params_file="/mnt/c/Users/crist/Documents/query-pattern-finder/tr_barbell.txt"
-
+touch $output_file
 
 while IFS= read -r params; do
     # Run the program with a timeout

@@ -132,7 +132,6 @@ int main(int argc , char **argv) {
 
 
     // Crear GHDs
-
     vector<ghd> empty_children(0);
     ghd sub_b = ghd(Q_b, empty_children);
     ghd sub_c = ghd(Q_c, empty_children);
@@ -141,40 +140,42 @@ int main(int argc , char **argv) {
     level_1.push_back(sub_c);
     ghd root = ghd(Q_root, level_1);
 
-    /* vector<qdag> test(7);
+    vector<qdag> test(7);
 
-     test[0] = qdag_rel_R;
-     test[1] = qdag_rel_S;
-     test[2] = qdag_rel_T;
-     test[3] = qdag_rel_U;
-     test[4] = qdag_rel_RP;
-     test[5] = qdag_rel_SP;
-     test[6] = qdag_rel_TP;
+    test[0] = qdag_rel_R;
+    test[1] = qdag_rel_S;
+    test[2] = qdag_rel_T;
+    test[3] = qdag_rel_U;
+    test[4] = qdag_rel_RP;
+    test[5] = qdag_rel_SP;
+    test[6] = qdag_rel_TP;
 
-     qdag* test_result;
-     auto start = high_resolution_clock::now();
-     test_result = multiJoin(test, false, 1000);
-     auto stop = high_resolution_clock::now();
-     const std::chrono::duration<double, std::milli> time_span = stop - start;
-     double mj_time = time_span.count() / 1000;
+    qdag* test_result;
+    auto start = high_resolution_clock::now();
+    test_result = multiJoin(test, false, 1000);
+    auto stop = high_resolution_clock::now();
+    const std::chrono::duration<double, std::milli> time_span = stop - start;
+    double mj_time = time_span.count() / 1000;
 
-     ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_triangle_barbell_mj.txt", ios::app);
-     outfile << mj_time << endl;
-     outfile.close();
- */
+    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_triangle_barbell_mj.txt", ios::app);
+    outfile << mj_time << endl;
+    outfile.close();
+
+    /*
     qdag* yan_res;
 
     auto start = high_resolution_clock::now();
 
-    yan_res = yannakakis_par(root);
+    yan_res = yannakakis(root);
 
     auto stop = high_resolution_clock::now();
     const std::chrono::duration<double, std::milli> time_span = stop - start;
     double y_time = time_span.count() / 1000;
 
-    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_triangle_barbell_yk_par.txt", ios::app);
+    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_triangle_barbell_yk.txt", ios::app);
     outfile << y_time << endl;
     outfile.close();
+    */
 
     return 0;
 }
