@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
     const std::chrono::duration<double, std::milli> time_span = stop - start;
     double y_time = time_span.count() / 1000;
 
-    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_square_tadpole_yk_par.txt", ios::app);
+    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_square_tadpole_yk.txt", ios::app);
     outfile << y_time << endl;
     outfile.close();
 

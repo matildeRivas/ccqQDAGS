@@ -131,8 +131,6 @@ int main(int argc, char **argv) {
     //level_1.push_back(sub_c);
     ghd root = ghd(Q_root, level_1);
 
-    /*
-
     vector<qdag> test(5);
 
     test[0] = qdag_rel_P;
@@ -141,28 +139,31 @@ int main(int argc, char **argv) {
     test[3] = qdag_rel_T;
     test[4] = qdag_rel_U;
 
-
     qdag* test_result;
     auto start = high_resolution_clock::now();
     test_result = multiJoin(test, false, 1000);
     auto stop = high_resolution_clock::now();
     const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double mj_time=time_span.count()/1000;
-*/
-    qdag* yan_res;
+    double mj_time = time_span.count() / 1000;
 
-    auto start = high_resolution_clock::now();
-
-    yan_res = yannakakis(root);
-
-    auto stop = high_resolution_clock::now();
-    const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double y_time=time_span.count()/1000;
-
-    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/triangle_tadpole_yk_par.txt",  ios::app);
-    outfile << y_time << endl;
+    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_triangle_tadpole_mj.txt", ios::app);
+    outfile << mj_time << endl;
     outfile.close();
+    /*
+        qdag* yan_res;
 
+        auto start = high_resolution_clock::now();
 
+        yan_res = yannakakis(root);
+
+        auto stop = high_resolution_clock::now();
+        const std::chrono::duration<double, std::milli> time_span = stop - start;
+        double y_time=time_span.count()/1000;
+
+        ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_triangle_tadpole_yk_par.txt", ios::app);
+        outfile << y_time << endl;
+        outfile.close();
+
+    */
     return 0;
 }

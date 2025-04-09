@@ -26,11 +26,11 @@ include_directories(src)
     #queries/tr1.cpp
     #queries/tr2.cpp
 #   )
-add_executable(triangle_tadpole includes/initArray.hpp queries/triangle_tadpole.cpp)
+add_executable(triangle_barbell includes/initArray.hpp queries/triangle_barbell.cpp)
 
-target_link_libraries(triangle_tadpole ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
-target_link_libraries(triangle_tadpole ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
-target_link_libraries(triangle_tadpole ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
+target_link_libraries(triangle_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
+target_link_libraries(triangle_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
+target_link_libraries(triangle_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
 
 add_executable(j3_ghd includes/initArray.hpp queries/j3_ghd.cpp)
 

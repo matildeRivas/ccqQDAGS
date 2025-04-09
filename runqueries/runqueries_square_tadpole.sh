@@ -1,4 +1,4 @@
-output_file="/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_square_tadpole_yk_par.txt"
+output_file="/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_square_tadpole_yk.txt"
 params_file="/mnt/c/Users/crist/Documents/query-pattern-finder/square_tadpole.txt"
 
 
