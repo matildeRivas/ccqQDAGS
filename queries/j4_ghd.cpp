@@ -96,54 +96,53 @@ int main(int argc, char** argv)
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
     qdag qdag_rel_U(*rel_U, att_U, grid_side, 2, att_U.size());
 
-    // Crear vectores de relacion de cada nodo_tr
-    vector<qdag> Q_root(2);
-
-    Q_root[0] = qdag_rel_R;
-    Q_root[1] = qdag_rel_T;
-
-    vector<qdag> Q_b(2);
-    Q_b[0] = qdag_rel_S;
-    Q_b[1] = qdag_rel_U;
-    // Crear GHDs
-
-    vector<ghd> empty_children(0);
-    ghd sub_b = ghd(Q_b, empty_children);
-    vector<ghd> level_1;
-    level_1.push_back(sub_b);
-    ghd root = ghd(Q_root, level_1);
-    //*/
     high_resolution_clock::time_point start, stop;
-    double mj_time = 0.0;
-    double y_time = 0.0;
-    duration<double> time_span;
-/*
-    vector<qdag> test(4);
 
-    test[0] = qdag_rel_R;
-    test[1] = qdag_rel_S;
-    test[2] = qdag_rel_T;
-    test[3] = qdag_rel_U;
+    if (strcmp(argv[argc - 2], "mj") == 0) {
+        vector<qdag> test(4);
 
-    qdag* test_result;
-    start = high_resolution_clock::now();
-    test_result = multiJoin(test, false, 1000);
-    stop = high_resolution_clock::now();
-    time_span = duration<double>(stop - start);
-    mj_time = time_span.count();
-   */
-   qdag* yan_res;
+        test[0] = qdag_rel_R;
+        test[1] = qdag_rel_S;
+        test[2] = qdag_rel_T;
+        test[3] = qdag_rel_U;
 
-   start = high_resolution_clock::now();
+        qdag* test_result;
+        start = high_resolution_clock::now();
+        test_result = multiJoin(test, false, 1000);
+        stop = high_resolution_clock::now();
+    } else {
+        // Crear vectores de relacion de cada nodo
+        vector<qdag> Q_root(2);
 
-   yan_res = yannakakis(root);
+        Q_root[0] = qdag_rel_R;
+        Q_root[1] = qdag_rel_T;
 
-   stop = high_resolution_clock::now();
-   time_span = duration_cast<microseconds>(stop - start);
-   y_time = time_span.count();
+        vector<qdag> Q_b(2);
+        Q_b[0] = qdag_rel_S;
+        Q_b[1] = qdag_rel_U;
 
-    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/j4_yk2.txt",  ios::app);
-    outfile << y_time << endl;
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        ghd root = ghd(Q_root, level_1);
+
+        qdag* yan_res;
+        start = high_resolution_clock::now();
+        if (strcmp(argv[argc - 2], "yk") == 0) {
+            yan_res = yannakakis(root);
+        } else {
+            yan_res = yannakakis_par(root);
+        }
+        stop = high_resolution_clock::now();
+    }
+
+    const std::chrono::duration<double, std::milli> time_span = stop - start;
+    double time = time_span.count() / 1000;
+    cout << "took " << time << "s" << endl;
+    ofstream outfile(argv[argc - 1], ios::app);
+    outfile << time << endl;
     outfile.close();
 
     return 0;
