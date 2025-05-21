@@ -1,4 +1,4 @@
-pattern="square_barbell"
+pattern="penta_barbell"
 params_file="/mnt/c/Users/crist/Documents/query-pattern-finder/${pattern}.txt"
 
 for method in "yk" "yk_par" "mj"
