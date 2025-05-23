@@ -402,8 +402,7 @@ public:
     {
         size_type dim = pow(k, d);
         uint64_t i, start, l, level_size;
-        for (i = 1; i < height; i++)
-        {
+        for (i = 0; i < height; i++) {
             if (bv[i].size() > 0)
                 level_size = bv[i].size();
             else

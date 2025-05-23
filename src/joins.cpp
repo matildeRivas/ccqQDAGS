@@ -846,11 +846,11 @@ qdag *parMultiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
 void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
     qdag::att_set A;
     map<uint64_t, uint8_t> attr_map;
-/*
+
     if (Q.size() == 1) {
         return;
     }
-*/
+
     // computes the union of the attribute sets
     for (uint64_t i = 0; i < Q.size(); i++) {
         //cout << "attrs " << i << ":";
@@ -887,14 +887,12 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND) {
 
     SemiAND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, last_pos, A.size(), bounded_result, UPPER_BOUND, result_bv);
 
-    //cout << endl << "========================  propagating active  =======================" << endl << endl;
-    //bajar por result_bv recursivamente, si hay un 1 en el nodo hijo, marcar padre
-    propagate_active(Q_star[0], 1, Q_star[0]->getHeight() - 1, result_bv, 0);
+    // bajar por result_bv recursivamente, si hay un 1 en el nodo hijo, marcar padre
+    propagate_active(Q_star[0], 0, Q_star[0]->getHeight() - 1, result_bv, 0);
 
     // actualizar bv izquierdo
-    for (int i = 1; i < Q[0].getHeight(); i++) {
+    for (int i = 0; i < Q[0].getHeight(); i++) {
         Q[0].Q->active[i].bv_and(result_bv[i]);
     }
-
 }
 

@@ -4,6 +4,8 @@ DEBUG = 0
 
 def decrypt(littleTree):
   dims = int(math.log2(len(littleTree[0][0])))
+  if DEBUG:
+    print(f'dims: {dims}')
   binary_tuples = [['',] * dims]
 
   for level in littleTree:
@@ -60,5 +62,5 @@ def main():
 
   return
 
-#print('holi puh')
+print('holi puh')
 main()

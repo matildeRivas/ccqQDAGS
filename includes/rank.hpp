@@ -170,10 +170,10 @@ public:
         vector<uint64_t> result = vector<uint64_t>(size);
         for (size_t i = 0; i < size; i++, dim -= 64, start_pos += 64) {
             shift = start_pos & 0x3f;
-            mask = (1ULL << (dim & 0x3f)) - 1;
             if (dim >= 64) {
                 result[i] = (seq[start_pos >> 6] >> shift);
             } else {
+                mask = (1ULL << dim) - 1;
                 result[i] = (seq[start_pos >> 6] >> shift) & mask;
             }
         }
