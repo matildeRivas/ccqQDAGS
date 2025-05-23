@@ -69,62 +69,61 @@ int main(int argc, char** argv)
     std::vector<std::vector<uint64_t>>* rel_S = read_relation(strRel_S, att_S.size());
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
 
-    uint64_t grid_side = 52000000; // es como +infty para wikidata
+    // uint64_t grid_side = 52000000; // es como +infty para wikidata
+    uint64_t grid_side = 0;
+    grid_side = maximum_in_table(*rel_R, att_R.size(), grid_side);
+    grid_side = maximum_in_table(*rel_S, att_S.size(), grid_side);
+    grid_side = maximum_in_table(*rel_T, att_T.size(), grid_side);
+    grid_side = pow(2, std::ceil(log2(grid_side)));
 
-    //cout << "R" << endl;
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
-    //cout << "S" << endl;
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
-    //cout << "T" << endl;
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
 
-    // Crear vectores de relacion de cada nodo_tr
-    /*vector<qdag> Q_root(1);
-
-    Q_root[0] = qdag_rel_T;
-
-    vector<qdag> Q_b(2);
-    Q_b[0] = qdag_rel_R;
-    Q_b[1] = qdag_rel_S;
-    // Crear GHDs
-
-    vector<ghd> empty_children(0);
-    ghd sub_b = ghd(Q_b, empty_children);
-    vector<ghd> level_1;
-    level_1.push_back(sub_b);
-    ghd root = ghd(Q_root, level_1);
-    */
     high_resolution_clock::time_point start, stop;
-    double mj_time = 0.0;
-    double y_time = 0.0;
-    duration<double> time_span;
 
-    vector<qdag> test(3);
+    if (strcmp(argv[argc - 2], "mj") == 0) {
+        vector<qdag> test(3);
+        test[0] = qdag_rel_R;
+        test[1] = qdag_rel_S;
+        test[2] = qdag_rel_T;
 
-     test[0] = qdag_rel_R;
-     test[1] = qdag_rel_S;
-     test[2] = qdag_rel_T;
+        qdag* test_result;
+        start = high_resolution_clock::now();
+        test_result = multiJoin(test, false, 1000);
+        stop = high_resolution_clock::now();
+    } else {
+        // Crear vectores de relacion de cada nodo
+        vector<qdag> Q_root(1);
+        Q_root[0] = qdag_rel_T;
 
-     qdag* test_result;
-     start = high_resolution_clock::now();
-     test_result = multiJoin(test, false, 1000);
-     stop = high_resolution_clock::now();
-     time_span = duration_cast<microseconds>(stop - start);
-     mj_time = time_span.count();
-     /*
-    qdag* yan_res;
+        vector<qdag> Q_b(2);
+        Q_b[0] = qdag_rel_R;
+        Q_b[1] = qdag_rel_S;
 
-    start = high_resolution_clock::now();
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        ghd root = ghd(Q_root, level_1);
 
-    yan_res = yannakakis(root);
+        qdag* yan_res;
+        start = high_resolution_clock::now();
+        if (strcmp(argv[argc - 2], "yk") == 0) {
+            yan_res = yannakakis(root);
+        } else {
+            yan_res = yannakakis_par(root);
+        }
+        stop = high_resolution_clock::now();
+    }
 
-    stop = high_resolution_clock::now();
-    time_span = duration_cast<microseconds>(stop - start);
-    y_time = time_span.count();*/
+    const std::chrono::duration<double, std::milli> time_span = stop - start;
+    double time = time_span.count() / 1000;
+    ofstream outfile(argv[argc - 1], ios::app);
+    outfile << time << endl;
+    outfile.close();
+    cout << "took " << time << "s" << endl;
 
-     ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/j3_mj.txt", ios::app);
-     outfile << mj_time << endl;
-     outfile.close();
-
-     return 0;
+    return 0;
 }
