@@ -80,14 +80,11 @@ int main(int argc, char** argv)
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
     std::vector<std::vector<uint64_t>>* rel_U = read_relation(strRel_U, att_U.size());
 
-
     uint64_t grid_side = 0;
-
     grid_side = maximum_in_table(*rel_R, att_R.size(), grid_side);
     grid_side = maximum_in_table(*rel_S, att_S.size(), grid_side);
     grid_side = maximum_in_table(*rel_T, att_T.size(), grid_side);
     grid_side = maximum_in_table(*rel_U, att_U.size(), grid_side);
-
     grid_side = pow(2, std::ceil(log2(grid_side) ));
 
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
@@ -95,55 +92,52 @@ int main(int argc, char** argv)
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
     qdag qdag_rel_U(*rel_U, att_U, grid_side, 2, att_U.size());
 
-    // cout << ((((float)qdag_rel_R.size()*8) + ((float)qdag_rel_S.size()*8) + ((float)qdag_rel_T.size()*8) + ((float)qdag_rel_U.size()*8) )/(rel_R->size()*2 + rel_S->size()*2 + rel_T->size()*2 + rel_U->size()*2)) << "\t";
+    high_resolution_clock::time_point start, stop;
 
-    vector<qdag> Q(4);
+    if (strcmp(argv[argc - 2], "mj") == 0) {
+        vector<qdag> test(4);
 
-    Q[0] = qdag_rel_R;
-    Q[1] = qdag_rel_S;
-    Q[2] = qdag_rel_T;
-    Q[3] = qdag_rel_U;
+        test[0] = qdag_rel_R;
+        test[1] = qdag_rel_S;
+        test[2] = qdag_rel_T;
+        test[3] = qdag_rel_U;
 
-    qdag *Join_Result;
+        qdag* test_result;
+        start = high_resolution_clock::now();
+        test_result = multiJoin(test, false, 1000);
+        stop = high_resolution_clock::now();
+    } else {
+        // Crear vectores de relacion de cada nodo
+        vector<qdag> Q_root(2);
+        Q_root[0] = qdag_rel_R;
+        Q_root[1] = qdag_rel_U;
 
-    qdag* test_result;
-    auto start = high_resolution_clock::now();
-    Join_Result = multiJoin(Q, false, 1000);
-    auto stop = high_resolution_clock::now();
+        vector<qdag> Q_b(2);
+        Q_b[0] = qdag_rel_T;
+        Q_b[1] = qdag_rel_S;
+        // Crear GHDs
+
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        ghd root = ghd(Q_root, level_1);
+
+        qdag* yan_res;
+        start = high_resolution_clock::now();
+        if (strcmp(argv[argc - 2], "yk") == 0) {
+            yan_res = yannakakis(root);
+        } else {
+            yan_res = yannakakis_par(root);
+        }
+        stop = high_resolution_clock::now();
+    }
 
     const std::chrono::duration<double, std::milli> time_span = stop - start;
-
-    double mj_time=time_span.count()/1000;
-    /*
-
-    vector<qdag> Q_root(2);
-
-    Q_root[0] = qdag_rel_R;
-    Q_root[1] = qdag_rel_U;
-
-    vector<qdag> Q_b(2);
-    Q_b[0] = qdag_rel_T;
-    Q_b[1] = qdag_rel_S;
-    // Crear GHDs
-
-    vector<ghd> empty_children(0);
-    ghd sub_b = ghd(Q_b, empty_children);
-    vector<ghd> level_1;
-    level_1.push_back(sub_b);
-    ghd root = ghd(Q_root, level_1);
-
-    qdag* yan_res;
-
-    auto start = high_resolution_clock::now();
-
-    yan_res = yannakakis(root);
-
-    auto stop = high_resolution_clock::now();
-    const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double y_time=time_span.count()/1000;*/
-
-    ofstream outfile("/home/anouk/Documents/qdags/qdags-main/runqueries/outputs/ti4_mj.txt",  ios::app);
-    outfile << mj_time << endl;
+    double time = time_span.count() / 1000;
+    ofstream outfile(argv[argc - 1], ios::app);
+    outfile << time << endl;
     outfile.close();
+    cout << "took " << time << "s" << endl;
     return 0;
 }
