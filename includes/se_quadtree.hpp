@@ -395,8 +395,7 @@ public:
     {
         size_type dim = pow(k, d);
         uint64_t i, j, l, aa_r, zz;
-        for (i = 1; i < height; i++)
-        {
+        for (i = 0; i < height; i++) {
             if (bv[i].size() > 0)
                 aa_r = bv[i].size();
             else
@@ -426,8 +425,7 @@ public:
     {
         size_type dim = pow(k, d);
         uint64_t i, j, l, aa_r, zz;
-        for (i = 1; i < height; i++)
-        {
+        for (i = 0; i < height; i++) {
             if (active[i].size() > 0)
                 aa_r = active[i].size();
             else
