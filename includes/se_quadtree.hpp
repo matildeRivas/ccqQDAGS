@@ -437,7 +437,7 @@ public:
                 // read each byte
                 if (j % dim == 0)
                 {
-                    uint16_t x;
+                    uint64_t x;
                     x = +active[i].get_bits(j, dim);
 
                     for (int l = 0; l < dim; l++)

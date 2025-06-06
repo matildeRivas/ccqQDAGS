@@ -57,13 +57,12 @@ bool propagate_active(qdag* Q, uint16_t cur_level, uint16_t max_level, vector<ra
 
             root_temp = k_d * (rank_vector[child]-1);
 
-            if (propagate_active(Q, cur_level + 1, max_level, temp_bv, root_temp)){
-                uint64_t mask_one = 1 << (node + child);
-                *(temp_bv[cur_level]).seq = ( *(temp_bv[cur_level]).seq | (mask_one));
+            if (propagate_active(Q, cur_level + 1, max_level, temp_bv, root_temp)) {
+                temp_bv[cur_level].mark_bit(node + child);
                 has_children = true;
-                }
-
             }
+
+        }
     }
 
     return has_children;
@@ -624,10 +623,8 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
                 return false;
             else
             {
-
-                // obtener el bit del nodo
-                uint64_t mask_one =1;
-                *(temp_bv[cur_level].seq) = (*(temp_bv[cur_level]).seq | (mask_one << (roots[0] + Q[0]->getM(last_pos[cur_level] % p))));
+                // obtener el bit del nod
+                temp_bv[cur_level].mark_bit(roots[0] + Q[0]->getM(last_pos[cur_level] % p));
                 last_pos[cur_level]++;
                 just_zeroes = false;
             }
@@ -714,8 +711,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
                 uint64_t leftQ_children = Q[0]->Q->bv[cur_level+1].get_bits(root_temp[0], Q[0]->Q->getKD());
 
                 if (temp_children == leftQ_children){
-                    uint64_t mask_one = 1;
-                    *(temp_bv[cur_level]).seq = ( *(temp_bv[cur_level]).seq | (mask_one << (roots[0] + Q[0]->getM(last_pos[cur_level] % p))));
+                    temp_bv[cur_level].mark_bit(roots[0] + Q[0]->getM(last_pos[cur_level] % p));
                 }
                 last_pos[cur_level]++;
 
@@ -890,13 +886,10 @@ qdag *multiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
 
     vector<uint64_t> bv[Q_star[0]->getHeight()]; // OJO, asume que todos los qdags son de la misma altura
     uint64_t last_pos[Q_star[0]->getHeight()];
-    cout << "Q_star[0]->getHeight(): " << Q_star[0]->getHeight() << endl;
 
     for (uint64_t i = 0; i < Q_star[0]->getHeight(); i++)
         last_pos[i] = 0;
     AND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, bv, last_pos, A.size(), bounded_result, UPPER_BOUND);
-
-    cout << "finished multijoin, creating result qdag" << endl;
 
     qdag *qResult = new qdag(bv, A, Q_star[0]->getGridSide(), Q_star[0]->getK(), (uint8_t)A.size());
     return qResult;
@@ -974,6 +967,10 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
     qdag::att_set A;
     map<uint64_t, uint8_t> attr_map;
 
+    if (Q.size() == 1) {
+        return;
+    }
+
     // computes the union of the attribute sets
     for (uint64_t i = 0; i < Q.size(); i++)
     {
@@ -1013,23 +1010,19 @@ void semiJoin(vector<qdag> &Q, bool bounded_result, uint64_t UPPER_BOUND)
 
     for (uint64_t i = 0; i < Q[0].getHeight(); i++)
         last_pos[i] = 0;
-
-    // create temp active of 0s
-    bit_vector blank = bit_vector(4, 0);
+        
     vector<rank_bv_64> temp(Q[0].getHeight());
-    for (int i = 0; i < Q[0].getHeight(); i++ ) {
-        temp[i] = rank_bv_64(blank);
-        // temp[i] = Q[0].Q->bv[i].clone_empty();
+    for (int i = 0; i < Q[0].getHeight(); i++) {
+        temp[i] = Q[0].Q->bv[i].clone_empty();
     }
 
     SemiAND(Q_star, Q_roots, Q.size(), 0, Q_star[0]->getHeight() - 1, last_pos, A.size(), bounded_result, UPPER_BOUND, temp);
-    cout << "semi" << endl;
+    
     //bajar por temp recursivamente, si hay un 1 en el nodo hijo, marcar padre
     propagate_active(Q_star[0], 0, Q_star[0]->getHeight() - 1, temp, 0);
-    cout << "prop" << endl;
+
     // actualizar bv izquierdo
     for (int i = 0; i < Q[0].getHeight(); i++) {
-        cout << i << "    ";
         Q[0].Q->active[i].bv_and(temp[i]);
     }
 }

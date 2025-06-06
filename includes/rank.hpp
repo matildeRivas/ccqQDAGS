@@ -192,6 +192,10 @@ class rank_bv_64
 
         return *bv;
     }
+
+    void mark_bit(uint64_t i){
+        seq[i>>6] |= 1ULL << (i % 64);
+    }
 };
 
 #endif
