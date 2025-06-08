@@ -110,11 +110,11 @@ int main(int argc, char** argv)
         // Crear vectores de relacion de cada nodo
         vector<qdag> Q_root(2);
         Q_root[0] = qdag_rel_R;
-        Q_root[1] = qdag_rel_U;
+        Q_root[1] = qdag_rel_S;
 
         vector<qdag> Q_b(2);
         Q_b[0] = qdag_rel_T;
-        Q_b[1] = qdag_rel_S;
+        Q_b[1] = qdag_rel_U;
         // Crear GHDs
 
         vector<ghd> empty_children(0);
