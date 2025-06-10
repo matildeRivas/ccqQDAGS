@@ -1,10 +1,10 @@
-pattern="ti4_ghd"
+pattern="j3_ghd"
 params_file="/mnt/c/Users/crist/Documents/query-pattern-finder/${pattern}.txt"
 
-for method in "yk_par" "yk" # "mj"
+for method in "yk_par" "yk" "mj"
 do
     # create output file
-    output_file="/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/${pattern}_${method}_2.txt"
+    output_file="/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/${pattern}_${method}.txt"
     touch $output_file
     i=1
 

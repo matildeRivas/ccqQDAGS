@@ -1,25 +1,23 @@
 
+#include <bits/stdc++.h>
 #include <fstream>
-#include<bits/stdc++.h>
-#include<ratio>
+#include <ratio>
 
 using namespace std::chrono;
 
 #include "../includes/ghd.hpp"
 #include "../src/ghd_optimal_joins.cpp"
 
-
 #define AT_X 0
 #define AT_Y 1
 #define AT_Z 2
 #define AT_V 3
 
-
 std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, uint16_t n_Atts)
 {
     std::ifstream input_stream(filename);
     uint64_t x;
-    uint16_t i, j=0;
+    uint16_t i, j = 0;
 
     std::vector<std::vector<uint64_t>>* relation;
     std::vector<uint64_t> tuple;
@@ -39,8 +37,7 @@ std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, ui
     return relation;
 }
 
-
-uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_columns, uint64_t max_temp)
+uint64_t maximum_in_table(std::vector<std::vector<uint64_t>>& table, uint16_t n_columns, uint64_t max_temp)
 {
     uint64_t i, j;
 
@@ -49,10 +46,8 @@ uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_
             if (table[i][j] > max_temp)
                 max_temp = table[i][j];
 
-
     return max_temp;
 }
-
 
 int main(int argc, char** argv)
 {
@@ -60,9 +55,12 @@ int main(int argc, char** argv)
     qdag::att_set att_S;
     qdag::att_set att_T;
 
-    att_R.push_back(AT_Y); att_R.push_back(AT_X);
-    att_S.push_back(AT_Z); att_S.push_back(AT_X);
-    att_T.push_back(AT_X); att_T.push_back(AT_V);
+    att_R.push_back(AT_Y);
+    att_R.push_back(AT_X);
+    att_S.push_back(AT_Z);
+    att_S.push_back(AT_X);
+    att_T.push_back(AT_X);
+    att_T.push_back(AT_V);
 
     std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]);
 
@@ -76,57 +74,61 @@ int main(int argc, char** argv)
     grid_side = maximum_in_table(*rel_S, att_S.size(), grid_side);
     grid_side = maximum_in_table(*rel_T, att_T.size(), grid_side);
 
-    grid_side = pow(2, std::ceil(log2(grid_side) ));
+    grid_side = pow(2, std::ceil(log2(grid_side)));
 
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
 
-    // Crear vectores de relacion de cada nodo_tr
-    vector<qdag> Q_root(1);
+    high_resolution_clock::time_point start, stop;
 
-    Q_root[0] = qdag_rel_T;
-
-    vector<qdag> Q_b(2);
-    Q_b[0] = qdag_rel_R;
-    Q_b[1] = qdag_rel_S;
-    // Crear GHDs
-
-    vector<ghd> empty_children(0);
-    ghd sub_b = ghd(Q_b, empty_children);
-    vector<ghd> level_1;
-    level_1.push_back(sub_b);
-    ghd root = ghd(Q_root, level_1);
-
-    /*
+    if (strcmp(argv[argc - 2], "mj") == 0) {
 
         vector<qdag> test(3);
 
-         test[0] = qdag_rel_R;
-         test[1] = qdag_rel_S;
-         test[2] = qdag_rel_T;
+        test[0] = qdag_rel_R;
+        test[1] = qdag_rel_S;
+        test[2] = qdag_rel_T;
 
-         qdag* test_result;
-        auto start = high_resolution_clock::now();
+        qdag* test_result;
+        start = high_resolution_clock::now();
         test_result = multiJoin(test, false, 1000);
-        auto stop = high_resolution_clock::now();
-        const std::chrono::duration<double, std::milli> time_span = stop - start;
-        double mj_time=time_span.count()/1000;
-        ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/trad_j3_mj.txt", ios::app);
-        outfile << mj_time << endl;
-        outfile.close();
-         */
-    qdag* yan_res;
+        stop = high_resolution_clock::now();
+    } else {
 
-    auto start = high_resolution_clock::now();
-    yan_res = yannakakis(root);
+        // Crear vectores de relacion de cada nodo_tr
+        vector<qdag> Q_root(1);
 
-    auto stop = high_resolution_clock::now();
+        Q_root[0] = qdag_rel_T;
+
+        vector<qdag> Q_b(2);
+        Q_b[0] = qdag_rel_R;
+        Q_b[1] = qdag_rel_S;
+        // Crear GHDs
+
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        ghd root = ghd(Q_root, level_1);
+
+        qdag* yan_res;
+
+        if (strcmp(argv[argc - 2], "yk") == 0) {
+            start = high_resolution_clock::now();
+            yan_res = yannakakis(root);
+            stop = high_resolution_clock::now();
+        } else {
+            start = high_resolution_clock::now();
+            yan_res = yannakakis_par(root);
+            stop = high_resolution_clock::now();
+        }
+    }
     const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double yk_time = time_span.count() / 1000;
-    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/trad_j3_yk_log.txt", ios::app);
-    outfile << yk_time << endl;
+    double time = time_span.count() / 1000;
+    ofstream outfile(argv[argc - 1], ios::app);
+    outfile << time << endl;
     outfile.close();
-
+    cout << "took " << time << "s" << endl;
     return 0;
 }
