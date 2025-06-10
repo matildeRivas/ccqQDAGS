@@ -1,4 +1,4 @@
-pattern="j3_ghd"
+pattern="j4_ghd"
 params_file="/mnt/c/Users/crist/Documents/query-pattern-finder/${pattern}.txt"
 
 for method in "yk_par" "yk" "mj"
