@@ -1,4 +1,4 @@
-pattern="j4_ghd"
+pattern="triangle_tadpole"
 params_file="/mnt/c/Users/crist/Documents/query-pattern-finder/${pattern}.txt"
 
 for method in "yk_par" "yk" "mj"
