@@ -115,10 +115,10 @@ int main(int argc, char** argv)
         vector<qdag> Q_root(2);
 
         Q_root[0] = qdag_rel_R;
-        Q_root[1] = qdag_rel_T;
+        Q_root[1] = qdag_rel_S;
 
         vector<qdag> Q_b(2);
-        Q_b[0] = qdag_rel_S;
+        Q_b[0] = qdag_rel_T;
         Q_b[1] = qdag_rel_U;
 
         // Crear GHDs
