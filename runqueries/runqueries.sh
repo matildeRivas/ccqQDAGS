@@ -1,7 +1,7 @@
-pattern="triangle_tadpole"
+pattern="bowtie"
 params_file="/mnt/c/Users/crist/Documents/query-pattern-finder/${pattern}.txt"
 
-for method in "yk_par" "yk" "mj"
+for method in "mj" # "yk_par" "yk"
 do
     # create output file
     output_file="/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/${pattern}_${method}.txt"
