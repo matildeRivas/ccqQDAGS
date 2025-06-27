@@ -1,0 +1,6 @@
+services:
+  ccqdags:
+    image: ccqdags
+    build:
+      context: .
+      dockerfile: Dockerfile
