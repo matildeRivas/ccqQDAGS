@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 
     high_resolution_clock::time_point start, stop;
 
-    if (strcmp(argv[argc - 2], "mj") == 0) {
+    if (strcmp(argv[argc - 3], "mj") == 0) {
         vector<qdag> test(4);
 
         test[0] = qdag_rel_R;
@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 
         qdag* yan_res;
         start = high_resolution_clock::now();
-        if (strcmp(argv[argc - 2], "yk") == 0) {
+        if (strcmp(argv[argc - 3], "yk") == 0) {
             yan_res = yannakakis(root);
         } else {
             yan_res = yannakakis_par(root);
@@ -141,7 +141,7 @@ int main(int argc, char** argv)
     const std::chrono::duration<double, std::milli> time_span = stop - start;
     double time = time_span.count() / 1000;
     cout << "took " << time << "s" << endl;
-    ofstream outfile(argv[argc - 1], ios::app);
+    ofstream outfile(argv[argc - 2], ios::app);
     outfile << time << endl;
     outfile.close();
 

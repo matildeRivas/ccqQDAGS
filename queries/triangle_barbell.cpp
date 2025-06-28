@@ -115,67 +115,61 @@ int main(int argc , char **argv) {
     qdag qdag_rel_RP(*rel_RP, att_RP, grid_side, 2, att_RP.size());
     qdag qdag_rel_SP(*rel_SP, att_SP, grid_side, 2, att_SP.size());
     qdag qdag_rel_TP(*rel_TP, att_TP, grid_side, 2, att_TP.size());
-    // Crear vectores de relacion de cada nodo_tr
-    vector<qdag> Q_root(1);
 
-    Q_root[0] = qdag_rel_U;
+    high_resolution_clock::time_point start, stop;
 
-    vector<qdag> Q_b(3);
-    Q_b[0] = qdag_rel_R;
-    Q_b[1] = qdag_rel_S;
-    Q_b[2] = qdag_rel_T;
+    if (strcmp(argv[argc - 3], "mj") == 0) {
+        vector<qdag> test(7);
+        test[0] = qdag_rel_R;
+        test[1] = qdag_rel_S;
+        test[2] = qdag_rel_T;
+        test[3] = qdag_rel_U;
+        test[4] = qdag_rel_RP;
+        test[5] = qdag_rel_SP;
+        test[6] = qdag_rel_TP;
 
-    vector<qdag> Q_c(3);
-    Q_c[0] = qdag_rel_RP;
-    Q_c[1] = qdag_rel_SP;
-    Q_c[2] = qdag_rel_TP;
+        qdag* test_result;
+        start = high_resolution_clock::now();
+        test_result = multiJoin(test, false, 1000);
+        stop = high_resolution_clock::now();
+    } else {
+        vector<qdag> Q_root(1);
+        Q_root[0] = qdag_rel_U;
 
+        vector<qdag> Q_b(3);
+        Q_b[0] = qdag_rel_R;
+        Q_b[1] = qdag_rel_S;
+        Q_b[2] = qdag_rel_T;
 
-    // Crear GHDs
-    vector<ghd> empty_children(0);
-    ghd sub_b = ghd(Q_b, empty_children);
-    ghd sub_c = ghd(Q_c, empty_children);
-    vector<ghd> level_1;
-    level_1.push_back(sub_b);
-    level_1.push_back(sub_c);
-    ghd root = ghd(Q_root, level_1);
+        vector<qdag> Q_c(3);
+        Q_c[0] = qdag_rel_RP;
+        Q_c[1] = qdag_rel_SP;
+        Q_c[2] = qdag_rel_TP;
 
-    vector<qdag> test(7);
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        ghd sub_c = ghd(Q_c, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        level_1.push_back(sub_c);
+        ghd root = ghd(Q_root, level_1);
+        qdag* yan_res;
+        start = high_resolution_clock::now();
+        if (strcmp(argv[argc - 3], "yk") == 0) {
+            yan_res = yannakakis(root);
+        } else {
+            yan_res = yannakakis_par(root);
+        }
+        stop = high_resolution_clock::now();
+    }
 
-    test[0] = qdag_rel_R;
-    test[1] = qdag_rel_S;
-    test[2] = qdag_rel_T;
-    test[3] = qdag_rel_U;
-    test[4] = qdag_rel_RP;
-    test[5] = qdag_rel_SP;
-    test[6] = qdag_rel_TP;
-
-    qdag* test_result;
-    auto start = high_resolution_clock::now();
-    test_result = multiJoin(test, false, 1000);
-    auto stop = high_resolution_clock::now();
     const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double mj_time = time_span.count() / 1000;
-
-    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_triangle_barbell_mj.txt", ios::app);
-    outfile << mj_time << endl;
+    double time = time_span.count() / 1000;
+    ofstream outfile(argv[argc - 2], ios::app);
+    outfile << time << endl;
     outfile.close();
-
-    /*
-    qdag* yan_res;
-
-    auto start = high_resolution_clock::now();
-
-    yan_res = yannakakis(root);
-
-    auto stop = high_resolution_clock::now();
-    const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double y_time = time_span.count() / 1000;
-
-    ofstream outfile("/mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/ha_triangle_barbell_yk.txt", ios::app);
-    outfile << y_time << endl;
-    outfile.close();
-    */
+    cout << "took " << time << "s" << endl;
 
     return 0;
 }

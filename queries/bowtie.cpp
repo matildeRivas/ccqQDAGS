@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 
     high_resolution_clock::time_point start, stop;
 
-    if (strcmp(argv[argc - 2], "mj") == 0) {
+    if (strcmp(argv[argc - 3], "mj") == 0) {
         vector<qdag> test(6);
 
         test[0] = qdag_rel_R;
@@ -123,27 +123,30 @@ int main(int argc, char** argv)
         test_result = multiJoin(test, false, 1000);
         stop = high_resolution_clock::now();
     } else {
-        // Crear vectores de relacion de cada nodo_tr
-        vector<qdag> Q_root(3);
+        // Crear vectores de relacion de cada nodo
+        ghd root;
+        if (argv[argc - 2] == 1){
+            vector<qdag> Q_root(3);
+            Q_root[0] = qdag_rel_R;
+            Q_root[1] = qdag_rel_S;
+            Q_root[2] = qdag_rel_T;
 
-        Q_root[0] = qdag_rel_R;
-        Q_root[1] = qdag_rel_S;
-        Q_root[2] = qdag_rel_T;
+            vector<qdag> Q_c(3);
+            Q_c[0] = qdag_rel_RP;
+            Q_c[1] = qdag_rel_SP;
+            Q_c[2] = qdag_rel_TP;
 
-        vector<qdag> Q_c(3);
-        Q_c[0] = qdag_rel_RP;
-        Q_c[1] = qdag_rel_SP;
-        Q_c[2] = qdag_rel_TP;
+            // Crear GHDs
+            vector<ghd> empty_children(0);
+            ghd sub_c = ghd(Q_c, empty_children);
+            vector<ghd> level_1;
+            level_1.push_back(sub_c);
+            ghd root = ghd(Q_root, level_1);
 
-        // Crear GHDs
-        vector<ghd> empty_children(0);
-        ghd sub_c = ghd(Q_c, empty_children);
-        vector<ghd> level_1;
-        level_1.push_back(sub_c);
-        ghd root = ghd(Q_root, level_1);
-
+        }
+        
         qdag* yan_res;
-        if (strcmp(argv[argc - 2], "yk") == 0) {
+        if (strcmp(argv[argc - 3], "yk") == 0) {
             start = high_resolution_clock::now();
             yan_res = yannakakis(root);
             stop = high_resolution_clock::now();
@@ -155,7 +158,7 @@ int main(int argc, char** argv)
     }
     const std::chrono::duration<double, std::milli> time_span = stop - start;
     double time = time_span.count() / 1000;
-    ofstream outfile(argv[argc - 1], ios::app);
+    ofstream outfile(argv[argc - 2], ios::app);
     outfile << time << endl;
     outfile.close();
     cout << "took " << time << "s" << endl;

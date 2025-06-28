@@ -9,23 +9,6 @@ include_directories(external/sdsl-lite/include)
 include_directories(external/sdsl-lite/build/external/libdivsufsort/include)
 include_directories(src)
 
-# add_executable(qdags queries/j3.cpp
-    #queries/j4.cpp
-    #queries/p2.cpp
-    #queries/p3.cpp
-    #queries/p4.cpp
-    #queries/s1.cpp
-    #queries/s2.cpp
-    #queries/s3.cpp
-    #queries/s4.cpp
-    #queries/t2.cpp
-    #queries/t4.cpp
-    #queries/ti2.cpp
-    #queries/ti3.cpp
-    #queries/ti4.cpp
-    #queries/tr1.cpp
-    #queries/tr2.cpp
-#   )
 add_executable(triangle_tadpole includes/initArray.hpp queries/triangle_tadpole.cpp)
 
 target_link_libraries(triangle_tadpole ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
@@ -62,12 +45,6 @@ target_link_libraries(penta_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build
 target_link_libraries(penta_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
 target_link_libraries(penta_barbell ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
 
-add_executable(ccq_qdags includes/initArray.hpp queries/ghd_test.cpp)
-
-target_link_libraries(ccq_qdags ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
-target_link_libraries(ccq_qdags ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
-target_link_libraries(ccq_qdags ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
-
 add_executable(j4_ghd includes/initArray.hpp queries/j4_ghd.cpp)
 
 target_link_libraries(j4_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
@@ -80,8 +57,26 @@ target_link_libraries(ti4_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/l
 target_link_libraries(ti4_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
 target_link_libraries(ti4_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
 
+add_executable(t4_ghd includes/initArray.hpp queries/t4_ghd.cpp)
+
+target_link_libraries(t4_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
+target_link_libraries(t4_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
+target_link_libraries(t4_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
+
 add_executable(bowtie queries/bowtie.cpp)
 
 target_link_libraries(bowtie ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
 target_link_libraries(bowtie ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
 target_link_libraries(bowtie ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
+
+add_executable(t3_ghd includes/initArray.hpp queries/t3_ghd.cpp)
+
+target_link_libraries(t3_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
+target_link_libraries(t3_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
+target_link_libraries(t3_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
+
+add_executable(ti3_ghd includes/initArray.hpp queries/ti3_ghd.cpp)
+
+target_link_libraries(ti3_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/lib/libsdsl.a)
+target_link_libraries(ti3_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort.a)
+target_link_libraries(ti3_ghd ${CMAKE_SOURCE_DIR}/external/sdsl-lite/build/external/libdivsufsort/lib/libdivsufsort64.a)
