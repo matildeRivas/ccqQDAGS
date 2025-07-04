@@ -59,9 +59,9 @@ int main(int argc, char** argv)
     qdag::att_set att_S;
     qdag::att_set att_T;
 
-    att_R.push_back(AT_Y); att_R.push_back(AT_X); 
-    att_S.push_back(AT_Z); att_S.push_back(AT_X); 
-    att_T.push_back(AT_U); att_T.push_back(AT_X);
+    att_R.push_back(1); att_R.push_back(0); 
+    att_S.push_back(2); att_S.push_back(0); 
+    att_T.push_back(3); att_T.push_back(0);
 
     std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]);
 
