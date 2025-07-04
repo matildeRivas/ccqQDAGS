@@ -107,24 +107,59 @@ int main(int argc, char** argv)
 
         qdag* test_result;
         start = high_resolution_clock::now();
-        test_result = multiJoin(test, false, 1000);
+        test_result = multiJoin(Q, false, 1000);
         stop = high_resolution_clock::now();
     } else {
-        // Crear vectores de relacion de cada nodo
-        vector<qdag> Q_root(2);
-        Q_root[0] = qdag_rel_R;
-        Q_root[1] = qdag_rel_S;
+        ghd root;
+        if (argv[argc - 2] == "1") {
+            vector<qdag> Q_root(2);
+            Q_root[0] = qdag_rel_R;
+            Q_root[1] = qdag_rel_T;
 
-        vector<qdag> Q_b(2);
-        Q_b[0] = qdag_rel_T;
-        Q_b[1] = qdag_rel_U;
-        // Crear GHDs
+            vector<qdag> Q_b(2);
+            Q_b[0] = qdag_rel_S;
+            Q_b[1] = qdag_rel_U;
+            // Crear GHDs
 
-        vector<ghd> empty_children(0);
-        ghd sub_b = ghd(Q_b, empty_children);
-        vector<ghd> level_1;
-        level_1.push_back(sub_b);
-        ghd root = ghd(Q_root, level_1);
+            vector<ghd> empty_children(0);
+            ghd sub_b = ghd(Q_b, empty_children);
+            vector<ghd> level_1;
+            level_1.push_back(sub_b);
+            root = ghd(Q_root, level_1);
+
+        }
+        else if (argv[argc - 2] == "2"){
+            vector<qdag> Q_root(2);
+            Q_root[0] = qdag_rel_R;
+            Q_root[1] = qdag_rel_S;
+
+            vector<qdag> Q_b(2);
+            Q_b[0] = qdag_rel_T;
+            Q_b[1] = qdag_rel_U;
+            // Crear GHD
+
+            vector<ghd> empty_children(0);
+            ghd sub_b = ghd(Q_b, empty_children);
+            vector<ghd> level_1;
+            level_1.push_back(sub_b);
+            root = ghd(Q_root, level_1);
+        }
+        else if (argv[argc - 2] == "3"){
+            vector<qdag> Q_root(2);
+            Q_root[0] = qdag_rel_R;
+            Q_root[1] = qdag_rel_U;
+
+            vector<qdag> Q_b(2);
+            Q_b[0] = qdag_rel_T;
+            Q_b[1] = qdag_rel_S;
+            // Crear GHDs
+
+            vector<ghd> empty_children(0);
+            ghd sub_b = ghd(Q_b, empty_children);
+            vector<ghd> level_1;
+            level_1.push_back(sub_b);
+            root = ghd(Q_root, level_1);
+        }
         
         qdag* yan_res;
 

@@ -141,7 +141,7 @@ int main(int argc, char** argv)
             ghd sub_c = ghd(Q_c, empty_children);
             vector<ghd> level_1;
             level_1.push_back(sub_c);
-            ghd root = ghd(Q_root, level_1);
+            root = ghd(Q_root, level_1);
 
         }
         
