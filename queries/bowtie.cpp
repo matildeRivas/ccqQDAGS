@@ -125,7 +125,7 @@ int main(int argc, char** argv)
     } else {
         // Crear vectores de relacion de cada nodo
         ghd root;
-        if (argv[argc - 2] == 1){
+        if (argv[argc - 2] == "1") {
             vector<qdag> Q_root(3);
             Q_root[0] = qdag_rel_R;
             Q_root[1] = qdag_rel_S;
@@ -161,6 +161,6 @@ int main(int argc, char** argv)
     ofstream outfile(argv[argc - 2], ios::app);
     outfile << time << endl;
     outfile.close();
-    cout << "took " << time << "s" << endl;
+    std::cout << "took " << time << "s" << endl;
     return 0;
 }
