@@ -7,15 +7,19 @@ ghd_confs=(
     ["bowtie"]="1"
     ["j3_ghd"]="3"
     ["j4_ghd"]="3"
-    ["tr_barbell"]="1"
+    ["triangle_barbell"]="1"
     ["triangle_tadpole"]="1"
     ["ti4_ghd"]="3"
     ["square_tadpole"]="1"
     ["square_barbell"]="1"
     ["penta_barbell"]="1"
+    ["t3_ghd"]="3"
+    ["t4_ghd"]="3"
+    ["ti3_ghd"]="3"
+do
 )
 
-for pattern in "bowtie" "j3_ghd" "j4_ghd" "tr_barbell" "triangle_tadpole" "ti4_ghd" "square_tadpole" "square_barbell" "penta_barbell"
+for pattern in "bowtie" "j3_ghd" "j4_ghd" "triangle_barbell" "triangle_tadpole" "ti4_ghd" "square_tadpole" "square_barbell" "penta_barbell" "t3_ghd" "t4_ghd" "ti3_ghd"
 do
     params_file="${input_folder}/${pattern}.txt"
     # create output file
