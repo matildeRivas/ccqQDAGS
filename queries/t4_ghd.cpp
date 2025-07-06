@@ -1,20 +1,12 @@
-//
-// Created by anouk on 31-12-24.
-//
-
 
 #include <fstream>
 #include<bits/stdc++.h>
 #include<ratio>
-#include<chrono>
-#include<ctime>
 
 using namespace std::chrono;
 
-
 #include "../includes/ghd.hpp"
 #include "../src/ghd_optimal_joins.cpp"
-
 
 #define AT_X 0
 #define AT_Y 1
@@ -26,12 +18,16 @@ std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, ui
 {
     std::ifstream input_stream(filename);
     uint64_t x;
-    uint16_t i, j=0;
+    uint16_t i, j = 0;
 
     std::vector<std::vector<uint64_t>>* relation;
     std::vector<uint64_t> tuple;
 
     relation = new std::vector<std::vector<uint64_t>>();
+    if (!input_stream.good()) {
+        cout << "file does not exist: '" << filename << "'" << endl;
+        return relation;
+    }
 
     input_stream >> x;
     while (!input_stream.eof()) {
@@ -46,8 +42,7 @@ std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, ui
     return relation;
 }
 
-
-uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_columns, uint64_t max_temp)
+uint64_t maximum_in_table(std::vector<std::vector<uint64_t>>& table, uint16_t n_columns, uint64_t max_temp)
 {
     uint64_t i, j;
 
@@ -56,10 +51,8 @@ uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_
             if (table[i][j] > max_temp)
                 max_temp = table[i][j];
 
-
     return max_temp;
 }
-
 
 int main(int argc, char** argv)
 {
@@ -67,18 +60,26 @@ int main(int argc, char** argv)
     qdag::att_set att_S;
     qdag::att_set att_T;
     qdag::att_set att_U;
-    
-    att_R.push_back(AT_X); att_R.push_back(AT_Y); 
-    att_S.push_back(AT_X); att_S.push_back(AT_Z); 
-    att_T.push_back(AT_X); att_T.push_back(AT_U); 
-    att_U.push_back(AT_X); att_U.push_back(AT_V); 
-    
-    std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]), strRel_U(argv[4]); 
-    
+
+    att_R.push_back(AT_X);
+    att_R.push_back(AT_Y);
+    att_S.push_back(AT_X);
+    att_S.push_back(AT_Z);
+    att_T.push_back(AT_X);
+    att_T.push_back(AT_U);
+    att_U.push_back(AT_X);
+    att_U.push_back(AT_V);
+
+    std::string strRel_R(argv[1]), strRel_S(argv[2]), strRel_T(argv[3]), strRel_U(argv[4]);
+
     std::vector<std::vector<uint64_t>>* rel_R = read_relation(strRel_R, att_R.size());
     std::vector<std::vector<uint64_t>>* rel_S = read_relation(strRel_S, att_S.size());
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
     std::vector<std::vector<uint64_t>>* rel_U = read_relation(strRel_U, att_U.size());
+
+    if (!rel_R->size() || !rel_S->size() || !rel_T->size() || !rel_U->size()) {
+        return 1;
+    }
 
     uint64_t grid_side = 0;
 
@@ -87,11 +88,11 @@ int main(int argc, char** argv)
     grid_side = maximum_in_table(*rel_T, att_T.size(), grid_side);
     grid_side = maximum_in_table(*rel_U, att_U.size(), grid_side);
 
-    grid_side = pow(2, std::ceil(log2(grid_side) ));
+    grid_side = pow(2, std::ceil(log2(grid_side)));
 
-    //cout << "Grid side: " << grid_side << endl;
+    // cout << "Grid side: " << grid_side << endl;
 
-   qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
+    qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
     qdag qdag_rel_U(*rel_U, att_U, grid_side, 2, att_U.size());
@@ -99,7 +100,7 @@ int main(int argc, char** argv)
     high_resolution_clock::time_point start, stop;
 
     if (strcmp(argv[argc - 3], "mj") == 0) {
-       vector<qdag> Q(4);
+        vector<qdag> Q(4);
         Q[0] = qdag_rel_R;
         Q[1] = qdag_rel_S;
         Q[2] = qdag_rel_T;
@@ -111,7 +112,7 @@ int main(int argc, char** argv)
         stop = high_resolution_clock::now();
     } else {
         ghd root;
-        if (argv[argc - 2] == "1") {
+        if (strcmp(argv[argc - 1], "1") == 0) {
             vector<qdag> Q_root(2);
             Q_root[0] = qdag_rel_R;
             Q_root[1] = qdag_rel_T;
@@ -127,8 +128,7 @@ int main(int argc, char** argv)
             level_1.push_back(sub_b);
             root = ghd(Q_root, level_1);
 
-        }
-        else if (argv[argc - 2] == "2"){
+        } else if (strcmp(argv[argc - 1], "2") == 0) {
             vector<qdag> Q_root(2);
             Q_root[0] = qdag_rel_R;
             Q_root[1] = qdag_rel_S;
@@ -143,8 +143,8 @@ int main(int argc, char** argv)
             vector<ghd> level_1;
             level_1.push_back(sub_b);
             root = ghd(Q_root, level_1);
-        }
-        else if (argv[argc - 2] == "3"){
+
+        } else if (strcmp(argv[argc - 1], "3") == 0) {
             vector<qdag> Q_root(2);
             Q_root[0] = qdag_rel_R;
             Q_root[1] = qdag_rel_U;
@@ -160,7 +160,7 @@ int main(int argc, char** argv)
             level_1.push_back(sub_b);
             root = ghd(Q_root, level_1);
         }
-        
+
         qdag* yan_res;
 
         start = high_resolution_clock::now();

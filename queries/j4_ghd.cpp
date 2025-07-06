@@ -112,7 +112,7 @@ int main(int argc, char** argv)
         stop = high_resolution_clock::now();
     } else {
         ghd root;
-        if (argv[argc - 2] == "1") {
+        if (strcmp(argv[argc - 1], "1") == 0) {
             vector<qdag> Q_root(2);
             Q_root[0] = qdag_rel_R;
             Q_root[1] = qdag_rel_S;
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
             root = ghd(Q_root, level_1);
 
         }
-        else if (argv[argc - 2] == "2"){
+        else if (strcmp(argv[argc - 1], "2") == 0){
             vector<qdag> Q_root(2);
             Q_root[0] = qdag_rel_R;
             Q_root[1] = qdag_rel_T;
@@ -143,9 +143,9 @@ int main(int argc, char** argv)
             ghd sub_b = ghd(Q_b, empty_children);
             vector<ghd> level_1;
             level_1.push_back(sub_b);
-            ghd root = ghd(Q_root, level_1);
+            root = ghd(Q_root, level_1);
         }
-        else if (argv[argc - 2] == "3"){
+        else if (strcmp(argv[argc - 1], "3") == 0){
             vector<qdag> Q_root(2);
             Q_root[0] = qdag_rel_R;
             Q_root[1] = qdag_rel_U;
@@ -159,7 +159,7 @@ int main(int argc, char** argv)
             ghd sub_b = ghd(Q_b, empty_children);
             vector<ghd> level_1;
             level_1.push_back(sub_b);
-            ghd root = ghd(Q_root, level_1);
+            root = ghd(Q_root, level_1);
         }
         
         qdag* yan_res;

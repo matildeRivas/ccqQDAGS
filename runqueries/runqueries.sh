@@ -16,14 +16,13 @@ ghd_confs=(
     ["t3_ghd"]="3"
     ["t4_ghd"]="3"
     ["ti3_ghd"]="3"
-do
 )
 
-for pattern in "bowtie" "j3_ghd" "j4_ghd" "triangle_barbell" "triangle_tadpole" "ti4_ghd" "square_tadpole" "square_barbell" "penta_barbell" "t3_ghd" "t4_ghd" "ti3_ghd"
+for pattern in "bowtie" "j3_ghd" "j4_ghd" "ti4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "triangle_tadpole" "square_tadpole" "triangle_barbell" "square_barbell" "penta_barbell"
 do
     params_file="${input_folder}/${pattern}.txt"
     # create output file
-    output_file="${output_folder}/ha_${pattern}_mj_1.txt"
+    output_file="${output_folder}/ha_${pattern}_mj.txt"
     touch $output_file
     i=1
 
@@ -31,7 +30,7 @@ do
         printf "\nRunning ${pattern} - mj - ${i}:\n\t${params}\n"
         i=$((i+1))
         # Run the program with a timeout
-        timeout 1800 ./build/${pattern} $params mj $output_file
+        timeout 1800 ./build/${pattern} $params mj $output_file 0
         exit_code=$?
 
         # check errors
