@@ -20,35 +20,32 @@ public:
 
     ghd() = default;
 
-    ghd(vector<qdag> qdags, vector<ghd> subtrees) {
-        relations = qdags;
-        children = subtrees;
-    }
+    ghd(const std::vector<qdag>& qdags, const std::vector<ghd>& subtrees)
+        : relations(qdags), children(subtrees) {}
 
-    vector<qdag> get_relations(){
+    const std::vector<qdag>& get_relations() const {
         return relations;
     }
 
-    vector<ghd> get_children(){
+    const std::vector<ghd>& get_children() const {
         return children;
     }
 
-    vector<qdag> get_child_qdags(){
+    vector<qdag> get_child_qdags() const{
         // This will be used during semijoin, so there will only be 1 qdag per vector
         // obtengo el primer qdag que guarda cada uno de mis hijos en su nodo
         vector<qdag> results;
-        for (auto child = children.begin(); child != children.end(); child++){
-            results.push_back(child->get_relations().front());
+        results.reserve(children.size());
+        for (const auto& child : children) {
+            results.push_back(child.get_relations().front());
         }
         return results;
     }
 
-    void get_subtree_qdags(vector<qdag> &subtree){
-
+    void get_subtree_qdags(vector<qdag> &subtree) const {
         subtree.push_back(relations.front());
-        for (auto child = children.begin(); child != children.end(); child++){
-
-            child->get_subtree_qdags(subtree);
+        for (const auto& child : children) {
+            child.get_subtree_qdags(subtree);
         }
     }
 
@@ -63,7 +60,7 @@ public:
     }
 
 
-    void set_relations(vector<qdag> new_relations){
+    void set_relations(const vector<qdag> new_relations){
         relations = new_relations;
     }
 

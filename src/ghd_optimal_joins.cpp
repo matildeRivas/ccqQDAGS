@@ -15,7 +15,7 @@ double total_time_select = 0.0;
 duration<double> time_span_select;
 
 
-qdag *yannakakis(ghd root)
+qdag *yannakakis(ghd& root)
 {
 
     // Ejecutar multijoin en todos los niveles
@@ -36,7 +36,7 @@ qdag *yannakakis(ghd root)
     return qResult;
 }
 
-qdag* yannakakis_par(ghd root)
+qdag* yannakakis_par(ghd& root)
 {
     // Collect all nodes into a flat list
     std::vector<ghd*> node_list;
