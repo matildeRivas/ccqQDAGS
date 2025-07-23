@@ -59,6 +59,9 @@ uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_
 
 int main(int argc, char **argv) {
     // Setup de GHD: leer qdags que forman nodos
+    if (strcmp(argv[12], "mj") == 0) {
+        return 0;}
+    
     qdag::att_set att_A;
     qdag::att_set att_B;
     qdag::att_set att_C;
