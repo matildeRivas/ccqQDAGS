@@ -2,7 +2,7 @@
 input_folder="patterns"
 output_folder="runqueries/outputs"
 
-for pattern in "bowtie" "j3_ghd" "j4_ghd" "ti4_ghd" "triangle_tadpole" "t3_ghd" "t4_ghd" "ti3_ghd"
+for pattern in "bowtie" "t3_ghd" "t4_ghd" "ti3_ghd"
 do
     params_file="${input_folder}/${pattern}.txt"
 
