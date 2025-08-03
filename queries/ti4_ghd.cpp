@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 
     high_resolution_clock::time_point start, stop;
 
-    if (strcmp(argv[argc - 2], "mj") == 0) {
+    if (strcmp(argv[argc - 3], "mj") == 0) {
         vector<qdag> test(4);
 
         test[0] = qdag_rel_R;
@@ -107,25 +107,60 @@ int main(int argc, char** argv)
         test_result = multiJoin(test, false, 1000);
         stop = high_resolution_clock::now();
     } else {
-        // Crear vectores de relacion de cada nodo
-        vector<qdag> Q_root(2);
-        Q_root[0] = qdag_rel_R;
-        Q_root[1] = qdag_rel_S;
+        ghd root;
+        if (strcmp(argv[argc - 1], "1") == 0) {
+            vector<qdag> Q_root(2);
+            Q_root[0] = qdag_rel_R;
+            Q_root[1] = qdag_rel_T;
 
-        vector<qdag> Q_b(2);
-        Q_b[0] = qdag_rel_T;
-        Q_b[1] = qdag_rel_U;
-        // Crear GHDs
+            vector<qdag> Q_b(2);
+            Q_b[0] = qdag_rel_S;
+            Q_b[1] = qdag_rel_U;
+            // Crear GHDs
 
-        vector<ghd> empty_children(0);
-        ghd sub_b = ghd(Q_b, empty_children);
-        vector<ghd> level_1;
-        level_1.push_back(sub_b);
-        ghd root = ghd(Q_root, level_1);
+            vector<ghd> empty_children(0);
+            ghd sub_b = ghd(Q_b, empty_children);
+            vector<ghd> level_1;
+            level_1.push_back(sub_b);
+            root = ghd(Q_root, level_1);
+
+        }
+        else if (strcmp(argv[argc - 1], "2") == 0){
+            vector<qdag> Q_root(2);
+            Q_root[0] = qdag_rel_R;
+            Q_root[1] = qdag_rel_S;
+
+            vector<qdag> Q_b(2);
+            Q_b[0] = qdag_rel_T;
+            Q_b[1] = qdag_rel_U;
+            // Crear GHD
+
+            vector<ghd> empty_children(0);
+            ghd sub_b = ghd(Q_b, empty_children);
+            vector<ghd> level_1;
+            level_1.push_back(sub_b);
+            root = ghd(Q_root, level_1);
+        }
+        else if (strcmp(argv[argc - 1], "3") == 0){
+            vector<qdag> Q_root(2);
+            Q_root[0] = qdag_rel_R;
+            Q_root[1] = qdag_rel_U;
+
+            vector<qdag> Q_b(2);
+            Q_b[0] = qdag_rel_T;
+            Q_b[1] = qdag_rel_S;
+            // Crear GHDs
+
+            vector<ghd> empty_children(0);
+            ghd sub_b = ghd(Q_b, empty_children);
+            vector<ghd> level_1;
+            level_1.push_back(sub_b);
+            root = ghd(Q_root, level_1);
+        }
 
         qdag* yan_res;
         start = high_resolution_clock::now();
-        if (strcmp(argv[argc - 2], "yk") == 0) {
+        if (strcmp(argv[argc - 3], "yk") == 0) {
             yan_res = yannakakis(root);
         } else {
             yan_res = yannakakis_par(root);
@@ -135,7 +170,7 @@ int main(int argc, char** argv)
 
     const std::chrono::duration<double, std::milli> time_span = stop - start;
     double time = time_span.count() / 1000;
-    ofstream outfile(argv[argc - 1], ios::app);
+    ofstream outfile(argv[argc - 2], ios::app);
     outfile << time << endl;
     outfile.close();
     cout << "took " << time << "s" << endl;
