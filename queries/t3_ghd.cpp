@@ -15,9 +15,13 @@ using namespace std::chrono;
 #define AT_V 3
 
 
+/* 
+/mnt/c/Users/crist/Documents/ccqQDAGS/build/t3_ghd /mnt/c/Users/crist/Documents/ccqQDAGS/data/prop-direct-P5383 /mnt/c/Users/crist/Documents/ccqQDAGS/data/prop-direct-P5294 /mnt/c/Users/crist/Documents/ccqQDAGS/data/prop-direct-P84 mj /mnt/c/Users/crist/Documents/ccqQDAGS/runqueries/outputs/test.txt 1 & /mnt/c/Users/crist/Downloads/monitor.sh $! output
+*/
 std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, uint16_t n_Atts)
 {
     std::ifstream input_stream(filename);
+
     uint64_t x;
     uint16_t i, j=0;
 
@@ -25,6 +29,10 @@ std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, ui
     std::vector<uint64_t> tuple;
 
     relation = new std::vector<std::vector<uint64_t>>();
+    if (!input_stream.good()) {
+        cout << "file does not exist: '" << filename << "'" << endl;
+        return relation;
+    }
 
     input_stream >> x;
     while (!input_stream.eof()) {
@@ -68,6 +76,7 @@ int main(int argc, char** argv)
     std::vector<std::vector<uint64_t>>* rel_R = read_relation(strRel_R, att_R.size());
     std::vector<std::vector<uint64_t>>* rel_S = read_relation(strRel_S, att_S.size());
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
+    cout << "read all relations, with a total of " << rel_R->size() + rel_S->size() + rel_T->size() << " tuples" << endl;
 
     // uint64_t grid_side = 52000000; // es como +infty para wikidata
     uint64_t grid_side = 0;

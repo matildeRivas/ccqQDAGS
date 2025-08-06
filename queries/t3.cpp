@@ -31,6 +31,10 @@ std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, ui
     std::vector<uint64_t> tuple;   
 
     relation = new std::vector<std::vector<uint64_t>>();
+    if (!input_stream.good()) {
+        cout << "file does not exist: '" << filename << "'" << endl;
+        return relation;
+    }
 
     input_stream >> x;
     while (!input_stream.eof()) {
