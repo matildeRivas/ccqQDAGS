@@ -34,6 +34,5 @@ for i, m in enumerate(multi):
 
     for patch, color in zip(props['boxes'], colors):
         patch.set_facecolor(color)
-    ax.legend()
 
 plt.savefig("ghd_configurations")
