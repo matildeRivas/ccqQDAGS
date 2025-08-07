@@ -80,6 +80,9 @@ for i, p in enumerate(patterns):
         ykp_res = pd.read_csv(f"runqueries/outputs/{p}_yk_par.txt", names=["GHD par"])
         df_mj = pd.read_csv(f"runqueries/outputs/{p}_mj.txt", names=["multijoin"])
 
+    df_mj[df_mj['multijoin'] == 'timeout'] = 1800
+    df_mj["multijoin"] = pd.to_numeric(df_mj["multijoin"], downcast='float')
+
     res = pd.merge(yk_res[["GHD"]], ykp_res[["GHD par"]], left_index=True, right_index=True)
     res = pd.merge(res, df_mj, left_index=True, right_index=True)
     ax = axes[i//2][i%2]
@@ -87,6 +90,7 @@ for i, p in enumerate(patterns):
     ax.set_ylabel('Execution time (s)')
     bplot, props = res.boxplot(
         ax=ax,
+        column=["GHD", "GHD par", "multijoin"],
         patch_artist=True,
         medianprops=medianprops,
         showmeans=False,
@@ -97,6 +101,7 @@ for i, p in enumerate(patterns):
 
     for patch, color in zip(props['boxes'], colors):
         patch.set_facecolor(color)
+
 handles, labels = plt.gca().get_legend_handles_labels()
 fig.legend(handles, labels, loc='upper center')
 plt.savefig("times")
