@@ -125,6 +125,17 @@ public:
         }
 
     }
+
+    uint64_t size() {
+        uint64_t total = 0;
+        for (auto qdag = relations.begin(); qdag != relations.end(); qdag++){
+            total += qdag->size();
+        }
+        for (auto child = children.begin(); child != children.end(); child++){
+            total += child->size();
+        }
+        return total;
+    }
 };
 
 #endif //CCQ_QDAGS_GHD_HPP

@@ -89,6 +89,8 @@ int main(int argc, char** argv)
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
 
+    cout << "qdags size: " << (qdag_rel_R.size() + qdag_rel_S.size() + qdag_rel_T.size()) << endl;
+
     high_resolution_clock::time_point start, stop;
 
     if (strcmp(argv[argc - 3], "mj") == 0) {

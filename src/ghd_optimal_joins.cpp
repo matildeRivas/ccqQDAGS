@@ -17,10 +17,11 @@ duration<double> time_span_select;
 qdag* yannakakis(ghd root)
 {
 
+    cout << "GHD size before multijoins:" << root.size() << endl;
     // Ejecutar multijoin en todos los niveles
     root.deep_exec_multijoin();
-    auto result = root.get_relations();
 
+    cout << "GHD size after multijoins:" << root.size() << endl;
     // Ejecutar semijoin entre root y nivel 1
     root.constrained_by_children();
 
@@ -31,6 +32,7 @@ qdag* yannakakis(ghd root)
     root.get_subtree_qdags(producto_punto);
 
     qdag* qResult = multiJoin(producto_punto, false, 1000);
+    cout << "final qdag size:" << qResult->size() << endl;
 
     return qResult;
 }
@@ -48,8 +50,6 @@ qdag* yannakakis_par(ghd root)
     }
 
     // solve_mj = high_resolution_clock::now();
-
-    auto result = root.get_relations();
 
     // Ejecutar semijoin entre root y nivel 1
 

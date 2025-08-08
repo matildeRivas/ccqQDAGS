@@ -259,6 +259,7 @@ public:
         uint64_t i, s = 0;
         for (i = 0; i < height; i++)
             s += bv[i].size_in_bytes();
+            s += active[i].size_in_bytes();
 
         return s + total_ones.size() * sizeof(uint64_t);
     }
