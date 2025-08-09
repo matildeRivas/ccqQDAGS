@@ -7,6 +7,7 @@
 #include <ctime>
 #include <omp.h>
 #include <ratio>
+#include <optional>
 
 using namespace std::chrono;
 
@@ -14,14 +15,17 @@ high_resolution_clock::time_point start_select, stop_select;
 double total_time_select = 0.0;
 duration<double> time_span_select;
 
-qdag* yannakakis(ghd root)
+qdag* yannakakis(ghd root, std::optional<std::reference_wrapper<std::ofstream>> outfile)
 {
-
-    cout << "GHD size before multijoins:" << root.size() << endl;
+    float init, mid, end;
+    
+    init = root.size();
+    //cout << "GHD size before multijoins:" << root.size() << endl;
     // Ejecutar multijoin en todos los niveles
     root.deep_exec_multijoin();
 
-    cout << "GHD size after multijoins:" << root.size() << endl;
+    //cout << "GHD size after multijoins:" << root.size() << endl;
+    mid = root.size();
     // Ejecutar semijoin entre root y nivel 1
     root.constrained_by_children();
 
@@ -32,8 +36,11 @@ qdag* yannakakis(ghd root)
     root.get_subtree_qdags(producto_punto);
 
     qdag* qResult = multiJoin(producto_punto, false, 1000);
-    cout << "final qdag size:" << qResult->size() << endl;
-
+    end = qResult->size();
+    if(outfile){
+        outfile->get() << init << "," << mid << "," << end;
+    }
+    
     return qResult;
 }
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 input_folder="patterns"
-output_folder="runqueries/outputs"
+metric="$1"
+output_folder="outputs_${metric}"
 
 declare -A ghd_confs
 ghd_confs=(
@@ -22,15 +23,17 @@ for pattern in "t3_ghd"
 do
     params_file="${input_folder}/${pattern}.txt"
     # create output file
-    output_file="${output_folder}/${pattern}_mj.txt"
+    output_file="${output_folder}/${pattern}_mj.csv"
     touch $output_file
     i=1
-
+    if [ "$metric" = "space" ]; then
+        echo -e "tuples,qdags" >> $output_file
+    fi
     while IFS= read -r params; do
         printf "\nRunning ${pattern} - mj - ${i}:\n\t${params}\n"
         i=$((i+1))
         # Run the program with a timeout
-        timeout 1800 ./build/${pattern} $params mj $output_file 0
+        timeout 1800 ./build/${pattern} $params $metric mj $output_file 0
         exit_code=$?
 
         # check errors
@@ -48,15 +51,19 @@ do
         for (( ghd_conf=1; ghd_conf<=${ghd_confs[$pattern]}; ghd_conf++ ));
         do
             # create output file
-            output_file="${output_folder}/ha_${pattern}_${method}_${ghd_conf}.txt"
+            output_file="${output_folder}/${pattern}_${method}_${ghd_conf}.csv"
             touch $output_file
+            if [ "$metric" = "space" ]; then
+                echo -e "tuples,qdags,ghd,post mj,result" >> $output_file
+            fi
+            
             i=1
 
             while IFS= read -r params; do
                 printf "\nRunning ${pattern}_${method}_${ghd_conf} ${i}:\n\t${params}\n"
                 i=$((i+1))
                 # Run the program with a timeout
-                timeout 1800 ./build/${pattern} $params $method $output_file $ghd_conf
+                timeout 1800 ./build/${pattern} $params $metric $method $output_file $ghd_conf 
                 exit_code=$?
 
                 # check errors
