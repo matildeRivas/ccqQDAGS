@@ -63,6 +63,7 @@ uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_
 
 int main(int argc, char** argv)
 {
+    ofstream outfile(argv[argc - 2], ios::app);
     qdag::att_set att_R;
     qdag::att_set att_S;
     qdag::att_set att_T;
@@ -77,7 +78,7 @@ int main(int argc, char** argv)
     std::vector<std::vector<uint64_t>>* rel_S = read_relation(strRel_S, att_S.size());
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
     cout << "read all relations, with a total of " << rel_R->size() + rel_S->size() + rel_T->size() << " tuples" << endl;
-
+    
     // uint64_t grid_side = 52000000; // es como +infty para wikidata
     uint64_t grid_side = 0;
     grid_side = maximum_in_table(*rel_R, att_R.size(), grid_side);
@@ -88,8 +89,10 @@ int main(int argc, char** argv)
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
-
-    cout << "qdags size: " << (qdag_rel_R.size() + qdag_rel_S.size() + qdag_rel_T.size()) << endl;
+    if (strcmp(argv[argc - 4], "space") == 0){
+        outfile <<  rel_R->size() + rel_S->size() + rel_T->size() << ",";
+        outfile << (qdag_rel_R.size() + qdag_rel_S.size() + qdag_rel_T.size()) << ",";
+    }
 
     high_resolution_clock::time_point start, stop;
 
@@ -155,7 +158,7 @@ int main(int argc, char** argv)
         qdag* yan_res;
         start = high_resolution_clock::now();
         if (strcmp(argv[argc - 3], "yk") == 0) {
-            yan_res = yannakakis(root);
+            yan_res = yannakakis(root, {outfile});
         } else {
             yan_res = yannakakis_par(root);
         }
@@ -164,10 +167,13 @@ int main(int argc, char** argv)
 
     const std::chrono::duration<double, std::milli> time_span = stop - start;
     double time = time_span.count() / 1000;
-    ofstream outfile(argv[argc - 2], ios::app);
-    outfile << time << endl;
+    if (strcmp(argv[argc - 4], "time") == 0){
+        outfile << time << endl;
+        cout << "took " << time << "s" << endl;
+    }
+    
+    outfile << endl;
     outfile.close();
-    cout << "took " << time << "s" << endl;
 
     return 0;
 }
