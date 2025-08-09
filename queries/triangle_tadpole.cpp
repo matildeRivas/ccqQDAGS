@@ -76,11 +76,9 @@ int main(int argc, char** argv)
     std::vector<std::vector<uint64_t>>* rel_P = read_relation(strRel_P, att_P.size());
     std::vector<std::vector<uint64_t>>* rel_Q = read_relation(strRel_Q, att_Q.size());
     std::vector<std::vector<uint64_t>>* rel_R = read_relation(strRel_R, att_R.size());
-    // cout<<"R"<<endl;
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
     std::vector<std::vector<uint64_t>>* rel_U = read_relation(strRel_U, att_U.size());
-    // cout<<"t"<<endl;
-    // std::vector<std::vector<uint64_t>>* rel_U = read_relation(strRel_U, att_U.size());
+    cout << "read all relations, with a total of " << rel_P->size() + rel_Q->size() + rel_R->size() + rel_T->size() + rel_U->size() << " tuples" << endl;
 
     uint64_t grid_side = 128;
 
@@ -96,6 +94,12 @@ int main(int argc, char** argv)
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
     qdag qdag_rel_U(*rel_U, att_U, grid_side, 2, att_U.size());
+    
+    ofstream outfile(argv[argc - 2], ios::app);
+    if (strcmp(argv[argc - 4], "space") == 0) {
+        outfile << rel_P->size() + rel_Q->size() + rel_R->size() + rel_T->size() + rel_U->size() << ",";
+        outfile << qdag_rel_P.size() + qdag_rel_Q.size() + qdag_rel_R.size() + qdag_rel_T.size() + qdag_rel_U.size() << ",";
+    }
 
     high_resolution_clock::time_point start, stop;
 
@@ -132,9 +136,13 @@ int main(int argc, char** argv)
         ghd root = ghd(Q_root, level_1);
         qdag* yan_res;
 
-        if (strcmp(argv[argc - 2], "yk") == 0) {
+        if (strcmp(argv[argc - 3], "yk") == 0) {
             start = high_resolution_clock::now();
-            yan_res = yannakakis(root);
+            if (strcmp(argv[argc - 4], "space") == 0) {
+                yan_res = yannakakis(root, { outfile });
+            } else {
+                yan_res = yannakakis(root, {});
+            }
             stop = high_resolution_clock::now();
         } else {
             start = high_resolution_clock::now();
@@ -144,9 +152,11 @@ int main(int argc, char** argv)
     }
     const std::chrono::duration<double, std::milli> time_span = stop - start;
     double time = time_span.count() / 1000;
-    ofstream outfile(argv[argc - 1], ios::app);
-    outfile << time << endl;
+    if (strcmp(argv[argc - 4], "time") == 0){
+        outfile << time;
+        cout << "took " << time << "s" << endl;
+    }
+    outfile << endl;
     outfile.close();
-    cout << "took " << time << "s" << endl;
     return 0;
 }

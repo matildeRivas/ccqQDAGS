@@ -83,6 +83,13 @@ int main(int argc, char** argv)
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
+    cout << "read all relations, with a total of " << rel_R->size() + rel_S->size() + rel_T->size() << " tuples" << endl;
+
+    ofstream outfile(argv[argc - 2], ios::app);
+    if (strcmp(argv[argc - 4], "space") == 0) {
+        outfile << rel_R->size() + rel_S->size() + rel_T->size() << ",";
+        outfile << qdag_rel_R.size() + qdag_rel_S.size() + qdag_rel_T.size() << ",";
+    }
 
     high_resolution_clock::time_point start, stop;
 
@@ -148,7 +155,11 @@ int main(int argc, char** argv)
         qdag* yan_res;
         start = high_resolution_clock::now();
         if (strcmp(argv[argc - 3], "yk") == 0) {
-            yan_res = yannakakis(root);
+            if (strcmp(argv[argc - 4], "space") == 0) {
+                yan_res = yannakakis(root, { outfile });
+            } else {
+                yan_res = yannakakis(root, {});
+            }
         } else {
             yan_res = yannakakis_par(root);
         }
@@ -157,10 +168,12 @@ int main(int argc, char** argv)
 
     const std::chrono::duration<double, std::milli> time_span = stop - start;
     double time = time_span.count() / 1000;
-    ofstream outfile(argv[argc - 2], ios::app);
-    outfile << time << endl;
+    if (strcmp(argv[argc - 4], "time") == 0){
+        outfile << time;
+        cout << "took " << time << "s" << endl;
+    }
+    outfile << endl;
     outfile.close();
-    cout << "took " << time << "s" << endl;
 
     return 0;
 }

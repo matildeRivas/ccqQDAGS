@@ -76,6 +76,7 @@ int main(int argc, char** argv)
     std::vector<std::vector<uint64_t>>* rel_S = read_relation(strRel_S, att_S.size());
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
     std::vector<std::vector<uint64_t>>* rel_U = read_relation(strRel_U, att_U.size());
+    cout << "read all relations, with a total of " << rel_R->size() + rel_S->size() + rel_T->size() + rel_U->size() << " tuples" << endl;
 
     if (!rel_R->size() || !rel_S->size() || !rel_T->size() || !rel_U->size()) {
         return 1;
@@ -96,6 +97,12 @@ int main(int argc, char** argv)
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
     qdag qdag_rel_U(*rel_U, att_U, grid_side, 2, att_U.size());
+
+    ofstream outfile(argv[argc - 2], ios::app);
+    if (strcmp(argv[argc - 4], "space") == 0) {
+        outfile << rel_R->size() + rel_S->size() + rel_T->size() + rel_U->size() << ",";
+        outfile << qdag_rel_R.size() + qdag_rel_S.size() + qdag_rel_T.size() + qdag_rel_U.size() << ",";
+    }
 
     high_resolution_clock::time_point start, stop;
 
@@ -165,7 +172,11 @@ int main(int argc, char** argv)
 
         start = high_resolution_clock::now();
         if (strcmp(argv[argc - 3], "yk") == 0) {
-            yan_res = yannakakis(root);
+            if (strcmp(argv[argc - 4], "space") == 0) {
+                yan_res = yannakakis(root, { outfile });
+            } else {
+                yan_res = yannakakis(root, {});
+            }
         } else {
             yan_res = yannakakis_par(root);
         }
@@ -175,8 +186,11 @@ int main(int argc, char** argv)
     const std::chrono::duration<double, std::milli> time_span = stop - start;
     double time = time_span.count() / 1000;
     cout << "took " << time << "s" << endl;
-    ofstream outfile(argv[argc - 2], ios::app);
-    outfile << time << endl;
+    if (strcmp(argv[argc - 4], "time") == 0){
+        outfile << time;
+        cout << "took " << time << "s" << endl;
+    }
+    outfile << endl;
     outfile.close();
 
     return 0;

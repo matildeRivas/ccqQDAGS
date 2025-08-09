@@ -91,6 +91,7 @@ int main(int argc, char** argv)
     std::vector<std::vector<uint64_t>>* rel_RP = read_relation(strRel_RP, att_RP.size());
     std::vector<std::vector<uint64_t>>* rel_SP = read_relation(strRel_SP, att_SP.size());
     std::vector<std::vector<uint64_t>>* rel_TP = read_relation(strRel_TP, att_TP.size());
+    cout << "read all relations, with a total of " << rel_R->size() + rel_S->size() + rel_T->size() + rel_RP->size() + rel_SP->size() + rel_TP->size() << " tuples" << endl;
 
     uint64_t grid_side = 32;
 
@@ -110,9 +111,15 @@ int main(int argc, char** argv)
     qdag qdag_rel_SP(*rel_SP, att_SP, grid_side, 2, att_SP.size());
     qdag qdag_rel_TP(*rel_TP, att_TP, grid_side, 2, att_TP.size());
 
+    ofstream outfile(argv[argc - 2], ios::app);
+    if (strcmp(argv[argc - 4], "space") == 0) {
+        outfile << rel_R->size() + rel_S->size() + rel_T->size() + rel_RP->size() + rel_SP->size() + rel_TP->size() << ",";
+        outfile << qdag_rel_R.size() + qdag_rel_S.size() + qdag_rel_T.size() + qdag_rel_RP.size() + qdag_rel_SP.size() + qdag_rel_TP.size() << ",";
+    }
+
     high_resolution_clock::time_point start, stop;
 
-    if (strcmp(argv[argc - 2], "mj") == 0) {
+    if (strcmp(argv[argc - 3], "mj") == 0) {
         vector<qdag> test(6);
 
         test[0] = qdag_rel_R;
@@ -147,9 +154,13 @@ int main(int argc, char** argv)
         ghd root = ghd(Q_root, level_1);
 
         qdag* yan_res;
-        if (strcmp(argv[argc - 2], "yk") == 0) {
+        if (strcmp(argv[argc - 3], "yk") == 0) {
             start = high_resolution_clock::now();
-            yan_res = yannakakis(root);
+            if (strcmp(argv[argc - 4], "space") == 0) {
+                yan_res = yannakakis(root, { outfile });
+            } else {
+                yan_res = yannakakis(root, {});
+            }
             stop = high_resolution_clock::now();
         } else {
             start = high_resolution_clock::now();
@@ -159,9 +170,11 @@ int main(int argc, char** argv)
     }
     const std::chrono::duration<double, std::milli> time_span = stop - start;
     double time = time_span.count() / 1000;
-    ofstream outfile(argv[argc - 1], ios::app);
-    outfile << time << endl;
+    if (strcmp(argv[argc - 4], "time") == 0) {
+        outfile << time;
+        cout << "took " << time << "s" << endl;
+    }
+    outfile << endl;
     outfile.close();
-    cout << "took " << time << "s" << endl;
     return 0;
 }
