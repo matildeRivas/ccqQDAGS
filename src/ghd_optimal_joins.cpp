@@ -51,10 +51,12 @@ qdag* yannakakis_par(ghd root)
     root.collect_all_nodes(node_list);
 
     // Execute exec_multijoin in parallel for all nodes
-#pragma omp parallel for
-    for (size_t i = 0; i < node_list.size(); ++i) {
-        node_list[i]->exec_multijoin();
-    }
+    int j =2;
+    #pragma omp parallel for num_threads(j)
+        for (size_t i = 0; i < node_list.size(); ++i) {
+            node_list[i]->exec_multijoin();
+        }
+    
 
     // solve_mj = high_resolution_clock::now();
 
