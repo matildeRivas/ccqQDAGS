@@ -35,7 +35,7 @@ do
         for (( ghd_conf=1; ghd_conf<=${ghd_confs[$pattern]}; ghd_conf++ ));
         do
             # create output file
-            output_file="${output_folder}/test_${method}.csv" # ${pattern}_${method}_${ghd_conf}.csv"
+            output_file="${output_folder}/${pattern}_${method}_${ghd_conf}.csv"
             touch $output_file
             if [ "$metric" = "space" ]; then
                 echo -e "tuples,qdags,ghd,post mj,result" >> $output_file

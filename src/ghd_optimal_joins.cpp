@@ -52,7 +52,7 @@ qdag* yannakakis_par(ghd root)
 
     // Execute exec_multijoin in parallel for all nodes
     int j = 2;
-    #pragma omp parallel for
+    #pragma omp parallel for num_threads(j)
         for (size_t i = 0; i < node_list.size(); ++i) {
             node_list[i]->exec_multijoin();
         }
