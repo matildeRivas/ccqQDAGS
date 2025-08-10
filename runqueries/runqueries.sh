@@ -45,7 +45,6 @@ do
             echo "segfault" >> $output_file
             echo "##### segfault #####"
         fi
-        break
     done < ${params_file}
 
     for method in "yk" "yk_par"
@@ -76,7 +75,6 @@ do
                     echo "segfault" >> $output_file
                     echo "##### segfault #####"
                 fi
-                break
             done < ${params_file}
         done
     done
