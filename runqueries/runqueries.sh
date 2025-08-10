@@ -19,7 +19,7 @@ ghd_confs=(
     ["ti3_ghd"]="3"
 )
 
-for pattern in "bowtie" "j3_ghd" "j4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "ti4_ghd" "triangle_tadpole"
+for pattern in "triangle_tadpole" # "bowtie" "j3_ghd" "j4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "ti4_ghd" "triangle_tadpole"
 do
     params_file="${input_folder}/${pattern}.txt"
     # create output file
@@ -29,6 +29,7 @@ do
     if [ "$metric" = "space" ]; then
         echo -e "tuples,qdags" >> $output_file
     fi
+    method="mj"
     while IFS= read -r params; do
         printf "\nRunning ${pattern} - mj - ${i}:\n\t${params}\n"
         i=$((i+1))
@@ -44,6 +45,7 @@ do
             echo "segfault" >> $output_file
             echo "##### segfault #####"
         fi
+        break
     done < ${params_file}
 
     for method in "yk" "yk_par"
@@ -74,6 +76,7 @@ do
                     echo "segfault" >> $output_file
                     echo "##### segfault #####"
                 fi
+                break
             done < ${params_file}
         done
     done

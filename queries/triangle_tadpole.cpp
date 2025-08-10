@@ -103,7 +103,7 @@ int main(int argc, char** argv)
 
     high_resolution_clock::time_point start, stop;
 
-    if (strcmp(argv[argc - 2], "mj") == 0) {
+    if (strcmp(argv[argc - 3], "mj") == 0) {
         vector<qdag> test(5);
         test[0] = qdag_rel_P;
         test[1] = qdag_rel_Q;
