@@ -19,7 +19,7 @@ ghd_confs=(
     ["ti3_ghd"]="3"
 )
 
-for pattern in "bowtie" # "bowtie" "j3_ghd" "j4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "ti4_ghd" "triangle_tadpole"
+for pattern in "j3_ghd" "j4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "ti4_ghd"
 do
     params_file="${input_folder}/${pattern}.txt"
     # create output file
