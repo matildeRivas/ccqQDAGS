@@ -11,10 +11,6 @@
 #include<chrono>
 #include<ctime>
 
-extern high_resolution_clock::time_point start_rank, stop_rank;
-extern double total_time_rank;
-extern duration<double> time_span_rank;
-
 typedef uint16_t type_mapping_M;
 
 bool compare_pairs(const pair<uint64_t, uint64_t> &i, const pair<uint64_t, uint64_t> &j) {
@@ -50,7 +46,7 @@ public:
 
     uint64_t size() {
         uint64_t s = Q->size() + Msize * sizeof(uint16_t) + attribute_set.size() * sizeof(uint64_t)
-                     + M_prime.size() * sizeof(vector<type_mapping_M> *) + sizeof(uint64_t);
+                     + M_prime.size() * sizeof(vector<type_mapping_M> *) + sizeof(uint64_t) + sizeof(uint16_t);
 
         for (uint64_t i = 0; i < M_prime.size(); i++)
             s += M_prime[i]->size() * sizeof(type_mapping_M);

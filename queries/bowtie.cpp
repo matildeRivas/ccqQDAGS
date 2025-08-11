@@ -16,42 +16,6 @@ using namespace std::chrono;
 #define AT_YP 3
 #define AT_ZP 4
 
-std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, uint16_t n_Atts)
-{
-    std::ifstream input_stream(filename);
-    uint64_t x;
-    uint16_t i, j = 0;
-
-    std::vector<std::vector<uint64_t>>* relation;
-    std::vector<uint64_t> tuple;
-
-    relation = new std::vector<std::vector<uint64_t>>();
-
-    input_stream >> x;
-    while (!input_stream.eof()) {
-        tuple.clear();
-        for (i = 0; i < n_Atts; i++) {
-            tuple.push_back(x);
-            input_stream >> x;
-        }
-        relation->push_back(tuple);
-    }
-
-    return relation;
-}
-
-uint64_t maximum_in_table(std::vector<std::vector<uint64_t>>& table, uint16_t n_columns, uint64_t max_temp)
-{
-    uint64_t i, j;
-
-    for (i = 0; i < table.size(); i++)
-        for (j = 0; j < n_columns; j++)
-            if (table[i][j] > max_temp)
-                max_temp = table[i][j];
-
-    return max_temp;
-}
-
 int main(int argc, char** argv)
 {
     // Setup de GHD: leer qdags que forman nodos
@@ -106,60 +70,29 @@ int main(int argc, char** argv)
     qdag qdag_rel_SP(*rel_SP, att_SP, grid_side, 2, att_SP.size());
     qdag qdag_rel_TP(*rel_TP, att_TP, grid_side, 2, att_TP.size());
 
-    high_resolution_clock::time_point start, stop;
+    auto rels = { rel_R, rel_S, rel_T, rel_RP, rel_SP, rel_TP };
+    cout << "read all relations, with a total of " << relations_size(rels) << " tuples" << endl;
 
-    if (strcmp(argv[argc - 3], "mj") == 0) {
-        vector<qdag> test(6);
+    vector<qdag> qdags = { qdag_rel_R, qdag_rel_S, qdag_rel_T, qdag_rel_RP, qdag_rel_SP, qdag_rel_TP };
 
-        test[0] = qdag_rel_R;
-        test[1] = qdag_rel_S;
-        test[2] = qdag_rel_T;
-        test[3] = qdag_rel_RP;
-        test[4] = qdag_rel_SP;
-        test[5] = qdag_rel_TP;
+    ghd root;
+    vector<qdag> Q_root(3);
+    Q_root[0] = qdag_rel_R;
+    Q_root[1] = qdag_rel_S;
+    Q_root[2] = qdag_rel_T;
 
-        qdag* test_result;
-        start = high_resolution_clock::now();
-        test_result = multiJoin(test, false, 1000);
-        stop = high_resolution_clock::now();
-    } else {
-        // Crear vectores de relacion de cada nodo
-        ghd root;
-        if (strcmp(argv[argc - 1], "1") == 0) {
-            vector<qdag> Q_root(3);
-            Q_root[0] = qdag_rel_R;
-            Q_root[1] = qdag_rel_S;
-            Q_root[2] = qdag_rel_T;
+    vector<qdag> Q_c(3);
+    Q_c[0] = qdag_rel_RP;
+    Q_c[1] = qdag_rel_SP;
+    Q_c[2] = qdag_rel_TP;
 
-            vector<qdag> Q_c(3);
-            Q_c[0] = qdag_rel_RP;
-            Q_c[1] = qdag_rel_SP;
-            Q_c[2] = qdag_rel_TP;
+    // Crear GHDs
+    vector<ghd> empty_children(0);
+    ghd sub_c = ghd(Q_c, empty_children);
+    vector<ghd> level_1;
+    level_1.push_back(sub_c);
+    root = ghd(Q_root, level_1);
 
-            // Crear GHDs
-            vector<ghd> empty_children(0);
-            ghd sub_c = ghd(Q_c, empty_children);
-            vector<ghd> level_1;
-            level_1.push_back(sub_c);
-            root = ghd(Q_root, level_1);
-        }
-        
-        qdag* yan_res;
-        if (strcmp(argv[argc - 3], "yk") == 0) {
-            start = high_resolution_clock::now();
-            yan_res = yannakakis(root);
-            stop = high_resolution_clock::now();
-        } else {
-            start = high_resolution_clock::now();
-            yan_res = yannakakis_par(root);
-            stop = high_resolution_clock::now();
-        }
-    }
-    const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double time = time_span.count() / 1000;
-    ofstream outfile(argv[argc - 2], ios::app);
-    outfile << time << endl;
-    outfile.close();
-    std::cout << "took " << time << "s" << endl;
+    run_experiment(argv, argc, rels, qdags, root);
     return 0;
 }

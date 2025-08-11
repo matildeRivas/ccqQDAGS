@@ -159,9 +159,9 @@ public:
 
     inline uint64_t size_in_bytes()
     {
-        return sizeof(uint64_t)*((u+63)/64) + sizeof(uint32_t)*(u+63)/64
+        return sizeof(uint64_t)*nw + sizeof(uint32_t)*nw
                + sizeof(uint64_t*) + sizeof(uint32_t*)
-               + 2*sizeof(uint64_t);
+               + 3*sizeof(uint64_t);
     }
 
     vector<uint64_t> get_bits(uint64_t start_pos, uint64_t dim)

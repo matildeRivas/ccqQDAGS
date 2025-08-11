@@ -49,7 +49,7 @@ public:
         }
     }
 
-    uint64_t assign(const uint64_t i, const uint64_t value)
+    void assign(const uint64_t i, const uint64_t value)
     {
         if (U[i] < top && S[U[i]] == i)
             V[i] = value;

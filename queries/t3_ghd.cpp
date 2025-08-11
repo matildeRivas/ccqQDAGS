@@ -15,44 +15,6 @@ using namespace std::chrono;
 #define AT_V 3
 
 
-std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, uint16_t n_Atts)
-{
-    std::ifstream input_stream(filename);
-    uint64_t x;
-    uint16_t i, j=0;
-
-    std::vector<std::vector<uint64_t>>* relation;
-    std::vector<uint64_t> tuple;
-
-    relation = new std::vector<std::vector<uint64_t>>();
-
-    input_stream >> x;
-    while (!input_stream.eof()) {
-        tuple.clear();
-        for (i = 0; i < n_Atts; i++) {
-            tuple.push_back(x);
-            input_stream >> x;
-        }
-        relation->push_back(tuple);
-    }
-
-    return relation;
-}
-
-
-uint64_t maximum_in_table(std::vector<std::vector<uint64_t>> &table, uint16_t n_columns, uint64_t max_temp)
-{
-    uint64_t i, j;
-
-    for (i = 0; i < table.size(); i++)
-        for (j = 0; j < n_columns; j++)
-            if (table[i][j] > max_temp)
-                max_temp = table[i][j];
-
-
-    return max_temp;
-}
-
 int main(int argc, char** argv)
 {
     qdag::att_set att_R;
@@ -144,7 +106,7 @@ int main(int argc, char** argv)
         qdag* yan_res;
         start = high_resolution_clock::now();
         if (strcmp(argv[argc - 3], "yk") == 0) {
-            yan_res = yannakakis(root);
+            yan_res = yannakakis(root, {});
         } else {
             yan_res = yannakakis_par(root);
         }
