@@ -53,87 +53,62 @@ int main(int argc, char** argv)
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
     qdag qdag_rel_U(*rel_U, att_U, grid_side, 2, att_U.size());
 
-    high_resolution_clock::time_point start, stop;
+    auto rels = { rel_R, rel_S, rel_T, rel_U};
+    std::cout << "read all relations, with a total of " << relations_size(rels) << " tuples" << endl;
 
-    if (strcmp(argv[argc - 3], "mj") == 0) {
-        vector<qdag> test(4);
+    vector<qdag> qdags = { qdag_rel_R, qdag_rel_S, qdag_rel_T, qdag_rel_U};
 
-        test[0] = qdag_rel_R;
-        test[1] = qdag_rel_S;
-        test[2] = qdag_rel_T;
-        test[3] = qdag_rel_U;
+    ghd root;
+    if (strcmp(argv[argc - 1], "1") == 0) {
+        vector<qdag> Q_root(2);
+        Q_root[0] = qdag_rel_R;
+        Q_root[1] = qdag_rel_T;
 
-        qdag* test_result;
-        start = high_resolution_clock::now();
-        test_result = multiJoin(test, false, 1000);
-        stop = high_resolution_clock::now();
-    } else {
-        ghd root;
-        if (strcmp(argv[argc - 1], "1") == 0) {
-            vector<qdag> Q_root(2);
-            Q_root[0] = qdag_rel_R;
-            Q_root[1] = qdag_rel_T;
+        vector<qdag> Q_b(2);
+        Q_b[0] = qdag_rel_S;
+        Q_b[1] = qdag_rel_U;
+        // Crear GHDs
 
-            vector<qdag> Q_b(2);
-            Q_b[0] = qdag_rel_S;
-            Q_b[1] = qdag_rel_U;
-            // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
 
-            vector<ghd> empty_children(0);
-            ghd sub_b = ghd(Q_b, empty_children);
-            vector<ghd> level_1;
-            level_1.push_back(sub_b);
-            root = ghd(Q_root, level_1);
-
-        }
-        else if (strcmp(argv[argc - 1], "2") == 0){
-            vector<qdag> Q_root(2);
-            Q_root[0] = qdag_rel_R;
-            Q_root[1] = qdag_rel_S;
-
-            vector<qdag> Q_b(2);
-            Q_b[0] = qdag_rel_T;
-            Q_b[1] = qdag_rel_U;
-            // Crear GHD
-
-            vector<ghd> empty_children(0);
-            ghd sub_b = ghd(Q_b, empty_children);
-            vector<ghd> level_1;
-            level_1.push_back(sub_b);
-            root = ghd(Q_root, level_1);
-        }
-        else if (strcmp(argv[argc - 1], "3") == 0){
-            vector<qdag> Q_root(2);
-            Q_root[0] = qdag_rel_R;
-            Q_root[1] = qdag_rel_U;
-
-            vector<qdag> Q_b(2);
-            Q_b[0] = qdag_rel_T;
-            Q_b[1] = qdag_rel_S;
-            // Crear GHDs
-
-            vector<ghd> empty_children(0);
-            ghd sub_b = ghd(Q_b, empty_children);
-            vector<ghd> level_1;
-            level_1.push_back(sub_b);
-            root = ghd(Q_root, level_1);
-        }
-
-        qdag* yan_res;
-        start = high_resolution_clock::now();
-        if (strcmp(argv[argc - 3], "yk") == 0) {
-            yan_res = yannakakis(root, {});
-        } else {
-            yan_res = yannakakis_par(root);
-        }
-        stop = high_resolution_clock::now();
     }
+    else if (strcmp(argv[argc - 1], "2") == 0){
+        vector<qdag> Q_root(2);
+        Q_root[0] = qdag_rel_R;
+        Q_root[1] = qdag_rel_S;
 
-    const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double time = time_span.count() / 1000;
-    ofstream outfile(argv[argc - 2], ios::app);
-    outfile << time << endl;
-    outfile.close();
-    cout << "took " << time << "s" << endl;
+        vector<qdag> Q_b(2);
+        Q_b[0] = qdag_rel_T;
+        Q_b[1] = qdag_rel_U;
+        // Crear GHD
+
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
+    }
+    else if (strcmp(argv[argc - 1], "3") == 0){
+        vector<qdag> Q_root(2);
+        Q_root[0] = qdag_rel_R;
+        Q_root[1] = qdag_rel_U;
+
+        vector<qdag> Q_b(2);
+        Q_b[0] = qdag_rel_T;
+        Q_b[1] = qdag_rel_S;
+        // Crear GHDs
+
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
+    }
+    run_experiment(argv, argc, rels, qdags, root);
+
     return 0;
 }

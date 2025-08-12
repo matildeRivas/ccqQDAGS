@@ -57,21 +57,11 @@ int main(int argc, char** argv)
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
     qdag qdag_rel_U(*rel_U, att_U, grid_side, 2, att_U.size());
+auto rels = { rel_R, rel_S, rel_T, rel_U};
+    std::cout << "read all relations, with a total of " << relations_size(rels) << " tuples" << endl;
 
-    high_resolution_clock::time_point start, stop;
-
-    if (strcmp(argv[argc - 3], "mj") == 0) {
-        vector<qdag> Q(4);
-        Q[0] = qdag_rel_R;
-        Q[1] = qdag_rel_S;
-        Q[2] = qdag_rel_T;
-        Q[3] = qdag_rel_U;
-
-        qdag* test_result;
-        start = high_resolution_clock::now();
-        test_result = multiJoin(Q, false, 1000);
-        stop = high_resolution_clock::now();
-    } else {
+    vector<qdag> qdags = { qdag_rel_R, qdag_rel_S, qdag_rel_T, qdag_rel_U};
+   
         ghd root;
         if (strcmp(argv[argc - 1], "1") == 0) {
             vector<qdag> Q_root(2);
@@ -121,24 +111,8 @@ int main(int argc, char** argv)
             level_1.push_back(sub_b);
             root = ghd(Q_root, level_1);
         }
-
-        qdag* yan_res;
-
-        start = high_resolution_clock::now();
-        if (strcmp(argv[argc - 3], "yk") == 0) {
-            yan_res = yannakakis(root, {});
-        } else {
-            yan_res = yannakakis_par(root);
-        }
-        stop = high_resolution_clock::now();
-    }
-
-    const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double time = time_span.count() / 1000;
-    cout << "took " << time << "s" << endl;
-    ofstream outfile(argv[argc - 2], ios::app);
-    outfile << time << endl;
-    outfile.close();
+    
+    run_experiment(argv, argc, rels, qdags, root);
 
     return 0;
 }
