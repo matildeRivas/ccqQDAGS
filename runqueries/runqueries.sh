@@ -20,10 +20,31 @@ ghd_confs=(
     ["ti3_ghd"]="1" #"3"
 )
 
-for pattern in "bowtie" "j3_ghd" "j4_ghd" "ti4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "triangle_tadpole" "square_tadpole" "triangle_barbell" "square_barbell" "penta_barbell"
+pat = "triangle_tadpole"
+output_file="${output_folder}/ha_${pat}_mj.csv"
+ touch $output_file
+ i=1
+while IFS= read -r params; do
+        printf "\nRunning ${pat} - mj - ${i}:\n\t${params}\n"
+        i=$((i+1))
+        # Run the program with a timeout
+         timeout 1800 ./build/${pat} $params time mj $output_file 0
+        exit_code=$?
+
+        # check errors
+        if  [ $exit_code -eq 124 ]; then
+            echo "timeout" >> $output_file
+            echo "##### timeout #####"
+        elif [ $exit_code -eq 139 ]; then
+            echo "segfault" >> $output_file
+            echo "##### segfault #####"
+        fi
+    done < ${params_file}
+
+for pattern in "triangle_tadpole" "square_barbell" "penta_barbell" # "bowtie" "j3_ghd" "j4_ghd" "ti4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "triangle_tadpole" "square_tadpole" "triangle_barbell" "square_barbell" "penta_barbell"
 do
     params_file="${input_folder}/${pattern}.txt"
-    for method in "yk" # "yk_par"
+    for method in "yk" "yk_par"
     do
         for (( ghd_conf=1; ghd_conf<=${ghd_confs[$pattern]}; ghd_conf++ ));
         do
