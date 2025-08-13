@@ -32,7 +32,7 @@ qdag* yannakakis(ghd& root, std::optional<std::reference_wrapper<std::ofstream>>
     qdag* qResult = multiJoin(producto_punto, false, 1000);
     end = qResult->size();
     if (outfile) {
-        outfile->get() << init << "," << mid << "," << end;
+        outfile->get() << init << "," << mid << "," << end << ",";
     }
 
     return qResult;
@@ -162,6 +162,9 @@ void run_experiment(char** argv, int argc, vector<vector<vector<uint64_t>>*> rel
             yan_res = yannakakis_par(root);
             stop = high_resolution_clock::now();
         }
+        if (strcmp(argv[argc - 4], "space") == 0) {
+        outfile << yan_res->Q->bv[yan_res->getHeight()-1].n_ones();
+    }
     }
 
     const std::chrono::duration<double, std::milli> time_span = stop - start;
