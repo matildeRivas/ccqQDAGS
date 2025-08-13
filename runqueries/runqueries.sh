@@ -22,6 +22,7 @@ ghd_confs=(
 
 for pattern in "bowtie" "j3_ghd" "j4_ghd" "ti4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "triangle_tadpole" "square_tadpole" "triangle_barbell" "square_barbell" "penta_barbell"
 do
+    params_file="${input_folder}/${pattern}.txt"
     for method in "yk" # "yk_par"
     do
         for (( ghd_conf=1; ghd_conf<=${ghd_confs[$pattern]}; ghd_conf++ ));
