@@ -19,40 +19,19 @@ ghd_confs=(
     ["ti3_ghd"]="3"
 )
 
-for pattern in "triangle_tadpole" # "bowtie" "j3_ghd" "j4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "ti4_ghd" "triangle_tadpole"
+for pattern in "bowtie" "j3_ghd" "j4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "ti4_ghd" "triangle_tadpole"
 do
     params_file="${input_folder}/${pattern}.txt"
-    # create output file
-    output_file="${output_folder}/${pattern}_mj.csv"
-    touch $output_file
     i=1
     if [ "$metric" = "space" ]; then
         echo -e "tuples,qdags" >> $output_file
     fi
-    method="mj"
-    while IFS= read -r params; do
-        printf "\nRunning ${pattern} - mj - ${i}:\n\t${params}\n"
-        i=$((i+1))
-        # Run the program with a timeout
-        timeout 1800 ./build/${pattern} $params $metric mj $output_file 0
-        exit_code=$?
-
-        # check errors
-        if  [ $exit_code -eq 124 ]; then
-            echo "timeout" >> $output_file
-            echo "##### timeout #####"
-        elif [ $exit_code -eq 139 ]; then
-            echo "segfault" >> $output_file
-            echo "##### segfault #####"
-        fi
-    done < ${params_file}
-
-    for method in "yk" "yk_par"
+    for method in "yk" # "yk_par"
     do
         for (( ghd_conf=1; ghd_conf<=${ghd_confs[$pattern]}; ghd_conf++ ));
         do
             # create output file
-            output_file="${output_folder}/${pattern}_${method}_${ghd_conf}.csv"
+            output_file="${output_folder}/no_pruning_${pattern}_${method}_${ghd_conf}.csv"
             touch $output_file
             if [ "$metric" = "space" ]; then
                 echo -e "tuples,qdags,ghd,post mj,result" >> $output_file
