@@ -52,7 +52,8 @@ def plot_config():
 def plot_times():
     patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "square_tadpole", "bowtie", "triangle_barbell", "square_barbell", "penta_barbell"]
     medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
-
+    data = {"Pattern": [], "Mean MJ": [], "Median MJ": [], "Std. dev. MJ": [], "Mean GHD": [], "Median GHD": [], "Std. dev. GHD": []}
+    df = pd.DataFrame(data)
     fig = plt.figure(layout='constrained', figsize=(10, 10))
     axes = fig.subplots(6, 2)
     fig.suptitle('Times for High Arity Qdag Variant')
@@ -97,11 +98,13 @@ def plot_times():
             showfliers=False,
             return_type='both',
         )
-        res.to_csv(f"outputs/{p}_times.csv")
         colors = ['firebrick', 'gold', 'cornflowerblue']
 
         for patch, color in zip(props['boxes'], colors):
             patch.set_facecolor(color)
+        row = {"Pattern": p, "Mean MJ": round(res.multijoin.mean(),2), "Median MJ": round(res.multijoin.median(),2), "Std. dev. MJ": round(res.multijoin.std(),2), "Mean GHD": round(res.GHD.mean(),2), "Median GHD": round(res.GHD.median(),2), "Std. dev. GHD": round(res.GHD.std(),2)}
+        df.loc[len(df)] = row
+    df.to_csv("outputs/ha_times_stats.csv", index=False)
 
     handles, labels = plt.gca().get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper center')

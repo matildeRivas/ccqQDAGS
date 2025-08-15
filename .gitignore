@@ -3,3 +3,4 @@
 /data
 .idea
 .vscode
+__pycache__/plotter.cpython-39.pyc
