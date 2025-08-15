@@ -97,6 +97,7 @@ def plot_times():
             showfliers=False,
             return_type='both',
         )
+        res.to_csv(f"outputs/{p}_times.csv")
         colors = ['firebrick', 'gold', 'cornflowerblue']
 
         for patch, color in zip(props['boxes'], colors):
@@ -138,3 +139,28 @@ def yk_times():
         df.loc[len(df)] = row
     df.to_csv("outputs/ha_percentages.csv", index=False)
         
+def timeouts():
+    patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "square_tadpole", "bowtie", "triangle_barbell", "square_barbell", "penta_barbell"]
+    multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
+    data = {"Pattern": [], "Number of timeouts": [], "Average query time for GHD [s]": []}
+    df = pd.DataFrame(data)
+    for i, p in enumerate(patterns):
+        if p in multi:
+            df1 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_1.csv", names=["time"])
+            df2 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_2.csv", names=["time"])
+            df3 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_3.csv", names=["time"])
+
+            yk_res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
+            yk_res = pd.merge(yk_res, df3, left_index=True, right_index=True)
+            yk_res["GHD"] = yk_res.min(axis=1)
+            df_mj = pd.read_csv(f"outputs_time/ha_{p}_ghd_mj.csv", names=["multijoin"])
+        else:
+            yk_res = pd.read_csv(f"outputs_time/ha_{p}_yk.csv", names=["GHD"])
+            df_mj = pd.read_csv(f"outputs_time/ha_{p}_mj.csv", names=["multijoin"])
+
+        res = pd.merge(yk_res[["GHD"]], df_mj, left_index=True, right_index=True)
+        if "timeout" in res.multijoin.unique():
+            row = {"Pattern": p, "Number of timeouts": len(res[res.multijoin=="timeout"]), "Average query time for GHD [s]": round(res[res.multijoin=="timeout"].GHD.mean(),2)}
+            df.loc[len(df)] = row
+    df.to_csv("outputs/ha_timeouts.csv", index=False)
+   

@@ -1,0 +1,5 @@
+Pattern,Number of timeouts,Average query time for GHD [s]
+T4,3,3.05
+Ti4,5,68.71
+square_barbell,9,1.46
+penta_barbell,49,2.28
