@@ -222,6 +222,11 @@ public:
     uint64_t getHeight() {
         return Q->getHeight();
     }
+    
+
+    uint64_t n_ones() {
+        return Q->bv[getHeight() - 1].n_ones();
+    }
 
 
     uint8_t getK() {

@@ -11,14 +11,17 @@
 
 qdag* yannakakis(ghd& root, std::optional<std::reference_wrapper<std::ofstream>> outfile)
 {
-    float init, mid, end;
-
-    init = root.size();
+    if (outfile) { // initial size
+        outfile->get() << root.size() << ",";
+    }
 
     // Ejecutar multijoin en todos los niveles
     root.deep_exec_multijoin();
-
-    mid = root.size();
+    if (outfile) { // mid size and results
+        outfile->get() << root.size() << ",(";
+        root.print_n_ones(outfile);
+        outfile->get() << "),";
+    }
 
     // Ejecutar semijoin entre root y nivel 1
     root.constrained_by_children();
@@ -30,9 +33,8 @@ qdag* yannakakis(ghd& root, std::optional<std::reference_wrapper<std::ofstream>>
     root.get_subtree_qdags(producto_punto);
 
     qdag* qResult = multiJoin(producto_punto, false, 1000);
-    end = qResult->size();
-    if (outfile) {
-        outfile->get() << init << "," << mid << "," << end << ",";
+    if (outfile) { // end size
+        outfile->get() << qResult->size() << ",";
     }
 
     return qResult;
