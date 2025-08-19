@@ -152,6 +152,19 @@ public:
         }
     }
 
+    void print_all_ones(std::optional<std::reference_wrapper<std::ofstream>> outfile)
+    {
+        int n_tuples = 0;
+        for (auto rel = relations.begin(); rel != relations.end(); rel++) {
+            n_tuples += rel->n_ones();
+        }
+        outfile->get() << n_tuples;
+        for (auto child = children.begin(); child != children.end(); child++) {
+            outfile->get() << "-";
+            child->print_all_ones(outfile);
+        }
+    }
+
     uint64_t n_ones()
     {
         return relations.front().n_ones();

@@ -12,9 +12,11 @@
 qdag* yannakakis(ghd& root, std::optional<std::reference_wrapper<std::ofstream>> outfile)
 {
     if (outfile) { // initial size
-        outfile->get() << root.size() << ",";
+    
+        outfile->get() << root.size() << ",(";
+        root.print_all_ones(outfile);
+        outfile->get() << "),";
     }
-
     // Ejecutar multijoin en todos los niveles
     root.deep_exec_multijoin();
     if (outfile) { // mid size and results
@@ -113,6 +115,7 @@ uint64_t maximum_in_table(vector<vector<uint64_t>>& table, uint16_t n_columns, u
     return max_temp;
 }
 
+
 uint64_t relations_size(vector<vector<vector<uint64_t>>*> rels)
 {
     uint64_t size = 0;
@@ -120,6 +123,23 @@ uint64_t relations_size(vector<vector<vector<uint64_t>>*> rels)
         size += rel->size();
     }
     return size;
+}
+
+void sort_relations(vector<qdag>& qdags)
+{
+    int n = qdags.size();
+    bool swapped;
+    for (int i = 0; i < n - 1; i++) {
+        swapped = false;
+        for (int j = 0; j < n - i - 1; j++) {
+            if (qdags[j].n_ones() > qdags[j + 1].n_ones()) {
+                swap(qdags[j], qdags[j + 1]);
+                swapped = true;
+            }
+        }
+        if (!swapped)
+            break;
+    }
 }
 
 uint64_t qdags_size(vector<qdag> qdags)

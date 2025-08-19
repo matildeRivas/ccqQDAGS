@@ -44,16 +44,18 @@ int main(int argc, char** argv)
 
     auto rels = { rel_R, rel_S, rel_T };
     std::cout << "read all relations, with a total of " << relations_size(rels) << " tuples" << endl;
-
+    // diccionario rels a qdags para saber cuál es cual
     vector<qdag> qdags = { qdag_rel_R, qdag_rel_S, qdag_rel_T };
+    sort_relations(qdags);
     ghd root;
     if (strcmp(argv[argc - 1], "1") == 0) {
+        // root tiene el minimo
         vector<qdag> Q_root(1);
-        Q_root[0] = qdag_rel_T;
+        Q_root[0] = qdags[0];
 
         vector<qdag> Q_b(2);
-        Q_b[0] = qdag_rel_R;
-        Q_b[1] = qdag_rel_S;
+        Q_b[0] = qdags[1];
+        Q_b[1] = qdags[2];
 
         // Crear GHDs
         vector<ghd> empty_children(0);
@@ -64,12 +66,13 @@ int main(int argc, char** argv)
 
     }
     else if (strcmp(argv[argc - 1], "2") == 0){
+        // root tiene el mediano
         vector<qdag> Q_root(1);
-        Q_root[0] = qdag_rel_R;
+        Q_root[0] = qdags[1];
 
         vector<qdag> Q_b(2);
-        Q_b[0] = qdag_rel_T;
-        Q_b[1] = qdag_rel_S;
+        Q_b[0] = qdags[0];
+        Q_b[1] = qdags[2];
 
         // Crear GHDs
         vector<ghd> empty_children(0);
@@ -79,12 +82,13 @@ int main(int argc, char** argv)
         root = ghd(Q_root, level_1);
     }
     else if (strcmp(argv[argc - 1], "3") == 0){
+        // root tiene el maximo
         vector<qdag> Q_root(1);
-        Q_root[0] = qdag_rel_S;
+        Q_root[0] = qdags[2];
 
         vector<qdag> Q_b(2);
-        Q_b[0] = qdag_rel_R;
-        Q_b[1] = qdag_rel_T;
+        Q_b[0] = qdags[0];
+        Q_b[1] = qdags[1];
 
         // Crear GHDs
         vector<ghd> empty_children(0);

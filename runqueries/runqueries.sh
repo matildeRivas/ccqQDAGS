@@ -7,20 +7,20 @@ mkdir "${output_folder}"
 declare -A ghd_confs
 ghd_confs=(
     ["bowtie"]="1"
-    ["j3_ghd"]="1" #"3"
-    ["j4_ghd"]="1" #"3"
+    ["j3_ghd"]="3" #"3"
+    ["j4_ghd"]="3" #"3"
     ["triangle_barbell"]="1"
     ["triangle_tadpole"]="1"
-    ["ti4_ghd"]="1" #"3"
+    ["ti4_ghd"]="3" #"3"
     ["square_tadpole"]="1"
     ["square_barbell"]="1"
     ["penta_barbell"]="1"
-    ["t3_ghd"]="1" #"3"
-    ["t4_ghd"]="1" #"3"
-    ["ti3_ghd"]="1" #"3"
+    ["t3_ghd"]="3" #"3"
+    ["t4_ghd"]="3" #"3"
+    ["ti3_ghd"]="3" #"3"
 )
 
-for pattern in "bowtie" # "bowtie" "j3_ghd" "j4_ghd" "ti4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "triangle_tadpole" "square_tadpole" "triangle_barbell" "square_barbell" "penta_barbell"
+for pattern in  "j3_ghd" "t3_ghd" "ti3_ghd" # "bowtie" "j3_ghd" "j4_ghd" "ti4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "triangle_tadpole" "square_tadpole" "triangle_barbell" "square_barbell" "penta_barbell"
 do
     params_file="${input_folder}/${pattern}.txt"
     for method in "yk" # "yk_par"
@@ -28,10 +28,10 @@ do
         for (( ghd_conf=1; ghd_conf<=${ghd_confs[$pattern]}; ghd_conf++ ));
         do
             # create output file
-            output_file="${output_folder}/results_ha_${pattern}_${method}_${ghd_conf}.csv"
+            output_file="${output_folder}/config_ha_${pattern}_${method}_${ghd_conf}.csv"
             touch $output_file
             if [ "$metric" = "space" ]; then
-                echo -e "tuples,qdags,ghd size,post mj size,post mj results,result size,number of results" >> $output_file
+                echo -e "tuples,qdags,ghd size,tuples per node,post mj size,post mj results,result size,number of results" >> $output_file
             fi
             
             i=1

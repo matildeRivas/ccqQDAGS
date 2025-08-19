@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 def min_time():
     multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
@@ -167,3 +168,35 @@ def timeouts():
             df.loc[len(df)] = row
     df.to_csv("outputs/ha_timeouts.csv", index=False)
    
+def size_config():
+    multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
+    medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
+    rdict = {}
+    for i, m in enumerate(multi):
+        df1 = pd.read_csv(f"outputs_space/results_ha_{m}_ghd_yk_1.csv")
+        df2 = pd.read_csv(f"outputs_space/results_ha_{m}_ghd_yk_2.csv")
+        df3 = pd.read_csv(f"outputs_space/results_ha_{m}_ghd_yk_3.csv")
+        df1["config"]=1
+        df2["config"]=2
+        df3["config"]=3 
+        df1['query'] = np.arange(1, df1.shape[0] + 1)
+        df2['query'] = np.arange(1, df2.shape[0] + 1)
+        df3['query'] = np.arange(1, df3.shape[0] + 1)
+        res = pd.concat([df1,df2,df3])
+        res["tuples per node"]=res["tuples per node"].str.strip("()").str.split('-')
+        res["post mj results"]=res["post mj results"].str.strip("()").str.split('-').map(lambda x: int(x[0])+int(x[1]))
+        smallest = list(res.sort_values('post mj results').groupby('query').head(1).sort_values('query').config)
+        tdf1 = pd.read_csv(f"outputs_time/ha_{m}_ghd_yk_1.csv", names=["time"])
+        tdf2 = pd.read_csv(f"outputs_time/ha_{m}_ghd_yk_2.csv", names=["time"])
+        tdf3 = pd.read_csv(f"outputs_time/ha_{m}_ghd_yk_3.csv", names=["time"])
+        tdf1["config"]=1
+        tdf2["config"]=2
+        tdf3["config"]=3 
+        tdf1['query'] = np.arange(1, tdf1.shape[0] + 1)
+        tdf2['query'] = np.arange(1, tdf2.shape[0] + 1)
+        tdf3['query'] = np.arange(1, tdf3.shape[0] + 1)
+        tres = pd.concat([tdf1,tdf2,tdf3])
+        fastest = list(tres.sort_values('time').groupby('query').head(1).sort_values('query').config)
+        rdict[m]=sum(x == y for x, y in zip(smallest, fastest))/len(df1)
+    print(rdict)
+    #{'J3': 0.6, 'J4': 0.46, 'T3': 0.52, 'Ti3': 0.36, 'T4': 0.7, 'Ti4': 0.7551020408163265}
