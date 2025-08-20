@@ -19,7 +19,7 @@ ghd_confs=(
     ["ti3_ghd"]="3"
 )
 
-for pattern in "bowtie" "j3_ghd" "j4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "ti4_ghd" "triangle_tadpole"
+for pattern in  "j3_ghd" "t3_ghd" "ti3_ghd" # "bowtie" "j3_ghd" "j4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "ti4_ghd" "triangle_tadpole"
 do
     params_file="${input_folder}/${pattern}.txt"
     i=1
@@ -31,7 +31,7 @@ do
         for (( ghd_conf=1; ghd_conf<=${ghd_confs[$pattern]}; ghd_conf++ ));
         do
             # create output file
-            output_file="${output_folder}/no_pruning_${pattern}_${method}_${ghd_conf}.csv"
+            output_file="${output_folder}/config_${pattern}_${method}_${ghd_conf}.csv"
             touch $output_file
             if [ "$metric" = "space" ]; then
                 echo -e "tuples,qdags,ghd,post mj,result" >> $output_file

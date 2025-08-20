@@ -2,61 +2,29 @@
 // Created by anouk on 15-01-25.
 //
 
-#include <bits/stdc++.h>
-#include <chrono>
-#include <ctime>
 #include <fstream>
-#include <iostream>
-#include <ratio>
+#include<bits/stdc++.h>
+#include<ratio>
+#include<chrono>
+#include<ctime>
+#include<iostream>
 
 using namespace std::chrono;
 
 #include "../includes/ghd.hpp"
 #include "../src/ghd_optimal_joins.cpp"
 
-std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, uint16_t n_Atts)
-{
-    std::ifstream input_stream(filename);
-    uint64_t x;
-    uint16_t i, j = 0;
 
-    std::vector<std::vector<uint64_t>>* relation;
-    std::vector<uint64_t> tuple;
 
-    relation = new std::vector<std::vector<uint64_t>>();
-    if (!input_stream.good()) {
-        cout << "file does not exist: '" << filename << "'" << endl;
-        return relation;
-    }
+#define AT_X 0
+#define AT_Y 1
+#define AT_Z 2
+#define AT_XP 3
+#define AT_YP 4
+#define AT_ZP 5
 
-    input_stream >> x;
-    // cout << "contenido "<< x <<endl;
-    while (!input_stream.eof()) {
-        tuple.clear();
-        for (i = 0; i < n_Atts; i++) {
-            tuple.push_back(x);
-            input_stream >> x;
-        }
-        relation->push_back(tuple);
-    }
 
-    return relation;
-}
-
-uint64_t maximum_in_table(std::vector<std::vector<uint64_t>>& table, uint16_t n_columns, uint64_t max_temp)
-{
-    uint64_t i, j;
-
-    for (i = 0; i < table.size(); i++)
-        for (j = 0; j < n_columns; j++)
-            if (table[i][j] > max_temp)
-                max_temp = table[i][j];
-
-    return max_temp;
-}
-
-int main(int argc, char** argv)
-{
+int main(int argc, char **argv) {
     // Setup de GHD: leer qdags que forman nodos
     qdag::att_set att_R;
     qdag::att_set att_S;
@@ -76,9 +44,11 @@ int main(int argc, char** argv)
     std::vector<std::vector<uint64_t>>* rel_P = read_relation(strRel_P, att_P.size());
     std::vector<std::vector<uint64_t>>* rel_Q = read_relation(strRel_Q, att_Q.size());
     std::vector<std::vector<uint64_t>>* rel_R = read_relation(strRel_R, att_R.size());
+    //cout<<"R"<<endl;
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
     std::vector<std::vector<uint64_t>>* rel_U = read_relation(strRel_U, att_U.size());
-    cout << "read all relations, with a total of " << rel_P->size() + rel_Q->size() + rel_R->size() + rel_T->size() + rel_U->size() << " tuples" << endl;
+    //cout<<"t"<<endl;
+    //std::vector<std::vector<uint64_t>>* rel_U = read_relation(strRel_U, att_U.size());
 
     uint64_t grid_side = 128;
 
@@ -88,75 +58,42 @@ int main(int argc, char** argv)
     grid_side = maximum_in_table(*rel_T, att_T.size(), grid_side);
     grid_side = maximum_in_table(*rel_U, att_U.size(), grid_side);
 
-    grid_side = pow(2, std::ceil(log2(grid_side)));
+    grid_side = pow(2, std::ceil(log2(grid_side) ));
+    //cout << grid_side << endl;
     qdag qdag_rel_P(*rel_P, att_P, grid_side, 2, att_P.size());
+    //cout << "Built P\n";
     qdag qdag_rel_Q(*rel_Q, att_Q, grid_side, 2, att_Q.size());
+    //cout << "Built Q\n";
     qdag qdag_rel_R(*rel_R, att_R, grid_side, 2, att_R.size());
+    //cout << "Built R\n";
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
     qdag qdag_rel_U(*rel_U, att_U, grid_side, 2, att_U.size());
+    //cout << "Built T\n";
+auto rels = { rel_P, rel_Q, rel_R, rel_T, rel_U };
+    std::cout << "read all relations, with a total of " << relations_size(rels) << " tuples" << endl;
+
+    vector<qdag> qdags = {qdag_rel_P, qdag_rel_Q, qdag_rel_R, qdag_rel_T, qdag_rel_U};
     
-    ofstream outfile(argv[argc - 2], ios::app);
-    if (strcmp(argv[argc - 4], "space") == 0) {
-        outfile << rel_P->size() + rel_Q->size() + rel_R->size() + rel_T->size() + rel_U->size() << ",";
-        outfile << qdag_rel_P.size() + qdag_rel_Q.size() + qdag_rel_R.size() + qdag_rel_T.size() + qdag_rel_U.size() << ",";
-    }
+    ghd root;
+    vector<qdag> Q_root(3);
 
-    high_resolution_clock::time_point start, stop;
+    Q_root[0] = qdag_rel_P;
+    Q_root[1] = qdag_rel_Q;
+    Q_root[2] = qdag_rel_R;
 
-    if (strcmp(argv[argc - 3], "mj") == 0) {
-        vector<qdag> test(5);
-        test[0] = qdag_rel_P;
-        test[1] = qdag_rel_Q;
-        test[2] = qdag_rel_R;
-        test[3] = qdag_rel_T;
-        test[4] = qdag_rel_U;
+    vector<qdag> Q_b(2);
+    Q_b[0] = qdag_rel_T;
+    Q_b[1] = qdag_rel_U;
 
-        qdag* test_result;
-        start = high_resolution_clock::now();
-        test_result = multiJoin(test, false, 1000);
-        stop = high_resolution_clock::now();
-    } else {
-        // Crear vectores de relacion de cada nodo_tr
-        vector<qdag> Q_root(3);
-        Q_root[0] = qdag_rel_P;
-        Q_root[1] = qdag_rel_Q;
-        Q_root[2] = qdag_rel_R;
+    // Crear GHDs
 
-        vector<qdag> Q_b(2);
-        Q_b[0] = qdag_rel_T;
-        Q_b[1] = qdag_rel_U;
+    vector<ghd> empty_children(0);
+    ghd sub_b = ghd(Q_b, empty_children);
+    //ghd sub_c = ghd(Q_c, empty_children);
+    vector<ghd> level_1;
+    level_1.push_back(sub_b);
 
-        // Crear GHDs
-        vector<ghd> empty_children(0);
-        ghd sub_b = ghd(Q_b, empty_children);
-        vector<ghd> level_1;
-        level_1.push_back(sub_b);
-
-        // level_1.push_back(sub_c);
-        ghd root = ghd(Q_root, level_1);
-        qdag* yan_res;
-
-        if (strcmp(argv[argc - 3], "yk") == 0) {
-            start = high_resolution_clock::now();
-            if (strcmp(argv[argc - 4], "space") == 0) {
-                yan_res = yannakakis(root, { outfile });
-            } else {
-                yan_res = yannakakis(root, {});
-            }
-            stop = high_resolution_clock::now();
-        } else {
-            start = high_resolution_clock::now();
-            yan_res = yannakakis_par(root);
-            stop = high_resolution_clock::now();
-        }
-    }
-    const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double time = time_span.count() / 1000;
-    if (strcmp(argv[argc - 4], "time") == 0){
-        outfile << time;
-        cout << "took " << time << "s" << endl;
-    }
-    outfile << endl;
-    outfile.close();
-    return 0;
+    //level_1.push_back(sub_c);
+    root = ghd(Q_root, level_1);
+    run_experiment(argv, argc, rels, qdags, root);
 }

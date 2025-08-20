@@ -279,6 +279,11 @@ class qdag
         }
 
 
+        uint64_t n_ones() {
+            return Q->bv[getHeight() - 1].n_ones();
+        }
+
+
         uint8_t getK() 
         {
             return Q->getK();     

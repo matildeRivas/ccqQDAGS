@@ -14,45 +14,6 @@ using namespace std::chrono;
 #define AT_U 3
 #define AT_V 4
 
-std::vector<std::vector<uint64_t>>* read_relation(const std::string filename, uint16_t n_Atts)
-{
-    std::ifstream input_stream(filename);
-    uint64_t x;
-    uint16_t i, j = 0;
-
-    std::vector<std::vector<uint64_t>>* relation;
-    std::vector<uint64_t> tuple;
-
-    relation = new std::vector<std::vector<uint64_t>>();
-    if (!input_stream.good()) {
-        cout << "file does not exist: '" << filename << "'" << endl;
-        return relation;
-    }
-
-    input_stream >> x;
-    while (!input_stream.eof()) {
-        tuple.clear();
-        for (i = 0; i < n_Atts; i++) {
-            tuple.push_back(x);
-            input_stream >> x;
-        }
-        relation->push_back(tuple);
-    }
-
-    return relation;
-}
-
-uint64_t maximum_in_table(std::vector<std::vector<uint64_t>>& table, uint16_t n_columns, uint64_t max_temp)
-{
-    uint64_t i, j;
-
-    for (i = 0; i < table.size(); i++)
-        for (j = 0; j < n_columns; j++)
-            if (table[i][j] > max_temp)
-                max_temp = table[i][j];
-
-    return max_temp;
-}
 
 int main(int argc, char** argv)
 {
@@ -76,7 +37,6 @@ int main(int argc, char** argv)
     std::vector<std::vector<uint64_t>>* rel_S = read_relation(strRel_S, att_S.size());
     std::vector<std::vector<uint64_t>>* rel_T = read_relation(strRel_T, att_T.size());
     std::vector<std::vector<uint64_t>>* rel_U = read_relation(strRel_U, att_U.size());
-    cout << "read all relations, with a total of " << rel_R->size() + rel_S->size() + rel_T->size() + rel_U->size() << " tuples" << endl;
 
     if (!rel_R->size() || !rel_S->size() || !rel_T->size() || !rel_U->size()) {
         return 1;
@@ -97,27 +57,11 @@ int main(int argc, char** argv)
     qdag qdag_rel_S(*rel_S, att_S, grid_side, 2, att_S.size());
     qdag qdag_rel_T(*rel_T, att_T, grid_side, 2, att_T.size());
     qdag qdag_rel_U(*rel_U, att_U, grid_side, 2, att_U.size());
+auto rels = { rel_R, rel_S, rel_T, rel_U};
+    std::cout << "read all relations, with a total of " << relations_size(rels) << " tuples" << endl;
 
-    ofstream outfile(argv[argc - 2], ios::app);
-    if (strcmp(argv[argc - 4], "space") == 0) {
-        outfile << rel_R->size() + rel_S->size() + rel_T->size() + rel_U->size() << ",";
-        outfile << qdag_rel_R.size() + qdag_rel_S.size() + qdag_rel_T.size() + qdag_rel_U.size() << ",";
-    }
-
-    high_resolution_clock::time_point start, stop;
-
-    if (strcmp(argv[argc - 3], "mj") == 0) {
-        vector<qdag> Q(4);
-        Q[0] = qdag_rel_R;
-        Q[1] = qdag_rel_S;
-        Q[2] = qdag_rel_T;
-        Q[3] = qdag_rel_U;
-
-        qdag* test_result;
-        start = high_resolution_clock::now();
-        test_result = multiJoin(Q, false, 1000);
-        stop = high_resolution_clock::now();
-    } else {
+    vector<qdag> qdags = { qdag_rel_R, qdag_rel_S, qdag_rel_T, qdag_rel_U};
+   
         ghd root;
         if (strcmp(argv[argc - 1], "1") == 0) {
             vector<qdag> Q_root(2);
@@ -167,31 +111,8 @@ int main(int argc, char** argv)
             level_1.push_back(sub_b);
             root = ghd(Q_root, level_1);
         }
-
-        qdag* yan_res;
-
-        start = high_resolution_clock::now();
-        if (strcmp(argv[argc - 3], "yk") == 0) {
-            if (strcmp(argv[argc - 4], "space") == 0) {
-                yan_res = yannakakis(root, { outfile });
-            } else {
-                yan_res = yannakakis(root, {});
-            }
-        } else {
-            yan_res = yannakakis_par(root);
-        }
-        stop = high_resolution_clock::now();
-    }
-
-    const std::chrono::duration<double, std::milli> time_span = stop - start;
-    double time = time_span.count() / 1000;
-    cout << "took " << time << "s" << endl;
-    if (strcmp(argv[argc - 4], "time") == 0){
-        outfile << time;
-        cout << "took " << time << "s" << endl;
-    }
-    outfile << endl;
-    outfile.close();
+    
+    run_experiment(argv, argc, rels, qdags, root);
 
     return 0;
 }
