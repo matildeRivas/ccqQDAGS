@@ -159,3 +159,7 @@ def yk_times():
     tdf["diff"].hist(bins=10)
     print(tdf)
     plt.savefig("outputs/pruning_diff")
+
+if __name__ == '__main__':
+    print('plotting ghd configs')
+    plot_config()
