@@ -14,40 +14,40 @@ def min_time():
 
 
 def plot_config():
-    multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
+    multi = ["J3", "T3", "Ti3"] # , "T4", "Ti4", "J4",
     medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
 
-    fig = plt.figure(layout='constrained', figsize=(10, 10))
-    axes = fig.subplots(3, 2)
-    fig.suptitle('Times for Different Decompositions')
+    fig = plt.figure(layout='constrained', figsize=(15,5))
+    axes = fig.subplots(1, 3)
+    fig.suptitle('Query Times for Decompositions')
 
     for i, m in enumerate(multi):
-        df1 = pd.read_csv(f"outputs_time/{m}_ghd_yk_1.csv", names=["time"])
-        df2 = pd.read_csv(f"outputs_time/{m}_ghd_yk_2.csv", names=["time"])
-        df3 = pd.read_csv(f"outputs_time/{m}_ghd_yk_3.csv", names=["time"])
+        df1 = pd.read_csv(f"outputs_time/config_{m}_ghd_yk_1.csv", names=["time"])
+        df2 = pd.read_csv(f"outputs_time/config_{m}_ghd_yk_2.csv", names=["time"])
+        df3 = pd.read_csv(f"outputs_time/config_{m}_ghd_yk_3.csv", names=["time"])
 
         res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
         res = pd.merge(res, df3, left_index=True, right_index=True)
-        res.rename(columns={"time_1":"config 1", "time_2":"config 2", "time":"config 3"}, inplace=True)
-        ax = axes[i//2][i%2]
+        res.rename(columns={"time_1":"smallest", "time_2":"medium", "time":"largest"}, inplace=True)
+        ax = axes[i%3]
         ax.set_title(m)
         ax.set_ylabel('Execution time (s)')
+        #ax.set_xlabel('Which relation was left out of initial multijoin')
         bplot, props = res.boxplot(
             ax=ax, 
-            column=['config 1', 'config 2', 'config 3'],
+            column=['smallest', 'medium', 'largest'],
             patch_artist=True,
             medianprops=medianprops,
             showmeans=False,
             showfliers=False,
             return_type='both',
-            label=['config 1', 'config 2', 'config 3'],
         )
         colors = ['firebrick', 'gold', 'cornflowerblue']
 
         for patch, color in zip(props['boxes'], colors):
             patch.set_facecolor(color)
 
-    plt.savefig("ghd_configurations")
+    plt.savefig("outputs/triangle_ghd_configurations")
 
 def plot_times():
     patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "bowtie", "triangle_tadpole"]
