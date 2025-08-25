@@ -119,6 +119,52 @@ def plot_times():
     plt.savefig("times")
 
 
+def compare_times():
+    patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "bowtie"]
+    multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
+    data = {"Pattern": [], "Mean factor mj": [], "Mean factor ghd": []}
+    df = pd.DataFrame(data)
+    
+    for i, p in enumerate(patterns):
+        if p in multi:
+            df1 = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
+            df2 = pd.read_csv(f"outputs_time/{p}_ghd_yk_2.csv", names=["time"])
+            df3 = pd.read_csv(f"outputs_time/{p}_ghd_yk_3.csv", names=["time"])
+
+            yk_res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
+            yk_res = pd.merge(yk_res, df3, left_index=True, right_index=True)
+            yk_res["GHD_og"] = yk_res.min(axis=1)
+            df_mj = pd.read_csv(f"outputs_time/{p}_ghd_mj.csv", names=["multijoin_og"])
+
+
+            df1ha = pd.read_csv(f"/mnt/c/Users/crist/Documents/mati/ha_outputs_time/ha_{p}_ghd_yk_1.csv", names=["time"])
+            df2ha = pd.read_csv(f"/mnt/c/Users/crist/Documents/mati/ha_outputs_time/ha_{p}_ghd_yk_2.csv", names=["time"])
+            df3ha = pd.read_csv(f"/mnt/c/Users/crist/Documents/mati/ha_outputs_time/ha_{p}_ghd_yk_3.csv", names=["time"])
+            df_mj_ha = pd.read_csv(f"/mnt/c/Users/crist/Documents/mati/ha_outputs_time/ha_{p}_ghd_mj.csv", names=["multijoin_ha"])
+            ykp_res = pd.merge(df1ha, df2ha, left_index=True, right_index=True)
+            ykp_res = pd.merge(ykp_res, df3ha, left_index=True, right_index=True)
+            ykp_res["GHD_ha"] = ykp_res.min(axis=1)
+        else:
+            yk_res = pd.read_csv(f"outputs_time/{p}_yk.csv", names=["GHD_og"])
+            ykp_res = pd.read_csv(f"/mnt/c/Users/crist/Documents/mati/ha_outputs_time/ha_{p}_yk.csv", names=["GHD_ha"])
+            df_mj = pd.read_csv(f"outputs_time/{p}_mj.csv", names=["multijoin_og"])
+            df_mj_ha = pd.read_csv(f"/mnt/c/Users/crist/Documents/mati/ha_outputs_time/ha_{p}_mj.csv", names=["multijoin_ha"])
+
+        df_mj[df_mj['multijoin_og'] == 'timeout'] = 1800
+        df_mj["multijoin_og"] = pd.to_numeric(df_mj["multijoin_og"], downcast='float')
+        
+        df_mj_ha[df_mj_ha['multijoin_ha'] == 'timeout'] = 1800
+        df_mj_ha["multijoin_ha"] = pd.to_numeric(df_mj_ha["multijoin_ha"], downcast='float')
+        res = pd.merge(yk_res[["GHD_og"]], ykp_res[["GHD_ha"]], left_index=True, right_index=True)
+        res = pd.merge(res, df_mj, left_index=True, right_index=True)
+        res = pd.merge(res, df_mj_ha, left_index=True, right_index=True)
+        res["diff_ghd"] =  res["GHD_ha"]/res["GHD_og"]
+        res["diff_mj"] =  res["multijoin_ha"]/res["multijoin_og"]
+        row = {"Pattern": p, "Mean factor mj":  round(res["diff_mj"].mean(), 2), "Mean factor ghd": round(res["diff_ghd"].mean(), 2)}
+        df.loc[len(df)] = row
+    df.to_csv("outputs/qdag_variant_factor.csv", index=False)
+
+
 def yk_times():
     patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "bowtie"]
     multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
@@ -162,4 +208,4 @@ def yk_times():
 
 if __name__ == '__main__':
     print('plotting ghd configs')
-    plot_config()
+    compare_times()
