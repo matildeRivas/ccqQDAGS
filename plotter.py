@@ -115,7 +115,7 @@ def yk_times():
     patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "square_tadpole", "bowtie", "triangle_barbell", "square_barbell", "penta_barbell"]
    
     multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
-    data = {"Pattern": [], "Mean difference": [], "Median difference": [], "Max difference": []}
+    data = {"Pattern": [], "Mean difference": [], "Median difference": [], "Most  hindrance": [], "Most improvement": []}
     df = pd.DataFrame(data)
     for i, p in enumerate(patterns):
         if p in multi:
@@ -139,7 +139,7 @@ def yk_times():
 
         res = pd.merge(yk_res[["GHD"]], ykp_res[["GHD par"]], left_index=True, right_index=True)
         res["diff"] = 100*(1 - res["GHD par"] / res["GHD"])
-        row = {"Pattern": p, "Mean difference": round(res["diff"].mean(),2), "Median difference": round(res["diff"].median(),2), "Max difference":round(res["diff"].max(),2)}
+        row = {"Pattern": p, "Mean difference": round(res["diff"].mean(),2), "Median difference": round(res["diff"].median(),2), "Most  hindrance":round(res["diff"].min(),2), "Most improvement":round(res["diff"].max(),2)}
         df.loc[len(df)] = row
     df.to_csv("outputs/ha_percentages.csv", index=False)
         
