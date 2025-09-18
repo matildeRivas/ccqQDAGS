@@ -200,3 +200,42 @@ def size_config():
         rdict[m]=sum(x == y for x, y in zip(smallest, fastest))/len(df1)
     print(rdict)
     #{'J3': 0.6, 'J4': 0.46, 'T3': 0.52, 'Ti3': 0.36, 'T4': 0.7, 'Ti4': 0.7551020408163265}
+
+
+def number_of_results():
+    patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "square_tadpole", "bowtie", "triangle_barbell", "square_barbell", "penta_barbell"]
+    data = {"Pattern": [], "Avg Results": [], "Median Results": []}
+    df = pd.DataFrame(data)
+    multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
+
+    for i, p in enumerate(patterns):
+        if p in multi:
+            df1 = pd.read_csv(f"outputs_space/ha_{p}_ghd_yk_1.csv")
+        else:
+            df1 = pd.read_csv(f"outputs_space/ha_{p}_yk_1.csv")
+        row = {"Pattern": p, "Avg Results": round(df1["number of results"].mean(),2), "Median Results":  round(df1["number of results"].median(),2)}
+        df.loc[len(df)] = row
+    df.to_csv("outputs/number_results.csv", index=False)
+
+
+def yk_space():
+    patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "square_tadpole", "bowtie", "triangle_barbell", "square_barbell", "penta_barbell"]
+   
+    multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
+    data = {"Pattern": [], "Mean difference": [], "Median difference": [], "Most  hindrance": [], "Most improvement": []}
+    for i, p in enumerate(patterns):
+        if p in multi:
+            df1 = pd.read_csv(f"outputs_space/results_ha_{p}_ghd_yk_1.csv")
+            df2 = pd.read_csv(f"outputs_space/results_ha_{p}_ghd_yk_2.csv")
+            df3 = pd.read_csv(f"outputs_space/results_ha_{p}_ghd_yk_3.csv")
+
+            yk_res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
+            yk_res = pd.merge(yk_res, df3, left_index=True, right_index=True)
+            yk_res[['qdags_1','post mj size_1','post mj size_2','post mj size', 'result size_1']].to_csv(f'outputs/{p}_sizes.csv')
+        else:
+            yk_res = pd.read_csv(f"outputs_space/ha_{p}_yk.csv")
+            yk_res[['qdags','post mj','result']].to_csv(f'outputs/{p}_sizes.csv')
+            #qdags, post mj size, result size 
+       
+if __name__ == '__main__':
+    yk_space()

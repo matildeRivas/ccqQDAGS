@@ -1,0 +1,13 @@
+Pattern,Avg Results,Median Results
+J3,1131.18,5.0
+J4,292.78,4.0
+T3,29.6,2.0
+Ti3,203545.22,2.5
+T4,1304.88,2.0
+Ti4,2248722.76,3.0
+triangle_tadpole,5.7,1.0
+square_tadpole,4.42,2.0
+bowtie,6.38,1.0
+triangle_barbell,2.92,1.0
+square_barbell,8.54,2.0
+penta_barbell,20.88,2.0
