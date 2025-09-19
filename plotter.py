@@ -208,4 +208,4 @@ def yk_times():
 
 if __name__ == '__main__':
     print('plotting ghd configs')
-    compare_times()
+    plot_times()
