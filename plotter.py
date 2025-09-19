@@ -238,4 +238,4 @@ def yk_space():
             #qdags, post mj size, result size 
        
 if __name__ == '__main__':
-    yk_space()
+    yk_times()
