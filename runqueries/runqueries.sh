@@ -1,7 +1,7 @@
 #!/bin/bash
 input_folder="patterns"
 metric="$1"
-output_folder="outputs_${metric}"
+output_folder="outputs_${metric}_test"
 mkdir "${output_folder}"
 
 declare -A ghd_confs
@@ -18,12 +18,14 @@ ghd_confs=(
     ["t3_ghd"]="3" #"3"
     ["t4_ghd"]="3" #"3"
     ["ti3_ghd"]="3" #"3"
+    ["test"]="1" #"3"
 )
 
-for pattern in  "j3_ghd" "t3_ghd" "ti3_ghd" # "bowtie" "j3_ghd" "j4_ghd" "ti4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "triangle_tadpole" "square_tadpole" "triangle_barbell" "square_barbell" "penta_barbell"
+#for pattern in  "j3_ghd" "t3_ghd" "ti3_ghd" # "bowtie" "j3_ghd" "j4_ghd" "ti4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "triangle_tadpole" "square_tadpole" "triangle_barbell" "square_barbell" "penta_barbell"
+for pattern in "bowtie"
 do
     params_file="${input_folder}/${pattern}.txt"
-    for method in "yk" # "yk_par"
+    for method in "mj" # "yk_par"
     do
         for (( ghd_conf=1; ghd_conf<=${ghd_confs[$pattern]}; ghd_conf++ ));
         do

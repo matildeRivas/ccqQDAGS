@@ -166,6 +166,8 @@ void run_experiment(char** argv, int argc, vector<vector<vector<uint64_t>>*> rel
         start = high_resolution_clock::now();
         qdag* test_result = multiJoin(qdags, false, 1000);
         stop = high_resolution_clock::now();
+        outfile << test_result->size() << ",";
+        outfile << test_result->Q->bv[test_result->getHeight()-1].n_ones();
     } else {
         qdag* yan_res;
 
@@ -185,8 +187,8 @@ void run_experiment(char** argv, int argc, vector<vector<vector<uint64_t>>*> rel
             stop = high_resolution_clock::now();
         }
         if (strcmp(argv[argc - 4], "space") == 0) {
-        outfile << yan_res->Q->bv[yan_res->getHeight()-1].n_ones();
-    }
+            outfile << yan_res->Q->bv[yan_res->getHeight()-1].n_ones();
+        }
     }
 
     const std::chrono::duration<double, std::milli> time_span = stop - start;
