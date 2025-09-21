@@ -206,6 +206,25 @@ def yk_times():
     print(tdf)
     plt.savefig("outputs/pruning_diff")
 
+def bpt():
+    patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "bowtie"]
+    multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
+    data = {"average": [], "median": []}
+    df = pd.DataFrame(data)
+    data = {"tuples": [], "qdags": [], "ratio":[]}
+    res =pd.DataFrame(data)
+    for i, p in enumerate(patterns):
+        print(p)
+        if p in multi:
+            df1 = pd.read_csv(f"outputs_space/{p}_ghd_yk_1.csv")
+        else:
+            df1 = pd.read_csv(f"outputs_space/{p}_yk_1.csv")
+        df1["ratio"]=df1.qdags/df1.tuples
+        res = pd.concat([res, df1[["tuples", "qdags", "ratio"]]])
+    row = {"average": round( res["ratio"].mean(),2), "median": round( res["ratio"].median(),2)}
+    df.loc[len(df)] = row
+    df.to_csv("outputs/bpt.csv", index=False)
+    
+
 if __name__ == '__main__':
-    print('plotting ghd configs')
-    plot_times()
+    bpt()
