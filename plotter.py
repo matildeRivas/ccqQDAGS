@@ -224,7 +224,33 @@ def bpt():
     row = {"average": round( res["ratio"].mean(),2), "median": round( res["ratio"].median(),2)}
     df.loc[len(df)] = row
     df.to_csv("outputs/bpt.csv", index=False)
+
+def yk_space():
+    patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "bowtie"]
+    multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"] 
+    data = {"Pattern": [], "Avg factor input": [], "Median factor input": [], "Avg factor inter": [], "Median factor inter": []}
+    df = pd.DataFrame(data)
+    for i, p in enumerate(patterns):
+        if p in multi:
+            df1 = pd.read_csv(f"outputs_space/{p}_ghd_yk_1.csv")
+            df2 = pd.read_csv(f"outputs_space/{p}_ghd_yk_2.csv")
+            df3 = pd.read_csv(f"outputs_space/{p}_ghd_yk_3.csv")
+
+            yk_res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
+            yk_res = pd.merge(yk_res, df3, left_index=True, right_index=True)
+            yk_res[['qdags_1','post mj_1','post mj_2','post mj', 'result']].to_csv(f'outputs/{p}_sizes.csv', index=False)
+            yk_res["input"] = yk_res['qdags_1']/yk_res['result_1']
+            yk_res=yk_res.assign(inter=lambda d: d[['post mj_1','post mj_2','post mj']].min(1)/yk_res['result_1'])
+        else:
+            yk_res = pd.read_csv(f"outputs_space/{p}_yk_1.csv")
+            yk_res[['qdags','post mj','result']].to_csv(f'outputs/{p}_sizes.csv', index=False)
+            yk_res["input"] = yk_res['qdags']/yk_res['result']
+            yk_res["inter"] = yk_res['post mj']/yk_res['result']
+            #qdags, post mj size, result size }
+        row = {"Pattern": p, "Avg factor input": round( yk_res["input"].mean(),2), "Median factor input": round( yk_res["input"].median(),2), "Avg factor inter": round( yk_res["inter"].mean(),2), "Median factor inter": round( yk_res["inter"].median(),2)}
+        df.loc[len(df)] = row
+    df.to_csv("outputs/avg_size.csv", index=False)
     
 
 if __name__ == '__main__':
-    bpt()
+    yk_space()
