@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
 def min_time():
@@ -207,7 +208,7 @@ def yk_times():
     plt.savefig("outputs/pruning_diff")
 
 def bpt():
-    patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "bowtie"]
+    patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]#, "triangle_tadpole", "bowtie"]
     multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
     data = {"average": [], "median": []}
     df = pd.DataFrame(data)
@@ -216,7 +217,7 @@ def bpt():
     for i, p in enumerate(patterns):
         print(p)
         if p in multi:
-            df1 = pd.read_csv(f"outputs_space/{p}_ghd_yk_1.csv")
+            df1 = pd.read_csv(f"outputs_space/config_{p}_ghd_yk_1.csv")
         else:
             df1 = pd.read_csv(f"outputs_space/{p}_yk_1.csv")
         df1["ratio"]=df1.qdags/df1.tuples
@@ -226,31 +227,57 @@ def bpt():
     df.to_csv("outputs/bpt.csv", index=False)
 
 def yk_space():
-    patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "bowtie"]
+    patterns = ["J3", "T3", "Ti3", "J4", "T4", "Ti4", "triangle_tadpole", "bowtie"]
     multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"] 
     data = {"Pattern": [], "Avg factor input": [], "Median factor input": [], "Avg factor inter": [], "Median factor inter": []}
     df = pd.DataFrame(data)
     for i, p in enumerate(patterns):
+        temp = {"input":[],"inter":[]}
+        df_temp = pd.DataFrame(temp)
         if p in multi:
+            tdf1 = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
+            tdf2 = pd.read_csv(f"outputs_time/{p}_ghd_yk_2.csv", names=["time"])
+            tdf3 = pd.read_csv(f"outputs_time/{p}_ghd_yk_3.csv", names=["time"])
+            tdf1["config"]=1
+            tdf2["config"]=2
+            tdf3["config"]=3 
+            tdf1['query'] = np.arange(0, tdf1.shape[0] )
+            tdf2['query'] = np.arange(0, tdf2.shape[0] )
+            tdf3['query'] = np.arange(0, tdf3.shape[0] )
+            tres = pd.concat([tdf1,tdf2,tdf3])
+            fastest = list(tres.sort_values('time', ascending=True).groupby('query').head(1).sort_values('query').config)
             df1 = pd.read_csv(f"outputs_space/{p}_ghd_yk_1.csv")
             df2 = pd.read_csv(f"outputs_space/{p}_ghd_yk_2.csv")
             df3 = pd.read_csv(f"outputs_space/{p}_ghd_yk_3.csv")
-
-            yk_res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
-            yk_res = pd.merge(yk_res, df3, left_index=True, right_index=True)
-            yk_res[['qdags_1','post mj_1','post mj_2','post mj', 'result']].to_csv(f'outputs/{p}_sizes.csv', index=False)
-            yk_res["input"] = yk_res['qdags_1']/yk_res['result_1']
-            yk_res=yk_res.assign(inter=lambda d: d[['post mj_1','post mj_2','post mj']].min(1)/yk_res['result_1'])
+            df1['query'] = np.arange(0, df1.shape[0] )
+            df2['query'] = np.arange(0, df2.shape[0] )
+            df3['query'] = np.arange(0, df3.shape[0] )
+            for i,f in enumerate(fastest):
+                if f==1:
+                    aux_input = df1[df1['query']==i]['qdags'].values[0]
+                    aux_res = df1[df1['query']==i]['result'].values[0]
+                    aux_inter = df1[df1['query']==i]['post mj'].values[0]
+                elif f==2:
+                    aux_input = df2[df2['query']==i]['qdags'].values[0]
+                    aux_res = df2[df2['query']==i]['result'].values[0]
+                    aux_inter = df2[df2['query']==i]['post mj'].values[0]
+                elif f==3:
+                    aux_input = df3[df3['query']==i]['qdags'].values[0]
+                    aux_res = df3[df3['query']==i]['result'].values[0]
+                    aux_inter = df3[df3['query']==i]['post mj'].values[0]
+                row = {"input":aux_input/aux_res,"inter":[], "inter":aux_inter/aux_res}
+                df_temp.loc[len(df_temp)] = row
+            row = {"Pattern": p, "Avg factor input": round( df_temp["input"].mean(),2), "Median factor input": round( df_temp["input"].median(),2), "Avg factor inter": round(df_temp["inter"].mean(),2), "Median factor inter": round(df_temp["inter"].median(),2)}
+            df.loc[len(df)] = row
         else:
             yk_res = pd.read_csv(f"outputs_space/{p}_yk_1.csv")
-            yk_res[['qdags','post mj','result']].to_csv(f'outputs/{p}_sizes.csv', index=False)
             yk_res["input"] = yk_res['qdags']/yk_res['result']
             yk_res["inter"] = yk_res['post mj']/yk_res['result']
-            #qdags, post mj size, result size }
-        row = {"Pattern": p, "Avg factor input": round( yk_res["input"].mean(),2), "Median factor input": round( yk_res["input"].median(),2), "Avg factor inter": round( yk_res["inter"].mean(),2), "Median factor inter": round( yk_res["inter"].median(),2)}
-        df.loc[len(df)] = row
+            row = {"Pattern": p, "Avg factor input": round( yk_res["input"].mean(),2), "Median factor input": round( yk_res["input"].median(),2), "Avg factor inter": round(yk_res["inter"].mean(),2), "Median factor inter": round(yk_res["inter"].median(),2)}
+            df.loc[len(df)] = row
+        
     df.to_csv("outputs/avg_size.csv", index=False)
     
 
 if __name__ == '__main__':
-    yk_space()
+    bpt()
