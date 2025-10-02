@@ -15,7 +15,7 @@ def min_time():
 
 
 def plot_config():
-    multi = ["J3", "T3", "Ti3"] # , "T4", "Ti4", "J4",
+    multi = ["J3", "T3", "Ti3"] # , "T4", "Ti4", "J4"
     medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
 
     fig = plt.figure(layout='constrained', figsize=(15,5))
