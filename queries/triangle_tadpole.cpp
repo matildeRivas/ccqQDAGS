@@ -95,5 +95,6 @@ auto rels = { rel_P, rel_Q, rel_R, rel_T, rel_U };
 
     //level_1.push_back(sub_c);
     root = ghd(Q_root, level_1);
+    
     run_experiment(argv, argc, rels, qdags, root);
 }

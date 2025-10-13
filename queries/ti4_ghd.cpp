@@ -108,6 +108,70 @@ int main(int argc, char** argv)
         level_1.push_back(sub_b);
         root = ghd(Q_root, level_1);
     }
+     else if (strcmp(argv[argc - 1], "4") == 0){
+        vector<qdag> Q_root(1);
+        Q_root[0] = qdag_rel_R;
+
+        vector<qdag> Q_b(3);
+        Q_b[0] = qdag_rel_S;
+        Q_b[1] = qdag_rel_T;
+        Q_b[2] = qdag_rel_U;
+
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
+    }
+    else if (strcmp(argv[argc - 1], "5") == 0){
+        vector<qdag> Q_root(1);
+        Q_root[0] = qdag_rel_S;
+
+        vector<qdag> Q_b(3);
+        Q_b[0] = qdag_rel_R;
+        Q_b[1] = qdag_rel_T;
+        Q_b[2] = qdag_rel_U;
+
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
+    }
+    else if (strcmp(argv[argc - 1], "6") == 0){
+        vector<qdag> Q_root(1);
+        Q_root[0] = qdag_rel_T;
+
+        vector<qdag> Q_b(3);
+        Q_b[0] = qdag_rel_S;
+        Q_b[1] = qdag_rel_R;
+        Q_b[2] = qdag_rel_U;
+
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
+    }
+    else if (strcmp(argv[argc - 1], "7") == 0){
+        vector<qdag> Q_root(1);
+        Q_root[0] = qdag_rel_T;
+
+        vector<qdag> Q_b(3);
+        Q_b[0] = qdag_rel_S;
+        Q_b[1] = qdag_rel_T;
+        Q_b[2] = qdag_rel_R;
+
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
+    }
     run_experiment(argv, argc, rels, qdags, root);
 
     return 0;

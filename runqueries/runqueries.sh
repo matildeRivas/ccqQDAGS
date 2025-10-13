@@ -6,23 +6,23 @@ output_folder="outputs_${metric}"
 declare -A ghd_confs
 ghd_confs=(
     ["bowtie"]="1"
-    ["j3_ghd"]="3"
-    ["j4_ghd"]="3"
+    ["j3_ghd"]="7"
+    ["j4_ghd"]="7"
     ["triangle_barbell"]="1"
     ["triangle_tadpole"]="1"
-    ["ti4_ghd"]="3"
+    ["ti4_ghd"]="7"
     ["square_tadpole"]="1"
     ["square_barbell"]="1"
     ["penta_barbell"]="1"
-    ["t3_ghd"]="3"
-    ["t4_ghd"]="3"
-    ["ti3_ghd"]="3"
+    ["t3_ghd"]="7"
+    ["t4_ghd"]="7"
+    ["ti3_ghd"]="7"
 )
 
-for pattern in "bowtie" "triangle_tadpole" #"j3_ghd" "t3_ghd" "ti3_ghd" "bowtie" "j4_ghd" "t4_ghd" "ti4_ghd" "triangle_tadpole"
+for pattern in "j3_ghd" "t3_ghd" "ti3_ghd" "bowtie" "j4_ghd" "t4_ghd" "ti4_ghd" "triangle_tadpole"
 do
     params_file="${input_folder}/${pattern}.txt"
-    for method in "yk" # "yk_par"
+    for method in "yk" "yk_par"
     do
         for (( ghd_conf=1; ghd_conf<=${ghd_confs[$pattern]}; ghd_conf++ ));
         do

@@ -277,7 +277,38 @@ def yk_space():
             df.loc[len(df)] = row
         
     df.to_csv("outputs/avg_size.csv", index=False)
+
+def time_comp():
+    patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "bowtie"]
+    multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
+    data = {"Pattern": [], "Decomp beat": []}
+    df = pd.DataFrame(data)
     
+    for i, p in enumerate(patterns):
+        if p in multi:
+            df1 = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
+            df2 = pd.read_csv(f"outputs_time/{p}_ghd_yk_2.csv", names=["time"])
+            df3 = pd.read_csv(f"outputs_time/{p}_ghd_yk_3.csv", names=["time"])
+
+            yk_res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
+            yk_res = pd.merge(yk_res, df3, left_index=True, right_index=True)
+            
+        else:
+            yk_res = pd.read_csv(f"outputs_time/{p}_yk.csv", names=["GHD"])
+            ykp_res = pd.read_csv(f"outputs_time/no_pruning_{p}_yk.csv", names=["GHD np"])
+
+        res = pd.merge(yk_res[["GHD"]], ykp_res[["GHD np"]], left_index=True, right_index=True)
+        res["diff"] = 100*(1 - res["GHD"] / res["GHD np"])
+        row = {"Pattern": p, "Mean difference": round(res["diff"].mean(),2), "Median difference": round(res["diff"].median(),2), "Max difference":round(res["diff"].max(),2)}
+        df.loc[len(df)] = row
+        tdf=pd.concat([tdf, res], ignore_index=True)
+    df.to_csv("outputs/pruning_percentages.csv", index=False)
+    fig = plt.figure(layout='constrained', figsize=(10, 10))
+    fig.suptitle('Percentage change in time when using pruning')
+    plt.axvline(linewidth=2, color='r')
+    tdf["diff"].hist(bins=10)
+    print(tdf)
+    plt.savefig("outputs/pruning_diff")
 
 if __name__ == '__main__':
     bpt()
