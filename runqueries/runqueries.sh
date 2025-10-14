@@ -22,7 +22,7 @@ ghd_confs=(
 for pattern in "j3_ghd" "t3_ghd" "ti3_ghd" "bowtie" "j4_ghd" "t4_ghd" "ti4_ghd" "triangle_tadpole"
 do
     params_file="${input_folder}/${pattern}.txt"
-     output_file="${output_folder}/${pattern}_mj.csv"
+    output_file="${output_folder}/${pattern}_mj.csv"
     touch $output_file
     i=1
     if [ "$metric" = "space" ]; then
