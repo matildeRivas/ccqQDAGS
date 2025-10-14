@@ -6,7 +6,7 @@ output_folder="outputs_${metric}"
 declare -A ghd_confs
 ghd_confs=(
     ["bowtie"]="1"
-    ["j3_ghd"]="7"
+    ["j3_ghd"]="9"
     ["j4_ghd"]="7"
     ["triangle_barbell"]="1"
     ["triangle_tadpole"]="1"
@@ -14,14 +14,36 @@ ghd_confs=(
     ["square_tadpole"]="1"
     ["square_barbell"]="1"
     ["penta_barbell"]="1"
-    ["t3_ghd"]="7"
+    ["t3_ghd"]="9"
     ["t4_ghd"]="7"
-    ["ti3_ghd"]="7"
+    ["ti3_ghd"]="9"
 )
 
 for pattern in "j3_ghd" "t3_ghd" "ti3_ghd" "bowtie" "j4_ghd" "t4_ghd" "ti4_ghd" "triangle_tadpole"
 do
     params_file="${input_folder}/${pattern}.txt"
+     output_file="${output_folder}/${pattern}_mj.csv"
+    touch $output_file
+    i=1
+    if [ "$metric" = "space" ]; then
+        echo -e "tuples,qdags" >> $output_file
+    fi
+    while IFS= read -r params; do
+        printf "\nRunning ${pattern} - mj - ${i}:\n\t${params}\n"
+        i=$((i+1))
+        # Run the program with a timeout
+        timeout 1800 ./build/${pattern} $params $metric mj $output_file 0
+        exit_code=$?
+
+        # check errors
+        if  [ $exit_code -eq 124 ]; then
+            echo "timeout" >> $output_file
+            echo "##### timeout #####"
+        elif [ $exit_code -eq 139 ]; then
+            echo "segfault" >> $output_file
+            echo "##### segfault #####"
+        fi
+    done < ${params_file}
     for method in "yk" "yk_par"
     do
         for (( ghd_conf=1; ghd_conf<=${ghd_confs[$pattern]}; ghd_conf++ ));
