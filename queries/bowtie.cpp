@@ -1,11 +1,9 @@
-
-#include <bits/stdc++.h>
-#include <chrono>
-#include <ctime>
 #include <fstream>
+#include <bits/stdc++.h>
 #include <ratio>
 
 using namespace std::chrono;
+using namespace std;
 
 #include "../includes/ghd.hpp"
 #include "../src/ghd_optimal_joins.cpp"
