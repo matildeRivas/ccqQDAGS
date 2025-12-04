@@ -71,7 +71,13 @@ int main(int argc, char** argv)
     auto rels = { rel_R, rel_S, rel_T, rel_RP, rel_SP, rel_TP };
     cout << "read all relations, with a total of " << relations_size(rels) << " tuples" << endl;
 
-    vector<qdag> qdags = { qdag_rel_R, qdag_rel_S, qdag_rel_T, qdag_rel_RP, qdag_rel_SP, qdag_rel_TP };
+    vector<qdag> qdags(6);
+    qdags[0] = qdag_rel_R;
+    qdags[1] = qdag_rel_S;
+    qdags[2] = qdag_rel_T;
+    qdags[3] = qdag_rel_RP;
+    qdags[4] = qdag_rel_SP;
+    qdags[5] = qdag_rel_TP;
 
     ghd root;
     vector<qdag> Q_root(3);
