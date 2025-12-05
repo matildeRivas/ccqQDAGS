@@ -2,6 +2,20 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+ghd_confs={
+    "bowtie":1,
+    "J3":9,
+    "J4":7,
+    "triangle_barbell":1,
+    "triangle_tadpole":1,
+    "Ti4":7,
+    "square_tadpole":1,
+    "square_barbell":1,
+    "penta_barbell":1,
+    "T3":9,
+    "T4":7,
+    "Ti3":9,
+}
 def min_time():
     multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
     for i, m in enumerate(multi):
@@ -62,21 +76,15 @@ def plot_times():
     for i, p in enumerate(patterns):
         if p in multi:
             df1 = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
-            df2 = pd.read_csv(f"outputs_time/{p}_ghd_yk_2.csv", names=["time"])
-            df3 = pd.read_csv(f"outputs_time/{p}_ghd_yk_3.csv", names=["time"])
-
-            yk_res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
-            yk_res = pd.merge(yk_res, df3, left_index=True, right_index=True)
+            for j in range(2, ghd_confs[p]+1):
+                yk_res = pd.merge(df1, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('_1', f'_{j}'))
             yk_res["GHD"] = yk_res.min(axis=1)
-
             df1p = pd.read_csv(f"outputs_time/{p}_ghd_yk_par_1.csv", names=["time"])
-            df2p = pd.read_csv(f"outputs_time/{p}_ghd_yk_par_2.csv", names=["time"])
-            df3p = pd.read_csv(f"outputs_time/{p}_ghd_yk_par_3.csv", names=["time"])
-
-            ykp_res = pd.merge(df1p, df2p, left_index=True, right_index=True)
-            ykp_res = pd.merge(ykp_res, df3p, left_index=True, right_index=True)
+            for j in range(1, ghd_confs[p]+1):
+                ykp_res = pd.merge(df1p, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('_1', f'_{j}'))
+            
             ykp_res["GHD par"] = ykp_res.min(axis=1)
-
+            """
             df_np1 = pd.read_csv(f"outputs_time/no_pruning_{p}_ghd_yk_1.csv", names=["time"])
             df_np2 = pd.read_csv(f"outputs_time/no_pruning_{p}_ghd_yk_2.csv", names=["time"])
             df_np3 = pd.read_csv(f"outputs_time/no_pruning_{p}_ghd_yk_3.csv", names=["time"])
@@ -84,26 +92,26 @@ def plot_times():
             yk_np_res = pd.merge(df_np1, df_np2, left_index=True, right_index=True, suffixes=('_1', '_2'))
             yk_np_res = pd.merge(yk_np_res, df_np3, left_index=True, right_index=True)
             yk_np_res["GHD without pruning"] = yk_np_res.min(axis=1)
-
+"""
             df_mj = pd.read_csv(f"outputs_time/{p}_ghd_mj.csv", names=["multijoin"])
         else:
-            yk_res = pd.read_csv(f"outputs_time/{p}_yk.csv", names=["GHD"])
-            ykp_res = pd.read_csv(f"outputs_time/{p}_yk_par.csv", names=["GHD par"])
+            yk_res = pd.read_csv(f"outputs_time/{p}_yk_1.csv", names=["GHD"])
+            ykp_res = pd.read_csv(f"outputs_time/{p}_yk_par_1.csv", names=["GHD par"])
             df_mj = pd.read_csv(f"outputs_time/{p}_mj.csv", names=["multijoin"])
-            yk_np_res = pd.read_csv(f"outputs_time/no_pruning_{p}_yk.csv", names=["GHD without pruning"])
+           # yk_np_res = pd.read_csv(f"outputs_time/no_pruning_{p}_yk.csv", names=["GHD without pruning"])
 
         df_mj[df_mj['multijoin'] == 'timeout'] = 1800
         df_mj["multijoin"] = pd.to_numeric(df_mj["multijoin"], downcast='float')
 
         res = pd.merge(yk_res[["GHD"]], ykp_res[["GHD par"]], left_index=True, right_index=True)
-        res = pd.merge(res, yk_np_res, left_index=True, right_index=True)
+        #res = pd.merge(res, yk_np_res, left_index=True, right_index=True)
         res = pd.merge(res, df_mj, left_index=True, right_index=True)
         ax = axes[i//2][i%2]
         ax.set_title(p)
         ax.set_ylabel('Execution time (s)')
         bplot, props = res.boxplot(
             ax=ax,
-            column=["GHD", "GHD par", "GHD without pruning"],#, "multijoin"],
+            column=["GHD", "GHD par", "multijoin"],#"GHD without pruning"],#, "multijoin"],
             patch_artist=True,
             medianprops=medianprops,
             showmeans=False,
@@ -311,4 +319,4 @@ def time_comp():
     plt.savefig("outputs/pruning_diff")
 
 if __name__ == '__main__':
-    bpt()
+    plot_times()
