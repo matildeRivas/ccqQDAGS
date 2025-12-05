@@ -103,8 +103,16 @@ int main(int argc, char **argv) {
 
     auto rels = { rel_A, rel_B, rel_C, rel_D, rel_J, rel_R, rel_S, rel_T, rel_U };
     std::cout << "read all relations, with a total of " << relations_size(rels) << " tuples" << endl;
-
-    vector<qdag> qdags = {qdag_rel_A, qdag_rel_B, qdag_rel_C, qdag_rel_D, qdag_rel_J, qdag_rel_R, qdag_rel_S, qdag_rel_T, qdag_rel_U};
+    vector<qdag> qdags(7);
+    qdags[0] = qdag_rel_A;
+    qdags[1] = qdag_rel_B;
+    qdags[2] = qdag_rel_C;
+    qdags[3] = qdag_rel_D;
+    qdags[4] = qdag_rel_J;
+    qdags[5] = qdag_rel_R;
+    qdags[6] = qdag_rel_S;
+    qdags[7] = qdag_rel_T;
+    qdags[8] = qdag_rel_U;
     ghd root;
     vector<qdag> Q_root(1);
     Q_root[0] = qdag_rel_J;

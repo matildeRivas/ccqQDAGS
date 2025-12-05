@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     std::cout << "read all relations, with a total of " << relations_size(rels) << " tuples" << endl;
     // diccionario rels a qdags para saber cuál es cual
     vector<qdag> qdags = { qdag_rel_R, qdag_rel_S, qdag_rel_T };
-    sort_relations(qdags);
+    //sort_relations(qdags);
     ghd root;
     if (strcmp(argv[argc - 1], "1") == 0) {
         // root tiene el minimo
@@ -95,6 +95,114 @@ int main(int argc, char** argv)
         ghd sub_b = ghd(Q_b, empty_children);
         vector<ghd> level_1;
         level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
+    }
+    else if (strcmp(argv[argc - 1], "4") == 0){
+        // root tiene el maximo
+        vector<qdag> Q_root(2);
+        Q_root[0] = qdags[0];
+        Q_root[1] = qdags[1];
+
+        vector<qdag> Q_b(2);
+        Q_b[0] = qdags[0];
+        Q_b[1] = qdags[2];
+
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
+    }
+    else if (strcmp(argv[argc - 1], "5") == 0){
+        // root tiene el maximo
+        vector<qdag> Q_root(2);
+        Q_root[0] = qdags[1];
+        Q_root[1] = qdags[0];
+
+        vector<qdag> Q_b(2);
+        Q_b[0] = qdags[1];
+        Q_b[1] = qdags[2];
+
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
+    }
+    else if (strcmp(argv[argc - 1], "6") == 0){
+        // root tiene el maximo
+        vector<qdag> Q_root(2);
+        Q_root[0] = qdags[2];
+        Q_root[1] = qdags[0];
+
+        vector<qdag> Q_b(2);
+        Q_b[0] = qdags[2];
+        Q_b[1] = qdags[1];
+
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        root = ghd(Q_root, level_1);
+    }
+    else if (strcmp(argv[argc - 1], "7") == 0){
+        // root tiene el maximo
+        vector<qdag> Q_root(1);
+        Q_root[0] = qdags[0];
+
+        vector<qdag> Q_b(1);
+        Q_b[0] = qdags[1];
+        vector<qdag> Q_c(1);
+        Q_c[0] = qdags[2];
+
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        ghd sub_c = ghd(Q_c, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        level_1.push_back(sub_c);
+        root = ghd(Q_root, level_1);
+    }
+    else if (strcmp(argv[argc - 1], "8") == 0){
+        // root tiene el maximo
+        vector<qdag> Q_root(1);
+        Q_root[0] = qdags[1];
+
+        vector<qdag> Q_b(1);
+        Q_b[0] = qdags[0];
+        vector<qdag> Q_c(1);
+        Q_c[0] = qdags[2];
+
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        ghd sub_c = ghd(Q_c, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        level_1.push_back(sub_c);
+        root = ghd(Q_root, level_1);
+    }
+    else if (strcmp(argv[argc - 1], "9") == 0){
+        // root tiene el maximo
+        vector<qdag> Q_root(1);
+        Q_root[0] = qdags[2];
+
+        vector<qdag> Q_b(1);
+        Q_b[0] = qdags[1];
+        vector<qdag> Q_c(1);
+        Q_c[0] = qdags[0];
+
+        // Crear GHDs
+        vector<ghd> empty_children(0);
+        ghd sub_b = ghd(Q_b, empty_children);
+        ghd sub_c = ghd(Q_c, empty_children);
+        vector<ghd> level_1;
+        level_1.push_back(sub_b);
+        level_1.push_back(sub_c);
         root = ghd(Q_root, level_1);
     }
 
