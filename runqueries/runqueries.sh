@@ -19,7 +19,7 @@ ghd_confs=(
     ["ti3_ghd"]="9"
 )
 
-for pattern in "j3_ghd" "t3_ghd" "ti3_ghd" "bowtie" "j4_ghd" "t4_ghd" "ti4_ghd" "triangle_tadpole"
+for pattern in "ti4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "square_tadpole" "triangle_barbell" "square_barbell" "penta_barbell" #"bowtie" "triangle_tadpole" "j3_ghd" "j4_ghd" 
 do
     params_file="${input_folder}/${pattern}.txt"
     output_file="${output_folder}/${pattern}_mj.csv"
