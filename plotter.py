@@ -37,27 +37,28 @@ def plot_config():
     fig.suptitle('Times for Different Decompositions in high arity qdag')
 
     for i, m in enumerate(multi):
-        df1 = pd.read_csv(f"outputs_time/ha_{m}_ghd_yk_1.csv", names=["time"])
-        df2 = pd.read_csv(f"outputs_time/ha_{m}_ghd_yk_2.csv", names=["time"])
-        df3 = pd.read_csv(f"outputs_time/ha_{m}_ghd_yk_3.csv", names=["time"])
-
-        res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
-        res = pd.merge(res, df3, left_index=True, right_index=True)
-        res.rename(columns={"time_1":"config 1", "time_2":"config 2", "time":"config 3"}, inplace=True)
+        res = pd.read_csv(f"outputs_time/{m}_ghd_yk_1.csv", names=["time"])
+        for j in range(2, ghd_confs[m]+1):
+            res = pd.merge(res, pd.read_csv(f"outputs_time/{m}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
+        
+        res=res.set_axis([f'config {x}' for x in range(1, ghd_confs[m]+1)], axis='columns')
+        
+        print(res.columns)
+        
         ax = axes[i//2][i%2]
         ax.set_title(m)
         ax.set_ylabel('Execution time (s)')
         bplot, props = res.boxplot(
-            ax=ax, 
-            column=['config 1', 'config 2', 'config 3'],
+            ax=ax,   
             patch_artist=True,
             medianprops=medianprops,
             showmeans=False,
             showfliers=False,
-            return_type='both',
-            label=['config 1', 'config 2', 'config 3'],
+            return_type='both'
         )
-        colors = ['firebrick', 'gold', 'cornflowerblue']
+        ax.tick_params(axis='x', labelrotation=45)
+
+        colors = ['firebrick', 'gold', 'cornflowerblue', 'saddlebrown', 'lightpink', 'darkseagreen', 'mediumpurple', 'darkorange', 'olive']
 
         for patch, color in zip(props['boxes'], colors):
             patch.set_facecolor(color)
@@ -76,20 +77,20 @@ def plot_times():
 
     for i, p in enumerate(patterns):
         if p in multi:
-            df1 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_1.csv", names=["time"])
+            yk_res = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
             for j in range(2, ghd_confs[p]+1):
-                yk_res = pd.merge(df1, pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('_1', f'_{j}'))
+                yk_res = pd.merge(yk_res, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
             yk_res["GHD"] = yk_res.min(axis=1)
-            df1p = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_par_1.csv", names=["time"])
-            for j in range(1, ghd_confs[p]+1):
-                ykp_res = pd.merge(df1p, pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('_1', f'_{j}'))
-            
+            ykp_res = pd.read_csv(f"outputs_time/{p}_ghd_yk_par_1.csv", names=["time"])
+            for j in range(2, ghd_confs[p]+1):
+                ykp_res = pd.merge(ykp_res, pd.read_csv(f"outputs_time/{p}_ghd_yk_par_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
+
             ykp_res["GHD par"] = ykp_res.min(axis=1)
-            df_mj = pd.read_csv(f"outputs_time/ha_{p}_ghd_mj.csv", names=["multijoin"])
+            df_mj = pd.read_csv(f"outputs_time/{p}_ghd_mj.csv", names=["multijoin"])
         else:
-            yk_res = pd.read_csv(f"outputs_time/ha_{p}_yk.csv", names=["GHD"])
-            ykp_res = pd.read_csv(f"outputs_time/ha_{p}_yk_par.csv", names=["GHD par"])
-            df_mj = pd.read_csv(f"outputs_time/ha_{p}_mj.csv", names=["multijoin"])
+            yk_res = pd.read_csv(f"outputs_time/{p}_yk_1.csv", names=["GHD"])
+            ykp_res = pd.read_csv(f"outputs_time/{p}_yk_par_1.csv", names=["GHD par"])
+            df_mj = pd.read_csv(f"outputs_time/{p}_mj.csv", names=["multijoin"])
 
         df_mj[df_mj['multijoin'] == 'timeout'] = 1800
         df_mj["multijoin"] = pd.to_numeric(df_mj["multijoin"], downcast='float')
@@ -118,7 +119,7 @@ def plot_times():
 
     handles, labels = plt.gca().get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper center')
-    plt.savefig("outputs/times")
+    plt.savefig("outputs/ha_times")
 
 def yk_times():
     patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "square_tadpole", "bowtie", "triangle_barbell", "square_barbell", "penta_barbell"]
@@ -126,31 +127,51 @@ def yk_times():
     multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
     data = {"Pattern": [], "Mean difference": [], "Median difference": [], "Most  hindrance": [], "Most improvement": []}
     df = pd.DataFrame(data)
+    medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
+    df = pd.DataFrame(data)
+    fig = plt.figure(layout='constrained', figsize=(10, 10))
+    axes = fig.subplots(6, 2)
+    fig.suptitle('Times for High Arity Qdag Variant')
     for i, p in enumerate(patterns):
         if p in multi:
-            df1 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_1.csv", names=["time"])
-            df2 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_2.csv", names=["time"])
-            df3 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_3.csv", names=["time"])
-
-            yk_res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
-            yk_res = pd.merge(yk_res, df3, left_index=True, right_index=True)
+            yk_res = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
+            for j in range(2, ghd_confs[p]+1):
+                yk_res = pd.merge(yk_res, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
             yk_res["GHD"] = yk_res.min(axis=1)
-            df1p = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_par_1.csv", names=["time"])
-            df2p = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_par_2.csv", names=["time"])
-            df3p = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_par_3.csv", names=["time"])
-
-            ykp_res = pd.merge(df1p, df2p, left_index=True, right_index=True)
-            ykp_res = pd.merge(ykp_res, df3p, left_index=True, right_index=True)
+            ykp_res = pd.read_csv(f"outputs_time/{p}_ghd_yk_par_1.csv", names=["time"])
+            for j in range(2, ghd_confs[p]+1):
+                ykp_res = pd.merge(ykp_res, pd.read_csv(f"outputs_time/{p}_ghd_yk_par_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
+            print(yk_res)
             ykp_res["GHD par"] = ykp_res.min(axis=1)
+            print(ykp_res)
         else:
-            yk_res = pd.read_csv(f"outputs_time/ha_{p}_yk.csv", names=["GHD"])
-            ykp_res = pd.read_csv(f"outputs_time/ha_{p}_yk_par.csv", names=["GHD par"])
+            yk_res = pd.read_csv(f"outputs_time/{p}_yk_1.csv", names=["GHD"])
+            ykp_res = pd.read_csv(f"outputs_time/{p}_yk_par_1.csv", names=["GHD par"])
 
         res = pd.merge(yk_res[["GHD"]], ykp_res[["GHD par"]], left_index=True, right_index=True)
         res["diff"] = 100*(1 - res["GHD par"] / res["GHD"])
+        ax = axes[i//2][i%2]
+        ax.set_title(p)
+        ax.set_ylabel('Execution time (s)')
+        bplot, props = res.boxplot(
+            ax=ax,
+            column=["GHD", "GHD par"],
+            patch_artist=True,
+            medianprops=medianprops,
+            showmeans=False,
+            showfliers=False,
+            return_type='both',
+        )
+        colors = ['firebrick', 'gold']
+
+        for patch, color in zip(props['boxes'], colors):
+            patch.set_facecolor(color)
         row = {"Pattern": p, "Mean difference": round(res["diff"].mean(),2), "Median difference": round(res["diff"].median(),2), "Most  hindrance":round(res["diff"].min(),2), "Most improvement":round(res["diff"].max(),2)}
         df.loc[len(df)] = row
-    df.to_csv("outputs/ha_percentages.csv", index=False)
+    handles, labels = plt.gca().get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper center')
+    plt.savefig("outputs/ha_yk_times")
+    df.to_csv("outputs/percentages.csv", index=False)
         
 def timeouts():
     patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "triangle_tadpole", "square_tadpole", "bowtie", "triangle_barbell", "square_barbell", "penta_barbell"]
@@ -159,32 +180,35 @@ def timeouts():
     df = pd.DataFrame(data)
     for i, p in enumerate(patterns):
         if p in multi:
-            df1 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_1.csv", names=["time"])
-            df2 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_2.csv", names=["time"])
-            df3 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_3.csv", names=["time"])
-
-            yk_res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
-            yk_res = pd.merge(yk_res, df3, left_index=True, right_index=True)
+            df1 = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
+            for j in range(2, ghd_confs[p]+1):
+                yk_res = pd.merge(df1, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('_1', f'_{j}'))
             yk_res["GHD"] = yk_res.min(axis=1)
-            df_mj = pd.read_csv(f"outputs_time/ha_{p}_ghd_mj.csv", names=["multijoin"])
+            df1p = pd.read_csv(f"outputs_time/{p}_ghd_yk_par_1.csv", names=["time"])
+            for j in range(1, ghd_confs[p]+1):
+                ykp_res = pd.merge(df1p, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('_1', f'_{j}'))
+            
+            ykp_res["GHD par"] = ykp_res.min(axis=1)
+            df_mj = pd.read_csv(f"outputs_time/{p}_ghd_mj.csv", names=["multijoin"])
         else:
-            yk_res = pd.read_csv(f"outputs_time/ha_{p}_yk.csv", names=["GHD"])
-            df_mj = pd.read_csv(f"outputs_time/ha_{p}_mj.csv", names=["multijoin"])
+            yk_res = pd.read_csv(f"outputs_time/{p}_yk_1.csv", names=["GHD"])
+            ykp_res = pd.read_csv(f"outputs_time/{p}_yk_par_1.csv", names=["GHD par"])
+            df_mj = pd.read_csv(f"outputs_time/{p}_mj.csv", names=["multijoin"])
 
         res = pd.merge(yk_res[["GHD"]], df_mj, left_index=True, right_index=True)
         if "timeout" in res.multijoin.unique():
             row = {"Pattern": p, "Number of timeouts": len(res[res.multijoin=="timeout"]), "Average query time for GHD [s]": round(res[res.multijoin=="timeout"].GHD.mean(),2)}
             df.loc[len(df)] = row
-    df.to_csv("outputs/ha_timeouts.csv", index=False)
+    df.to_csv("outputs/timeouts.csv", index=False)
    
 def size_config():
     multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
     medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
     rdict = {}
     for i, m in enumerate(multi):
-        df1 = pd.read_csv(f"outputs_space/results_ha_{m}_ghd_yk_1.csv")
-        df2 = pd.read_csv(f"outputs_space/results_ha_{m}_ghd_yk_2.csv")
-        df3 = pd.read_csv(f"outputs_space/results_ha_{m}_ghd_yk_3.csv")
+        df1 = pd.read_csv(f"outputs_space/results_{m}_ghd_yk_1.csv")
+        df2 = pd.read_csv(f"outputs_space/results_{m}_ghd_yk_2.csv")
+        df3 = pd.read_csv(f"outputs_space/results_{m}_ghd_yk_3.csv")
         df1["config"]=1
         df2["config"]=2
         df3["config"]=3 
@@ -196,9 +220,9 @@ def size_config():
         res["post mj results"]=res["post mj results"].str.strip("()").str.split('-').map(lambda x: int(x[0])+int(x[1]))
         smallest = list(res.sort_values('post mj results', ascending=False).groupby('query').head(1).sort_values('query').config)
         print(m, smallest)
-        tdf1 = pd.read_csv(f"outputs_time/ha_{m}_ghd_yk_1.csv", names=["time"])
-        tdf2 = pd.read_csv(f"outputs_time/ha_{m}_ghd_yk_2.csv", names=["time"])
-        tdf3 = pd.read_csv(f"outputs_time/ha_{m}_ghd_yk_3.csv", names=["time"])
+        tdf1 = pd.read_csv(f"outputs_time/{m}_ghd_yk_1.csv", names=["time"])
+        tdf2 = pd.read_csv(f"outputs_time/{m}_ghd_yk_2.csv", names=["time"])
+        tdf3 = pd.read_csv(f"outputs_time/{m}_ghd_yk_3.csv", names=["time"])
         tdf1["config"]=1
         tdf2["config"]=2
         tdf3["config"]=3 
@@ -221,9 +245,9 @@ def number_of_results():
 
     for i, p in enumerate(patterns):
         if p in multi:
-            df1 = pd.read_csv(f"outputs_space/ha_{p}_ghd_yk_1.csv")
+            df1 = pd.read_csv(f"outputs_space/{p}_ghd_yk_1.csv")
         else:
-            df1 = pd.read_csv(f"outputs_space/ha_{p}_yk_1.csv")
+            df1 = pd.read_csv(f"outputs_space/{p}_yk_1.csv")
         row = {"Pattern": p, "Avg Results": round(df1["number of results"].mean(),2), "Median Results":  round(df1["number of results"].median(),2)}
         df.loc[len(df)] = row
     df.to_csv("outputs/number_results.csv", index=False)
@@ -238,9 +262,9 @@ def yk_space():
         temp = {"input":[],"inter":[]}
         df_temp = pd.DataFrame(temp)
         if p in multi:
-            tdf1 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_1.csv", names=["time"])
-            tdf2 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_2.csv", names=["time"])
-            tdf3 = pd.read_csv(f"outputs_time/ha_{p}_ghd_yk_3.csv", names=["time"])
+            tdf1 = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
+            tdf2 = pd.read_csv(f"outputs_time/{p}_ghd_yk_2.csv", names=["time"])
+            tdf3 = pd.read_csv(f"outputs_time/{p}_ghd_yk_3.csv", names=["time"])
             tdf1["config"]=1
             tdf2["config"]=2
             tdf3["config"]=3 
@@ -249,9 +273,9 @@ def yk_space():
             tdf3['query'] = np.arange(0, tdf3.shape[0] )
             tres = pd.concat([tdf1,tdf2,tdf3])
             fastest = list(tres.sort_values('time', ascending=True).groupby('query').head(1).sort_values('query').config)
-            df1 = pd.read_csv(f"outputs_space/results_ha_{p}_ghd_yk_1.csv")
-            df2 = pd.read_csv(f"outputs_space/results_ha_{p}_ghd_yk_2.csv")
-            df3 = pd.read_csv(f"outputs_space/results_ha_{p}_ghd_yk_3.csv")
+            df1 = pd.read_csv(f"outputs_space/results_{p}_ghd_yk_1.csv")
+            df2 = pd.read_csv(f"outputs_space/results_{p}_ghd_yk_2.csv")
+            df3 = pd.read_csv(f"outputs_space/results_{p}_ghd_yk_3.csv")
             df1['query'] = np.arange(0, df1.shape[0] )
             df2['query'] = np.arange(0, df2.shape[0] )
             df3['query'] = np.arange(0, df3.shape[0] )
@@ -273,7 +297,7 @@ def yk_space():
             row = {"Pattern": p, "Avg factor input": round( df_temp["input"].mean(),2), "Median factor input": round( df_temp["input"].median(),2), "Avg factor inter": round(df_temp["inter"].mean(),2), "Median factor inter": round(df_temp["inter"].median(),2)}
             df.loc[len(df)] = row
         else:
-            yk_res = pd.read_csv(f"outputs_space/ha_{p}_yk.csv")
+            yk_res = pd.read_csv(f"outputs_space/{p}_yk.csv")
             yk_res["input"] = yk_res['qdags']/yk_res['result']
             yk_res["inter"] = yk_res['post mj']/yk_res['result']
             row = {"Pattern": p, "Avg factor input": round( yk_res["input"].mean(),2), "Median factor input": round( yk_res["input"].median(),2), "Avg factor inter": round(yk_res["inter"].mean(),2), "Median factor inter": round(yk_res["inter"].median(),2)}
@@ -282,9 +306,9 @@ def yk_space():
     df.to_csv("outputs/avg_size.csv", index=False)
 
 '''
-            df1 = pd.read_csv(f"outputs_space/results_ha_{p}_ghd_yk_1.csv")
-            df2 = pd.read_csv(f"outputs_space/results_ha_{p}_ghd_yk_2.csv")
-            df3 = pd.read_csv(f"outputs_space/results_ha_{p}_ghd_yk_3.csv")
+            df1 = pd.read_csv(f"outputs_space/results_{p}_ghd_yk_1.csv")
+            df2 = pd.read_csv(f"outputs_space/results_{p}_ghd_yk_2.csv")
+            df3 = pd.read_csv(f"outputs_space/results_{p}_ghd_yk_3.csv")
             df1["config"]=1
             df2["config"]=2
             df3["config"]=3 
@@ -306,9 +330,9 @@ def bpt():
     res =pd.DataFrame(data)
     for i, p in enumerate(patterns):
         if p in multi:
-            df1 = pd.read_csv(f"outputs_space/results_ha_{p}_ghd_yk_1.csv")
+            df1 = pd.read_csv(f"outputs_space/results_{p}_ghd_yk_1.csv")
         else:
-            df1 = pd.read_csv(f"outputs_space/ha_{p}_yk.csv")
+            df1 = pd.read_csv(f"outputs_space/{p}_yk.csv")
         df1["ratio"]=df1.qdags/df1.tuples
         res = pd.concat([res, df1[["tuples", "qdags", "ratio"]]])
     row = {"average": round( res["ratio"].mean(),2), "median": round( res["ratio"].median(),2)}
@@ -316,4 +340,4 @@ def bpt():
     df.to_csv("outputs/bpt.csv", index=False)
        
 if __name__ == '__main__':
-    yk_space()
+    plot_config()
