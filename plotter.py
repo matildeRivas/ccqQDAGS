@@ -67,7 +67,8 @@ def plot_config():
 def plot_times():
     patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "bowtie", "triangle_tadpole"]
     medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
-
+    data = {"Pattern": [], "Mean MJ": [], "Median MJ": [], "Std. dev. MJ": [], "Mean GHD": [], "Median GHD": [], "Std. dev. GHD": []}
+    df = pd.DataFrame(data)
     fig = plt.figure(layout='constrained', figsize=(10, 10))
     axes = fig.subplots(4, 2)
     fig.suptitle('Times for Original Qdag Variant')
@@ -75,15 +76,16 @@ def plot_times():
 
     for i, p in enumerate(patterns):
         if p in multi:
-            df1 = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
+            yk_res = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
             for j in range(2, ghd_confs[p]+1):
-                yk_res = pd.merge(df1, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('_1', f'_{j}'))
+                yk_res = pd.merge(yk_res, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
             yk_res["GHD"] = yk_res.min(axis=1)
-            df1p = pd.read_csv(f"outputs_time/{p}_ghd_yk_par_1.csv", names=["time"])
-            for j in range(1, ghd_confs[p]+1):
-                ykp_res = pd.merge(df1p, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('_1', f'_{j}'))
-            
+            ykp_res = pd.read_csv(f"outputs_time/{p}_ghd_yk_par_1.csv", names=["time"])
+            for j in range(2, ghd_confs[p]+1):
+                ykp_res = pd.merge(ykp_res, pd.read_csv(f"outputs_time/{p}_ghd_yk_par_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
+            print(yk_res)
             ykp_res["GHD par"] = ykp_res.min(axis=1)
+            print(ykp_res)
             """
             df_np1 = pd.read_csv(f"outputs_time/no_pruning_{p}_ghd_yk_1.csv", names=["time"])
             df_np2 = pd.read_csv(f"outputs_time/no_pruning_{p}_ghd_yk_2.csv", names=["time"])
@@ -122,7 +124,9 @@ def plot_times():
 
         for patch, color in zip(props['boxes'], colors):
             patch.set_facecolor(color)
-
+        row = {"Pattern": p, "Mean MJ": round(res.multijoin.mean(),2), "Median MJ": round(res.multijoin.median(),2), "Std. dev. MJ": round(res.multijoin.std(),2), "Mean GHD": round(res.GHD.mean(),2), "Median GHD": round(res.GHD.median(),2), "Std. dev. GHD": round(res.GHD.std(),2)}
+        df.loc[len(df)] = row
+    df.to_csv("outputs/og_times_stats.csv", index=False)
     handles, labels = plt.gca().get_legend_handles_labels()
     fig.legend(handles, labels, loc='upper center')
     plt.savefig("times")
@@ -181,39 +185,61 @@ def yk_times():
     df = pd.DataFrame(data)
     data = {"GHD": [], "GHD np": [], "diff": []}
     tdf = pd.DataFrame(data)
-    
+    medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
+    fig = plt.figure(layout='constrained', figsize=(10, 10))
+    axes = fig.subplots(4, 2)
+    fig.suptitle('Times for Original Qdag Variant')
     for i, p in enumerate(patterns):
         if p in multi:
-            df1 = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
-            df2 = pd.read_csv(f"outputs_time/{p}_ghd_yk_2.csv", names=["time"])
-            df3 = pd.read_csv(f"outputs_time/{p}_ghd_yk_3.csv", names=["time"])
-
-            yk_res = pd.merge(df1, df2, left_index=True, right_index=True, suffixes=('_1', '_2'))
-            yk_res = pd.merge(yk_res, df3, left_index=True, right_index=True)
+            yk_res = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
+            for j in range(2, ghd_confs[p]+1):
+                yk_res = pd.merge(yk_res, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
             yk_res["GHD"] = yk_res.min(axis=1)
-            df1np = pd.read_csv(f"outputs_time/no_pruning_{p}_ghd_yk_1.csv", names=["time"])
-            df2np = pd.read_csv(f"outputs_time/no_pruning_{p}_ghd_yk_2.csv", names=["time"])
-            df3np = pd.read_csv(f"outputs_time/no_pruning_{p}_ghd_yk_3.csv", names=["time"])
-
-            ykp_res = pd.merge(df1np, df2np, left_index=True, right_index=True)
-            ykp_res = pd.merge(ykp_res, df3np, left_index=True, right_index=True)
-            ykp_res["GHD np"] = ykp_res.min(axis=1)
+            ykp_res = pd.read_csv(f"outputs_time/{p}_ghd_yk_par_1.csv", names=["time"])
+            for j in range(2, ghd_confs[p]+1):
+                ykp_res = pd.merge(ykp_res, pd.read_csv(f"outputs_time/{p}_ghd_yk_par_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
+            print(yk_res)
+            ykp_res["GHD par"] = ykp_res.min(axis=1)
+            print(ykp_res)
         else:
-            yk_res = pd.read_csv(f"outputs_time/{p}_yk.csv", names=["GHD"])
-            ykp_res = pd.read_csv(f"outputs_time/no_pruning_{p}_yk.csv", names=["GHD np"])
+            yk_res = pd.read_csv(f"outputs_time/{p}_yk_1.csv", names=["GHD"])
+            yk_res = pd.read_csv(f"outputs_time/{p}_yk_par_1.csv", names=["GHD"])
+            #ykp_res = pd.read_csv(f"outputs_time/no_pruning_{p}_yk.csv", names=["GHD np"])
 
-        res = pd.merge(yk_res[["GHD"]], ykp_res[["GHD np"]], left_index=True, right_index=True)
-        res["diff"] = 100*(1 - res["GHD"] / res["GHD np"])
+        res = pd.merge(yk_res[["GHD"]], ykp_res[["GHD par"]], left_index=True, right_index=True)
+        res["diff"] = 100*(1 - res["GHD"] / res["GHD par"])
         row = {"Pattern": p, "Mean difference": round(res["diff"].mean(),2), "Median difference": round(res["diff"].median(),2), "Max difference":round(res["diff"].max(),2)}
         df.loc[len(df)] = row
         tdf=pd.concat([tdf, res], ignore_index=True)
+        ax = axes[i//2][i%2]
+        ax.set_title(p)
+        ax.set_ylabel('Execution time (s)')
+        bplot, props = res.boxplot(
+            ax=ax,
+            column=["GHD", "GHD par"],
+            patch_artist=True,
+            medianprops=medianprops,
+            showmeans=False,
+            showfliers=False,
+            return_type='both',
+        )
+        colors = ['firebrick', 'gold']
+
+        for patch, color in zip(props['boxes'], colors):
+            patch.set_facecolor(color)
+        row = {"Pattern": p, "Mean difference": round(res["diff"].mean(),2), "Median difference": round(res["diff"].median(),2), "Most  hindrance":round(res["diff"].min(),2), "Most improvement":round(res["diff"].max(),2)}
+        df.loc[len(df)] = row
+    handles, labels = plt.gca().get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper center')
+    plt.savefig("outputs/og_yk_times")
+    """
     df.to_csv("outputs/pruning_percentages.csv", index=False)
     fig = plt.figure(layout='constrained', figsize=(10, 10))
     fig.suptitle('Percentage change in time when using pruning')
     plt.axvline(linewidth=2, color='r')
     tdf["diff"].hist(bins=10)
     print(tdf)
-    plt.savefig("outputs/pruning_diff")
+    plt.savefig("outputs/pruning_diff")"""
 
 def bpt():
     patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]#, "triangle_tadpole", "bowtie"]
