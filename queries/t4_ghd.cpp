@@ -161,7 +161,7 @@ auto rels = { rel_R, rel_S, rel_T, rel_U};
     }
     else if (strcmp(argv[argc - 1], "7") == 0){
         vector<qdag> Q_root(1);
-        Q_root[0] = qdag_rel_T;
+        Q_root[0] = qdag_rel_U;
 
         vector<qdag> Q_b(3);
         Q_b[0] = qdag_rel_S;
