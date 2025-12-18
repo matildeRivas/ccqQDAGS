@@ -572,7 +572,7 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
         uint64_t rank_vector[nQ][level_size];
 
         k_d[0] = Q[0]->getKD();
-        Q[0]->filterChildren(cur_level, roots[0], C, nQ, children_to_recurse, children_to_recurse_size, k_d[0], result_bv[cur_level]);
+        //Q[0]->filterChildren(cur_level, roots[0], C, nQ, children_to_recurse, children_to_recurse_size, k_d[0], result_bv[cur_level]);
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
             Q[i]->get_children(cur_level, roots[i], C, nQ, children_to_recurse, children_to_recurse_size, rank_vector[i], k_d[i], i);
@@ -608,12 +608,12 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
                 // si se llega al último nivel o si hay resultados en el subárbol, se pone un 1 en la posición para
                 // indicar que hay resultados
                 // check if my children are marked, if they are, mark me.
-                vector<uint64_t> result_children = result_bv[cur_level + 1].get_bits(root_temp[0], Q[0]->Q->getKD());
-                vector<uint64_t> leftQ_children = Q[0]->Q->bv[cur_level + 1].get_bits(root_temp[0], Q[0]->Q->getKD());
+                //vector<uint64_t> result_children = result_bv[cur_level + 1].get_bits(root_temp[0], Q[0]->Q->getKD());
+                //vector<uint64_t> leftQ_children = Q[0]->Q->bv[cur_level + 1].get_bits(root_temp[0], Q[0]->Q->getKD());
 
-                if (result_children == leftQ_children) {
-                    mark_result_bv(result_bv, cur_level, roots[0] + Q[0]->getM(last_pos[cur_level] % p));
-                }
+                //if (result_children == leftQ_children) {
+                //    mark_result_bv(result_bv, cur_level, roots[0] + Q[0]->getM(last_pos[cur_level] % p));
+                //}
                 last_pos[cur_level]++;
 
                 just_zeroes = false;
