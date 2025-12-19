@@ -527,7 +527,6 @@ bool SemiAND(qdag **Q, uint64_t *roots, uint16_t nQ,
     uint64_t children_to_recurse_size = 0;
 
     if (cur_level == max_level) {
-        cout << "cambio" <<endl;
         for (i = 0; i < nQ; ++i) {
             k_d[i] = Q[i]->getKD();
             Q[i]->get_children_lastlevel(roots[i], C, nQ, children_to_recurse, children_to_recurse_size, k_d[i]);
