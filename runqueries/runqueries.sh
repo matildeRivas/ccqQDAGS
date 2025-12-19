@@ -19,7 +19,7 @@ ghd_confs=(
     ["ti3_ghd"]="9"
 )
 
-for pattern in "ti4_ghd" "t3_ghd" "t4_ghd" "ti3_ghd" "square_tadpole" "triangle_barbell" "bowtie" "triangle_tadpole" "j3_ghd" "j4_ghd" "square_barbell" "penta_barbell"
+for pattern in "ti4_ghd" # "t3_ghd" "t4_ghd" "ti3_ghd" "square_tadpole" "triangle_barbell" "bowtie" "triangle_tadpole" "j3_ghd" "j4_ghd" "square_barbell" "penta_barbell"
 do
     params_file="${input_folder}/${pattern}.txt"
     output_file="${output_folder}/${pattern}_mj.csv"
@@ -56,6 +56,7 @@ do
                     echo "segfault" >> $output_file
                     echo "##### segfault #####"
                 fi
+                break
             done < ${params_file}
         done
     done
