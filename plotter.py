@@ -4,18 +4,61 @@ import numpy as np
 
 ghd_confs={
     "bowtie":1,
-    "J3":9,
-    "J4":7,
+    "j3":7,
+    "j4":7,
     "triangle_barbell":1,
     "triangle_tadpole":1,
-    "Ti4":7,
+    "ti4":7,
     "square_tadpole":1,
     "square_barbell":1,
     "penta_barbell":1,
-    "T3":9,
-    "T4":7,
-    "Ti3":9,
+    "t3":7,
+    "t4":7,
+    "ti3":7,
 }
+
+def compare_times():
+    patterns = ["j3", "j4", "t3", "ti3", "t4", "ti4", "triangle_tadpole", "bowtie"]
+    multi = ["j3", "j4", "t3", "ti3", "t4", "ti4"]
+    data = {"Pattern": [], "Mean factor mj": [], "Mean factor ghd": []}
+    df = pd.DataFrame(data)
+    
+    for i, p in enumerate(patterns):
+        if p in multi:
+            yk_res_ha = pd.read_csv(f"outputs_time/{p}_ghd_yk_1.csv", names=["time"])
+            for j in range(2, ghd_confs[p]+1):
+                yk_res_ha = pd.merge(yk_res_ha, pd.read_csv(f"outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
+            yk_res_ha["GHD_ha"] = yk_res_ha.min(axis=1)
+
+            df_mj_ha = pd.read_csv(f"outputs_time/{p}_ghd_mj.csv", names=["multijoin_ha"])
+            
+            yk_res_og = pd.read_csv(f"C:/Users/crist/Documents/resultados_original_qdag/outputs_time/{p}_ghd_yk_1.csv", names=["time"])
+            for j in range(2, ghd_confs[p]+1):
+                yk_res_og = pd.merge(yk_res_og, pd.read_csv(f"C:/Users/crist/Documents/resultados_original_qdag/outputs_time/{p}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
+            yk_res_og["GHD_og"] = yk_res_og.min(axis=1)
+            
+            df_mj_og = pd.read_csv(f"C:/Users/crist/Documents/resultados_original_qdag/outputs_time/{p}_ghd_mj.csv", names=["multijoin_og"])
+        else:
+            df_mj_ha = pd.read_csv(f"outputs_time/{p}_mj.csv", names=["multijoin_ha"])
+            yk_res_ha = pd.read_csv(f"outputs_time/{p}_yk_1.csv", names=["GHD_ha"])
+            yk_res_og = pd.read_csv(f"C:/Users/crist/Documents/resultados_original_qdag/outputs_time/{p}_yk_1.csv", names=["GHD_og"])
+            df_mj_og = pd.read_csv(f"C:/Users/crist/Documents/resultados_original_qdag/outputs_time/{p}_mj.csv", names=["multijoin_og"])
+          
+
+        df_mj_og[df_mj_og['multijoin_og'] == 'timeout'] = 1800
+        df_mj_og["multijoin_og"] = pd.to_numeric(df_mj_og["multijoin_og"], downcast='float')
+        
+        df_mj_ha[df_mj_ha['multijoin_ha'] == 'timeout'] = 1800
+        df_mj_ha["multijoin_ha"] = pd.to_numeric(df_mj_ha["multijoin_ha"], downcast='float')
+        res = pd.merge(yk_res_og[["GHD_og"]], yk_res_ha[["GHD_ha"]], left_index=True, right_index=True)
+        res = pd.merge(res, df_mj_og, left_index=True, right_index=True)
+        res = pd.merge(res, df_mj_ha, left_index=True, right_index=True)
+        res["diff_ghd"] =  res["GHD_ha"]/res["GHD_og"]
+        res["diff_mj"] =  res["multijoin_ha"]/res["multijoin_og"]
+        row = {"Pattern": p, "Mean factor mj":  round(res["diff_mj"].mean(), 2), "Mean factor ghd": round(res["diff_ghd"].mean(), 2)}
+        df.loc[len(df)] = row
+    df.to_csv("outputs/qdag_variant_factor.csv", index=False)
+
 def min_time():
     multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
     for i, m in enumerate(multi):
@@ -29,7 +72,7 @@ def min_time():
 
 
 def plot_config():
-    multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
+    multi = ["j3", "t3", "ti3", "j4", "t4", "ti4"]
     medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
 
     fig = plt.figure(layout='constrained', figsize=(10, 10))
