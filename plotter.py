@@ -4,17 +4,17 @@ import matplotlib.pyplot as plt
 
 ghd_confs={
     "bowtie":1,
-    "J3":9,
-    "J4":7,
+    "j3":7,
+    "j4":7,
     "triangle_barbell":1,
     "triangle_tadpole":1,
-    "Ti4":7,
+    "ti4":7,
     "square_tadpole":1,
     "square_barbell":1,
     "penta_barbell":1,
-    "T3":9,
-    "T4":7,
-    "Ti3":9,
+    "t3":7,
+    "t4":7,
+    "ti3":7,
 }
 def min_time():
     multi = ["J3", "J4", "T3", "Ti3", "T4", "Ti4"]
@@ -28,7 +28,7 @@ def min_time():
         res = res.min(axis=1)
 
 
-def plot_config():
+""" def plot_config():
     multi = ["J3", "T3", "Ti3"] # , "T4", "Ti4", "J4"
     medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
 
@@ -62,7 +62,44 @@ def plot_config():
         for patch, color in zip(props['boxes'], colors):
             patch.set_facecolor(color)
 
-    plt.savefig("outputs/triangle_ghd_configurations")
+    plt.savefig("outputs/triangle_ghd_configurations") """
+
+def plot_config():
+    multi = ["j3", "t3", "ti3","j4",  "t4", "ti4"]
+    medianprops = dict(linestyle='-.', linewidth=2.5, color='black')
+
+    fig = plt.figure(layout='constrained', figsize=(10, 10))
+    axes = fig.subplots(3, 2)
+    fig.suptitle('Times for Different Decompositions in original qdag')
+
+    for i, m in enumerate(multi):
+        res = pd.read_csv(f"outputs_time/{m}_ghd_yk_1.csv", names=["time"])
+        for j in range(2, ghd_confs[m]+1):
+            res = pd.merge(res, pd.read_csv(f"outputs_time/{m}_ghd_yk_{j}.csv", names=["time"]), left_index=True, right_index=True, suffixes=('', f'_{j}'))
+        
+        res=res.set_axis([f'config {x}' for x in range(1, ghd_confs[m]+1)], axis='columns')
+        
+        print(res.columns)
+        
+        ax = axes[i//2][i%2]
+        ax.set_title(m)
+        ax.set_ylabel('Execution time (s)')
+        bplot, props = res.boxplot(
+            ax=ax,   
+            patch_artist=True,
+            medianprops=medianprops,
+            showmeans=False,
+            showfliers=False,
+            return_type='both'
+        )
+        ax.tick_params(axis='x', labelrotation=45)
+
+        colors = ['firebrick', 'gold', 'cornflowerblue', 'saddlebrown', 'lightpink', 'darkseagreen', 'mediumpurple', 'darkorange', 'olive']
+
+        for patch, color in zip(props['boxes'], colors):
+            patch.set_facecolor(color)
+
+    plt.savefig("outputs/ghd_configurations")
 
 def plot_times():
     patterns = ["J3", "J4", "T3", "Ti3", "T4", "Ti4", "bowtie", "triangle_tadpole"]
@@ -345,4 +382,4 @@ def time_comp():
     plt.savefig("outputs/pruning_diff")
 
 if __name__ == '__main__':
-    plot_times()
+    plot_config()
